@@ -17,19 +17,19 @@
     </style>
     
     <style>
-        /* TEMEL RENK PALETİ VE DEĞİŞKENLER (Başlangıçta Siyah & Lacivert) */
+        /* MİNİMALİST KESKİN SİYAH TEMA */
         :root{
-            /* Temel Renkler */
+            /* Varsayılan Renkler (Başlangıçta Siyah & Lacivert) */
             --primary: #5BC0DE; /* Vurgu Rengi (Açık Mavi) */
             --bg: #000000; /* Ana Arka Plan (Siyah) */
-            --card: #0A192F; /* Kart Arka Planı (Koyu Lacivert) */
-            --text: #eaf2ff; /* Metin Rengi */
+            --card: #141414; /* Kart Arka Planı (Koyu Gri/Siyah) */
+            --text: #F0F0F0; /* Metin Rengi */
             
             /* Türetilmiş Renkler */
             --primary-dark: #37A3BB;
-            --muted: #8899A6;
-            --border: #1a345e;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            --muted: #A0A0A0; /* Gri Metin */
+            --border: #333333; /* Hafif Sınır */
+            --shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
             --header-bg: var(--card); 
             --sidebar-bg: var(--card);
             --font-body: 'Inter', sans-serif;
@@ -39,71 +39,69 @@
         *{box-sizing:border-box}
         html,body{height:100%;margin:0;font-family:var(--font-body);color:var(--text);background:var(--bg); transition: background-color 0.3s}
         
-        /* SPLASH SCREEN */
+        /* SPLASH SCREEN - LOGO KUTUSUZ */
         #splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:9999; opacity:1; transition: opacity 0.5s ease-out 2.5s;} 
         .splash-title{
-            font-weight:700;
-            letter-spacing: 5px;
-            font-size:clamp(40px, 10vw, 80px);
+            font-weight:900;
+            letter-spacing: 10px; /* Daha havalı bir boşluk */
+            font-size:clamp(50px, 12vw, 100px);
             color: var(--primary);
-            text-shadow: 0 0 10px var(--primary);
-            padding: 20px 40px;
-            border: 3px solid var(--primary);
+            text-shadow: 0 0 15px rgba(91, 192, 222, 0.7); /* Güçlü neon ışıltı */
             animation: scaleIn 0.5s ease both;
         }
         @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.9); }
+            from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
 
         /* HEADER */
         .header{height:60px;display:flex;align-items:center;gap:16px;padding:0 20px;background:var(--header-bg);color:var(--text);position:fixed;top:0;left:0;right:0;z-index:900;border-bottom:1px solid var(--border); box-shadow: var(--shadow)}
-        .header .brand{font-weight:700;font-size:1.5rem; color:var(--primary)}
+        .header .brand{font-weight:900;font-size:1.6rem; color:var(--primary); text-shadow: 0 0 5px rgba(91, 192, 222, 0.3);}
         .header .actions{margin-left:auto;display:flex;gap:10px;align-items:center}
         
         /* SIDEBAR */
-        .sidebar{width:240px;background:var(--sidebar-bg);height:calc(100vh - 60px);padding:15px;position:fixed;left:0;top:60px;border-right:1px solid var(--border);transition:transform .3s ease;z-index:800; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5)}
+        .sidebar{width:240px;background:var(--sidebar-bg);height:calc(100vh - 60px);padding:15px 0;position:fixed;left:0;top:60px;border-right:1px solid var(--border);transition:transform .3s ease;z-index:800; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5)}
         .sidebar.hidden{transform:translateX(-100%)}
-        .side-btn{display:flex;align-items:center;gap:12px;padding:12px;border-radius:6px;background:transparent;border:0;color:var(--text);cursor:pointer;width:100%;text-align:left; transition: background-color 0.2s, color 0.2s}
-        .side-btn:hover{background:var(--border); color:var(--primary)}
+        .side-btn{display:flex;align-items:center;gap:15px;padding:15px 20px;border-radius:0;background:transparent;border:0;color:var(--text);cursor:pointer;width:100%;text-align:left; transition: background-color 0.2s, color 0.2s}
+        .side-btn:hover{background:#202020; color:var(--primary)}
         .side-btn.active{background:var(--primary); color:var(--card); font-weight:700;}
         .side-btn.active:hover{background:var(--primary-dark)}
 
         /* MAIN CONTENT & CARDS */
-        .main{margin-left:240px;padding:20px;flex:1;min-height:calc(100vh - 60px); transition: margin-left 0.3s}
-        .card{background:var(--card);padding:20px;border-radius:8px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:20px;}
-        .grid-3{display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:15px}
+        .main{margin-left:240px;padding:30px;flex:1;min-height:calc(100vh - 60px); transition: margin-left 0.3s; background: var(--bg)}
+        .card{background:var(--card);padding:25px;border-radius:2px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:25px;}
+        .grid-3{display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:20px}
         
         /* İSTATİSTİK KARTLARI */
-        .stat-card{padding:18px; border-radius:6px; background:var(--bg); border-left:4px solid var(--primary); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);}
-        .stat-title{font-size:0.9rem; color:var(--muted); margin-bottom:5px}
-        .stat-value{font-weight:800;font-size:2.2rem; color:var(--primary);}
+        .stat-card{padding:20px; border-radius:2px; background:var(--card); border-left:5px solid var(--primary); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);}
+        .stat-title{font-size:0.9rem; color:var(--muted); margin-bottom:8px; text-transform:uppercase;}
+        .stat-value{font-weight:900;font-size:2.5rem; color:var(--primary);}
 
         /* FORMLAR & BUTONLAR */
         .form-row{display:flex; gap:15px; margin-bottom:15px; align-items:center; flex-wrap:wrap;}
-        .input, .select{padding:10px 15px;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text); font-size:1rem; transition: border-color 0.2s}
+        .input, .select{padding:12px 15px;border-radius:2px;border:1px solid var(--border);background:var(--bg);color:var(--text); font-size:1rem; transition: border-color 0.2s}
         .input:focus, .select:focus { border-color: var(--primary); outline: none;}
-        .btn{padding:10px 15px;border-radius:4px;cursor:pointer;background:var(--primary);border:none;color:var(--card); font-weight:600; transition: background-color 0.2s}
+        .btn{padding:12px 20px;border-radius:2px;cursor:pointer;background:var(--primary);border:none;color:var(--card); font-weight:600; transition: background-color 0.2s}
         .btn:hover{background:var(--primary-dark)}
         .btn-secondary{background:var(--muted); color:var(--card)}
         .btn-secondary:hover{background:#606060}
-        .label{width:120px; color:var(--muted);}
+        .label{width:150px; color:var(--muted); font-weight:600;}
 
         /* MODAL */
         .modal{position:fixed;inset:0;background:rgba(0,0,0,.8); backdrop-filter: blur(4px);display:flex;align-items:center;justify-content:center;z-index:1000; opacity:0; pointer-events:none; transition: opacity 0.3s}
         .modal.visible{opacity:1; pointer-events:auto}
-        .modal-box{width:90%;max-width:400px;background:var(--card);padding:30px;border-radius:10px; border:1px solid var(--primary);}
+        .modal-box{width:90%;max-width:400px;background:var(--card);padding:30px;border-radius:2px; border:1px solid var(--primary);}
 
         /* TABLO */
         .table{width:100%;border-collapse:collapse; margin-top:15px}
-        .table th,.table td{padding:12px;border-bottom:1px solid var(--border);text-align:left;}
-        .table th{background:rgba(10, 25, 47, 0.5); color:var(--primary); font-weight:700}
+        .table th,.table td{padding:15px;border-bottom:1px solid var(--border);text-align:left;}
+        .table th{background:#000000; color:var(--primary); font-weight:700}
         .table tbody tr:hover{background:rgba(91, 192, 222, 0.05)}
 
         /* UTILS */
         .hidden-panel{display:none}
         .muted{color:var(--muted)}
-        .badge{display:inline-block;padding:4px 10px;border-radius:4px;font-size:0.8rem; font-weight:600}
+        .badge{display:inline-block;padding:4px 10px;border-radius:2px;font-size:0.8rem; font-weight:600}
         .badge.active{background:#28a745; color:#fff}
         .badge.passive{background:#dc3545; color:#fff}
 
@@ -138,98 +136,108 @@
 </nav>
 
 <main class="main">
-    <section id="dashboard" class="card">
-        <h2 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">🎯 Genel Bakış</h2>
-        <div class="grid-3" style="margin-top:20px">
-            <div class="card stat-card">
-                <div class="stat-title">TOPLAM KULLANICI</div>
-                <div class="stat-value" id="statUsers">0</div>
+    <section id="dashboard" class="panel-content">
+        <div class="card">
+            <h2 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">🎯 Genel Bakış</h2>
+            <div class="grid-3" style="margin-top:20px">
+                <div class="stat-card">
+                    <div class="stat-title">TOPLAM KULLANICI</div>
+                    <div class="stat-value" id="statUsers">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">AKTİF KAYITLAR</div>
+                    <div class="stat-value" id="statActive">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">BUGÜN EK.</div>
+                    <div class="stat-value" id="statToday">0</div>
+                </div>
             </div>
-            <div class="card stat-card">
-                <div class="stat-title">AKTİF KAYITLAR</div>
-                <div class="stat-value" id="statActive">0</div>
-            </div>
-            <div class="card stat-card">
-                <div class="stat-title">BUGÜN EK.</div>
-                <div class="stat-value" id="statToday">0</div>
-            </div>
-        </div>
-        <div class="card" style="margin-top:20px">
-            <h3 style="margin-top:0; color:var(--primary)">Haftalık Aktivite Grafiği</h3>
-            <canvas id="visitorsChart" height="100"></canvas>
-        </div>
-    </section>
-
-    <section id="users" class="card hidden-panel">
-        <h2 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">👤 Kullanıcı Yönetimi</h2>
-        <div style="overflow-x:auto;margin-top:20px">
-            <table class="table" id="usersTable">
-                <thead><tr><th>İsim</th><th>Email</th><th>Durum</th><th>İşlem</th></tr></thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </section>
-
-    <section id="add" class="card hidden-panel">
-        <h2 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">✨ Yeni Veri Kaydı</h2>
-        <div class="form-row" style="margin-top:20px;flex-direction:column; gap:15px">
-            <input id="inpName" class="input" placeholder="Kullanıcı Adı" />
-            <input id="inpMail" class="input" placeholder="E-posta Adresi" type="email" />
-            <div style="display:flex;gap:10px;margin-top:10px">
-                <button class="btn" id="addBtn" style="flex:1">Kaydı Sisteme Ekle</button>
-                <button class="btn btn-secondary" id="clearBtn" style="flex:1">Temizle</button>
+            <div class="card" style="margin-top:25px">
+                <h3 style="margin-top:0; color:var(--primary)">Haftalık Aktivite Grafiği</h3>
+                <canvas id="visitorsChart" height="100"></canvas>
             </div>
         </div>
     </section>
 
-    <section id="settings" class="card hidden-panel">
-        <h2 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">🛠️ Sistem Ayarları</h2>
-        <div style="margin-top:20px">
-            <p class="muted">Veri Yönetimi:</p>
-            <button id="exportBtn" class="btn" style="margin-top:10px">Verileri Dışa Aktar (JSON)</button>
+    <section id="users" class="panel-content hidden-panel">
+        <div class="card">
+            <h2 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">👤 Kullanıcı Yönetimi</h2>
+            <div style="overflow-x:auto;margin-top:20px">
+                <table class="table" id="usersTable">
+                    <thead><tr><th>İsim</th><th>Email</th><th>Durum</th><th>İşlem</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
-        <hr style="border:none; border-top:1px dashed var(--border); margin:20px 0"/>
-        <p class="muted">Admin Panelini Yapılandırma:</p>
-        <button id="openAdminPanel" class="btn">Admin Renk Ayarlarına Git</button>
+    </section>
+
+    <section id="add" class="panel-content hidden-panel">
+        <div class="card">
+            <h2 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">✨ Yeni Veri Kaydı</h2>
+            <div class="form-row" style="margin-top:20px;flex-direction:column; gap:15px">
+                <input id="inpName" class="input" placeholder="Kullanıcı Adı" />
+                <input id="inpMail" class="input" placeholder="E-posta Adresi" type="email" />
+                <div style="display:flex;gap:10px;margin-top:10px">
+                    <button class="btn" id="addBtn" style="flex:1">Kaydı Sisteme Ekle</button>
+                    <button class="btn btn-secondary" id="clearBtn" style="flex:1">Temizle</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="settings" class="panel-content hidden-panel">
+        <div class="card">
+            <h2 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">🛠️ Sistem Ayarları</h2>
+            <div style="margin-top:20px">
+                <p class="muted">Veri Yönetimi:</p>
+                <button id="exportBtn" class="btn" style="margin-top:10px">Verileri Dışa Aktar (JSON)</button>
+            </div>
+            <hr style="border:none; border-top:1px dashed var(--border); margin:20px 0"/>
+            <p class="muted">Admin Panelini Yapılandırma:</p>
+            <button id="openAdminPanel" class="btn">Admin Renk Ayarlarına Git</button>
+        </div>
     </section>
     
-    <section id="admin-panel" class="card hidden-panel">
-        <h2 style="color:#FFD700; border-bottom:1px solid var(--border); padding-bottom:10px;">⚙️ Admin Ayarları & Renk Paleti</h2>
-        
-        <h3 style="color:var(--primary); margin-top:20px;">Tema Renklerini Ayarla (HEX Kod)</h3>
-        
-        <div class="form-settings">
-            <div class="form-row">
-                <div class="label">Vurgu Rengi (--primary)</div>
-                <input id="color-primary" class="input" type="color" value="#5BC0DE" style="width:60px; height:40px; padding:0; border:none;"/>
-                <input id="color-primary-hex" class="input" type="text" placeholder="#HEX" style="flex:1; max-width:120px;"/>
-            </div>
+    <section id="admin-panel" class="panel-content hidden-panel">
+        <div class="card">
+            <h2 style="color:#FFD700; border-bottom:1px solid var(--border); padding-bottom:10px;">⚙️ Admin Ayarları & Renk Paleti</h2>
             
-            <div class="form-row">
-                <div class="label">Arka Plan (--bg)</div>
-                <input id="color-bg" class="input" type="color" value="#000000" style="width:60px; height:40px; padding:0; border:none;"/>
-                <input id="color-bg-hex" class="input" type="text" placeholder="#HEX" style="flex:1; max-width:120px;"/>
-            </div>
-
-            <div class="form-row">
-                <div class="label">Kart Arka Planı (--card)</div>
-                <input id="color-card" class="input" type="color" value="#0A192F" style="width:60px; height:40px; padding:0; border:none;"/>
-                <input id="color-card-hex" class="input" type="text" placeholder="#HEX" style="flex:1; max-width:120px;"/>
-            </div>
+            <h3 style="color:var(--primary); margin-top:20px;">Tema Renklerini Ayarla (HEX Kod)</h3>
             
-            <div class="form-row">
-                <div class="label">Metin Rengi (--text)</div>
-                <input id="color-text" class="input" type="color" value="#EAF2FF" style="width:60px; height:40px; padding:0; border:none;"/>
-                <input id="color-text-hex" class="input" type="text" placeholder="#HEX" style="flex:1; max-width:120px;"/>
+            <div class="form-settings">
+                <div class="form-row">
+                    <div class="label">Vurgu Rengi (--primary)</div>
+                    <input id="color-primary" class="input" type="color" value="#5BC0DE" style="width:60px; height:40px; padding:0; border:none;"/>
+                    <input id="color-primary-hex" class="input" type="text" placeholder="#HEX" style="flex:1; max-width:120px;"/>
+                </div>
+                
+                <div class="form-row">
+                    <div class="label">Arka Plan (--bg)</div>
+                    <input id="color-bg" class="input" type="color" value="#000000" style="width:60px; height:40px; padding:0; border:none;"/>
+                    <input id="color-bg-hex" class="input" type="text" placeholder="#HEX" style="flex:1; max-width:120px;"/>
+                </div>
+
+                <div class="form-row">
+                    <div class="label">Kart Arka Planı (--card)</div>
+                    <input id="color-card" class="input" type="color" value="#141414" style="width:60px; height:40px; padding:0; border:none;"/>
+                    <input id="color-card-hex" class="input" type="text" placeholder="#HEX" style="flex:1; max-width:120px;"/>
+                </div>
+                
+                <div class="form-row">
+                    <div class="label">Metin Rengi (--text)</div>
+                    <input id="color-text" class="input" type="color" value="#F0F0F0" style="width:60px; height:40px; padding:0; border:none;"/>
+                    <input id="color-text-hex" class="input" type="text" placeholder="#HEX" style="flex:1; max-width:120px;"/>
+                </div>
+
+                <button id="saveColorsBtn" class="btn" style="width:100%; margin-top:15px;">Renkleri Uygula & Kaydet</button>
             </div>
 
-            <button id="saveColorsBtn" class="btn" style="width:100%; margin-top:15px;">Renkleri Uygula & Kaydet</button>
-        </div>
-
-        <h3 style="color:var(--primary); margin-top:30px;">Admin Şifresini Değiştir</h3>
-        <div class="form-settings">
-            <input id="newAdminCode" class="input" placeholder="Yeni Admin Kodu (Mevcut: ****)" type="password" style="width:100%; margin-bottom:10px;"/>
-            <button id="changeAdminCodeBtn" class="btn btn-secondary" style="width:100%;">Admin Kodunu Güncelle</button>
+            <h3 style="color:var(--primary); margin-top:30px;">Admin Şifresini Değiştir</h3>
+            <div class="form-settings">
+                <input id="newAdminCode" class="input" placeholder="Yeni Admin Kodu (Mevcut: ****)" type="password" style="width:100%; margin-bottom:10px;"/>
+                <button id="changeAdminCodeBtn" class="btn btn-secondary" style="width:100%;">Admin Kodunu Güncelle</button>
+            </div>
         </div>
     </section>
 
@@ -250,11 +258,10 @@
 
 <script>
 // --- App state & helpers ---
-const DEFAULT_COLORS = {primary: '#5BC0DE', bg: '#000000', card: '#0A192F', text: '#EAF2FF'};
-const LOCAL_STORAGE_KEY_COLORS = 'eroglu_colors';
-const LOCAL_STORAGE_KEY_ADMIN = 'eroglu_admin_code';
-let users = JSON.parse(localStorage.getItem('rp_users')||'[]');
-// Başlangıç admin kodu 6161
+const DEFAULT_COLORS = {primary: '#5BC0DE', bg: '#000000', card: '#141414', text: '#F0F0F0'};
+const LOCAL_STORAGE_KEY_COLORS = 'eroglu_colors_v2';
+const LOCAL_STORAGE_KEY_ADMIN = 'eroglu_admin_code_v2';
+let users = JSON.parse(localStorage.getItem('rp_users_v2')||'[]');
 let ADMIN_CODE = localStorage.getItem(LOCAL_STORAGE_KEY_ADMIN) || '6161'; 
 let isAdminLoggedIn = false;
 
@@ -283,7 +290,7 @@ function loadColors() {
     let colors = DEFAULT_COLORS;
     try {
         colors = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_COLORS)) || DEFAULT_COLORS;
-    } catch(e) { /* Hata yoksayılır */ }
+    } catch(e) { console.error("Renk yükleme hatası:", e); }
     
     // Tema renklerini uygulamak
     htmlEl.style.setProperty('--primary', colors.primary);
@@ -291,9 +298,6 @@ function loadColors() {
     htmlEl.style.setProperty('--card', colors.card);
     htmlEl.style.setProperty('--text', colors.text);
     
-    // Türetilmiş renkleri hesaplamak (daha basit bir yol: CSS'e bırakmak, ancak bazıları JS'te ayarlanmalıydı)
-    // Şimdilik sadece ana 4 rengi ayarlıyoruz, diğerleri CSS'te var olan değişkenleri kullanıyor.
-
     // Ayarlar inputlarını doldur
     document.getElementById('color-primary').value = colors.primary;
     document.getElementById('color-bg').value = colors.bg;
@@ -310,12 +314,20 @@ function loadColors() {
 
 function saveAndApplyColors() {
     const newColors = {
-        primary: document.getElementById('color-primary').value.toUpperCase(),
-        bg: document.getElementById('color-bg').value.toUpperCase(),
-        card: document.getElementById('color-card').value.toUpperCase(),
-        text: document.getElementById('color-text').value.toUpperCase(),
+        primary: document.getElementById('color-primary-hex').value.toUpperCase(),
+        bg: document.getElementById('color-bg-hex').value.toUpperCase(),
+        card: document.getElementById('color-card-hex').value.toUpperCase(),
+        text: document.getElementById('color-text-hex').value.toUpperCase(),
     };
     
+    // HEX kontrolü (Basit)
+    for (const key in newColors) {
+        if (!/^#[0-9A-F]{6}$/.test(newColors[key])) {
+            alert('Hata: Lütfen tüm renkler için geçerli 6 haneli HEX kodu girin (örn: #AABBCC).');
+            return;
+        }
+    }
+
     localStorage.setItem(LOCAL_STORAGE_KEY_COLORS, JSON.stringify(newColors));
     loadColors(); // Yeni renkleri uygula
     alert('Tema renkleri başarıyla güncellendi ve kaydedildi.');
@@ -335,6 +347,8 @@ function handleAuthSubmit() {
         authModal.classList.remove('visible');
         adminSettingsBtn.classList.remove('hidden'); // Admin butonu gör
         showPanel('admin-panel');
+        // İlgili ayar panelini açtıktan sonra tekrar Dashboard'a dönebilir
+        // showPanel('dashboard');
         alert('Admin girişi başarılı! Artık Ayarlar panelini kullanabilirsiniz.');
     } else {
         document.getElementById('authErr').style.display = 'block';
@@ -392,7 +406,7 @@ function showPanel(id){
     panels[id].classList.remove('hidden-panel');
     document.querySelector('.main').scrollTop=0; 
     
-    // Admin paneline geçiş yaparken renkleri tekrar yükle (değişiklikleri anında görmek için)
+    // Admin paneline geçiş yaparken renkleri tekrar yükle
     if (id === 'admin-panel') loadColors(); 
 }
 
@@ -407,24 +421,40 @@ document.getElementById('openAdminPanel').addEventListener('click', () => {
         showAuthModal();
     }
 });
-adminSettingsBtn.addEventListener('click', () => showPanel('admin-panel'));
+adminSettingsBtn.addEventListener('click', () => {
+    if (isAdminLoggedIn) {
+        showPanel('admin-panel');
+    } else {
+         // Eğer admin butonu tıklanıyorsa ve giriş yapılmadıysa, settings paneline düşür.
+         showPanel('settings');
+         alert('Admin ayarlarını görmek için öncelikle yetkili kod ile giriş yapmalısınız.');
+    }
+});
 document.getElementById('authSubmit').addEventListener('click', handleAuthSubmit);
 document.getElementById('authCancel').addEventListener('click', () => authModal.classList.remove('visible'));
 
-// Renk Inputları Senkronizasyonu
+// Renk Inputları Senkronizasyonu (Renk seçiciden HEX inputa)
 document.querySelectorAll('.form-settings input[type="color"]').forEach(input => {
     input.addEventListener('input', (e) => {
         document.getElementById(e.target.id + '-hex').value = e.target.value.toUpperCase();
+        
+        // Önizleme için hemen uygula (Kaydet butonuna basmadan)
+        htmlEl.style.setProperty('--' + e.target.id.replace('color-', ''), e.target.value);
+        if(window.visitorsChart) renderChart();
     });
 });
+
+// Renk Inputları Senkronizasyonu (HEX inputtan renk seçiciye)
 document.querySelectorAll('.form-settings input[type="text"]').forEach(input => {
     input.addEventListener('input', (e) => {
-        // Sadece valid hex kodları al
-        if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
-            document.getElementById(e.target.id.replace('-hex', '')).value = e.target.value.toUpperCase();
-            // Renk önizlemesi
-            htmlEl.style.setProperty('--' + e.target.id.replace('color-', '').replace('-hex', ''), e.target.value);
-            if(window.visitorsChart) renderChart(); // Grafiği güncelle
+        const hex = e.target.value.toUpperCase();
+        // Basit validasyon: # ile başla ve 6 karakter hex olsun
+        if (/^#[0-9A-F]{6}$/i.test(hex)) {
+            document.getElementById(e.target.id.replace('-hex', '')).value = hex;
+            
+            // Önizleme için hemen uygula
+            htmlEl.style.setProperty('--' + e.target.id.replace('color-', '').replace('-hex', ''), hex);
+            if(window.visitorsChart) renderChart();
         }
     });
 });
@@ -470,15 +500,15 @@ document.getElementById('addBtn').addEventListener('click',()=>{
     const mail=document.getElementById('inpMail').value.trim();
     if(!name||!mail){alert('Lütfen tüm alanları doldurun!');return;}
     users.push({name,mail,active:true,created:new Date().toISOString()});
-    localStorage.setItem('rp_users',JSON.stringify(users));
+    localStorage.setItem('rp_users_v2',JSON.stringify(users));
     document.getElementById('inpName').value='';
     document.getElementById('inpMail').value='';
     renderUsers();
 });
 
 document.getElementById('clearBtn').addEventListener('click',()=>{document.getElementById('inpName').value='';document.getElementById('inpMail').value=''});
-function delUser(i){if(!confirm('Bu kaydı silmek istediğinizden emin misiniz?')) return;users.splice(i,1);localStorage.setItem('rp_users',JSON.stringify(users));renderUsers()}
-function editUser(i){const n=prompt('Yeni isim girin:',users[i].name);const m=prompt('Yeni email girin:',users[i].mail);if(n&&m){users[i].name=n;users[i].mail=m;localStorage.setItem('rp_users',JSON.stringify(users));renderUsers()}}
+function delUser(i){if(!confirm('Bu kaydı silmek istediğinizden emin misiniz?')) return;users.splice(i,1);localStorage.setItem('rp_users_v2',JSON.stringify(users));renderUsers()}
+function editUser(i){const n=prompt('Yeni isim girin:',users[i].name);const m=prompt('Yeni email girin:',users[i].mail);if(n&&m){users[i].name=n;users[i].mail=m;localStorage.setItem('rp_users_v2',JSON.stringify(users));renderUsers()}}
 
 document.getElementById('exportBtn').addEventListener('click',()=>{
     const data='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(users, null, 2));
