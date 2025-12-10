@@ -1,152 +1,205 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EROĞLU | TV Servis Yönetimi</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-/* Temel stil ve renkler */
-:root{--primary:#FF5733;--bg:#0A0A0A;--card:#1C1C1C;--text:#F0F0F0;--primary-dark:#CC472A;--muted:#888;--border:#333;--shadow:0 5px 20px rgba(0,0,0,0.8);--header-bg:var(--card);--sidebar-bg:var(--card);--font-body:'Poppins',sans-serif}
-*{box-sizing:border-box}html,body{height:100%;margin:0;font-family:var(--font-body);color:var(--text);background:var(--bg);transition:background-color 0.3s}
-#splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:9999;opacity:1;transition:opacity 0.5s ease-out 2.5s;}
+:root{
+    --primary: #FF5733;
+    --bg: #0A0A0A;
+    --card: #1C1C1C;
+    --text: #F0F0F0;
+    --primary-dark: #CC472A;
+    --muted: #888888;
+    --border: #333333;
+    --shadow: 0 5px 20px rgba(0,0,0,0.8);
+    --header-bg: var(--card); 
+    --sidebar-bg: var(--card);
+    --font-body: 'Poppins', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font-body);color:var(--text);background:var(--bg);transition:background 0.3s}
+#splash{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:var(--bg);z-index:9999;opacity:1;transition:opacity 0.5s ease-out 2.5s;}
 .splash-title{font-weight:900;letter-spacing:12px;font-size:clamp(60px,14vw,120px);color:var(--primary);text-shadow:0 0 8px var(--primary);animation:textReveal 1s ease both;}
-@keyframes textReveal{from{opacity:0;transform:translateY(20px);filter:blur(10px);}to{opacity:1;transform:translateY(0);filter:blur(0);}}
-.header{height:60px;display:flex;align-items:center;gap:16px;padding:0 20px;background:var(--header-bg);color:var(--text);position:fixed;top:0;left:0;right:0;z-index:900;border-bottom:1px solid var(--border);box-shadow:var(--shadow)}
+@keyframes textReveal{from{opacity:0;transform:translateY(20px);filter:blur(10px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+.header{height:60px;display:flex;align-items:center;gap:16px;padding:0 20px;background:var(--header-bg);color:var(--text);position:fixed;top:0;left:0;right:0;z-index:900;border-bottom:1px solid var(--border);box-shadow: var(--shadow)}
 .header .brand{font-weight:900;font-size:1.6rem;color:var(--primary)}
 .header .actions{margin-left:auto;display:flex;gap:10px;align-items:center}
 .sidebar{width:240px;background:var(--sidebar-bg);height:calc(100vh - 60px);padding:15px 0;position:fixed;left:0;top:60px;border-right:1px solid var(--border);transition:transform .3s ease;z-index:800;box-shadow:2px 0 5px rgba(0,0,0,0.5)}
 .sidebar.hidden{transform:translateX(-100%)}
-.side-btn{display:flex;align-items:center;gap:15px;padding:15px 20px;border-radius:0;background:transparent;border:0;color:var(--text);cursor:pointer;width:100%;text-align:left;transition:background-color 0.2s,color 0.2s}
+.side-btn{display:flex;align-items:center;gap:15px;padding:15px 20px;border-radius:0;background:transparent;border:0;color:var(--text);cursor:pointer;width:100%;text-align:left;transition:background 0.2s,color 0.2s}
 .side-btn:hover{background:#282828;color:var(--primary)}
 .side-btn.active{background:var(--primary);color:var(--card);font-weight:700}
 .side-btn.active:hover{background:var(--primary-dark)}
 .main{margin-left:240px;padding:30px;flex:1;min-height:calc(100vh - 60px);transition:margin-left 0.3s;background:var(--bg)}
-.card{background:var(--card);padding:25px;border-radius:2px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:25px}
+.card{background:var(--card);padding:25px;border-radius:2px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:25px;}
 .grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
-.stat-card{padding:20px;border-radius:2px;background:var(--card);border-left:5px solid var(--primary);box-shadow:0 2px 5px rgba(0,0,0,0.3)}
-.stat-title{font-size:0.9rem;color:var(--muted);margin-bottom:8px;text-transform:uppercase}
-.stat-value{font-weight:900;font-size:2.5rem;color:var(--primary)}
-.form-row{display:flex;gap:15px;margin-bottom:15px;align-items:center;flex-wrap:wrap}
-.input,.select,.textarea{padding:12px 15px;border-radius:2px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:1rem;transition:border-color 0.2s;width:100%}
+.stat-card{padding:20px;border-radius:2px;background:var(--card);border-left:5px solid var(--primary);box-shadow:0 2px 5px rgba(0,0,0,0.3);}
+.stat-title{font-size:0.9rem;color:var(--muted);margin-bottom:8px;text-transform:uppercase;}
+.stat-value{font-weight:900;font-size:2.5rem;color:var(--primary);}
+.form-row{display:flex;gap:15px;margin-bottom:15px;align-items:center;flex-wrap:wrap;}
+.input,.select,.textarea{padding:12px 15px;border-radius:2px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:1rem;width:100%;transition:border-color 0.2s}
 .input:focus,.select:focus,.textarea:focus{border-color:var(--primary);outline:none}
 .textarea{resize:vertical;min-height:80px}
-.btn{padding:12px 20px;border-radius:2px;cursor:pointer;background:var(--primary);border:none;color:var(--card);font-weight:600;transition:background-color 0.2s}
+.btn{padding:12px 20px;border-radius:2px;cursor:pointer;background:var(--primary);border:none;color:var(--card);font-weight:600;transition:background 0.2s}
 .btn:hover{background:var(--primary-dark)}
 .btn-secondary{background:var(--muted);color:var(--card)}
 .btn-secondary:hover{background:#606060}
 .label{width:150px;color:var(--muted);font-weight:600}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity 0.3s}
+.modal.visible{opacity:1;pointer-events:auto}
+.modal-box{width:90%;max-width:400px;background:var(--card);padding:30px;border-radius:2px;border:1px solid var(--primary)}
+.table{width:100%;border-collapse:collapse;margin-top:15px}
+.table th,.table td{padding:15px;border-bottom:1px solid var(--border);text-align:left}
+.table th{background:var(--bg);color:var(--primary);font-weight:700}
+.table tbody tr:hover{background:rgba(255,87,51,0.05)}
 .hidden-panel{display:none}
 .muted{color:var(--muted)}
 .badge{display:inline-block;padding:4px 10px;border-radius:2px;font-size:0.8rem;font-weight:600}
 .badge.active{background:#28a745;color:#fff}
 .badge.passive{background:#dc3545;color:#fff}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity 0.3s}
-.modal.visible{opacity:1;pointer-events:auto}
-.modal-box{width:90%;max-width:400px;background:var(--card);padding:30px;border-radius:2px;border:1px solid var(--primary)}
-@media(max-width:900px){.sidebar{width:100%;height:calc(100vh - 60px);top:60px}.main{margin-left:0;padding:15px}.hamburger{display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--primary)}.sidebar.hidden{transform:translateX(-100%)}}
+.hamburger{display:none;font-size:1.2rem;color:var(--primary);cursor:pointer}
+@media(max-width:900px){.sidebar{width:100%;height:calc(100vh - 60px);top:60px}.main{margin-left:0;padding:15px}.hamburger{display:flex;align-items:center;justify-content:center}.sidebar.hidden{transform:translateX(-100%)}} 
 </style>
 </head>
 <body>
-
 <div id="splash"><div class="splash-title">EROĞLU</div></div>
 
 <header class="header">
-<button class="hamburger" id="hambBtn" aria-label="menü">☰</button>
-<div class="brand">EROĞLU</div>
-<div class="actions">
-<button id="adminSettingsBtn" class="btn hidden" style="padding:8px 15px;font-size:0.9rem;">⚙️ Admin Ayarları</button>
-</div>
+    <button class="hamburger" id="hambBtn">☰</button>
+    <div class="brand">EROĞLU</div>
+    <div class="actions">
+        <button id="adminSettingsBtn" class="btn hidden">Admin Ayarları</button>
+    </div>
 </header>
 
 <nav id="sidebar" class="sidebar hidden">
-<button class="side-btn active" data-panel="dashboard">📊 Servis Özeti</button>
-<button class="side-btn" data-panel="records">📑 Servis Kayıtları</button>
-<button class="side-btn" data-panel="add">➕ Yeni Servis Girişi</button>
-<button class="side-btn" data-panel="settings">🛠️ Ayarlar</button>
+    <button class="side-btn active" data-panel="dashboard">Servis Özeti</button>
+    <button class="side-btn" data-panel="records">Servis Kayıtları</button>
+    <button class="side-btn" data-panel="add">Yeni Servis Girişi</button>
+    <button class="side-btn" data-panel="settings">Ayarlar</button>
 </nav>
 
 <main class="main">
-<!-- Dashboard -->
 <section id="dashboard" class="panel-content">
-<div class="card">
-<h2 style="color:var(--primary);border-bottom:1px solid var(--border);padding-bottom:10px;">📊 Servis Özeti</h2>
-<div class="grid-3" style="margin-top:20px">
-<div class="stat-card"><div class="stat-title">TOPLAM SERVİS KAYDI</div><div class="stat-value" id="statRecords">0</div></div>
-<div class="stat-card"><div class="stat-title">GARANTİSİ SÜREN İŞLEM</div><div class="stat-value" id="statActiveWarranty">0</div></div>
-<div class="stat-card"><div class="stat-title">BU AY EKLENEN İŞLEM</div><div class="stat-value" id="statThisMonth">0</div></div>
-</div>
-<div class="card" style="margin-top:25px"><h3 style="margin-top:0;color:var(--primary)">Haftalık İşlem Grafiği</h3>
-<canvas id="visitorsChart" height="100"></canvas></div>
-</div>
+    <div class="card">
+        <h2 style="color:var(--primary)">📊 Servis Özeti</h2>
+        <div class="grid-3" style="margin-top:20px">
+            <div class="stat-card"><div class="stat-title">Toplam Kayıt</div><div class="stat-value" id="statRecords">0</div></div>
+            <div class="stat-card"><div class="stat-title">Garantisi Süren İşlem</div><div class="stat-value" id="statActiveWarranty">0</div></div>
+            <div class="stat-card"><div class="stat-title">Bu Ay Eklenen</div><div class="stat-value" id="statThisMonth">0</div></div>
+        </div>
+        <div class="card" style="margin-top:25px"><h3 style="color:var(--primary)">Haftalık İşlem Grafiği</h3><canvas id="visitorsChart" height="100"></canvas></div>
+    </div>
 </section>
 
-<!-- Records -->
 <section id="records" class="panel-content hidden-panel">
 <div class="card">
-<h2 style="color:var(--primary);border-bottom:1px solid var(--border);padding-bottom:10px;">📑 Servis Kayıtları Listesi</h2>
+<h2 style="color:var(--primary)">📑 Servis Kayıtları Listesi</h2>
 <div style="overflow-x:auto;margin-top:20px">
 <table class="table" id="recordsTable">
-<thead>
-<tr><th>TV Kod/Seri</th><th>Model</th><th>İşlem</th><th>Kayıt Tarihi</th><th>Garanti Bitiş</th><th>İşlem</th></tr>
-</thead>
+<thead><tr><th>TV Kod/Seri</th><th>Model</th><th>İşlem</th><th>Kayıt Tarihi</th><th>Garanti Bitiş</th><th>İşlem</th></tr></thead>
 <tbody></tbody>
 </table>
 </div>
 </div>
 </section>
 
-<!-- Add Record -->
 <section id="add" class="panel-content hidden-panel">
 <div class="card">
-<h2 style="color:var(--primary);border-bottom:1px solid var(--border);padding-bottom:10px;">➕ Yeni Servis Girişi</h2>
+<h2 style="color:var(--primary)">➕ Yeni Servis Girişi</h2>
 <div style="margin-top:20px;">
-<div class="form-row"><label class="label">TV Kod/Seri No:</label><input id="inpCode" class="input" placeholder="Müşteri Kodu veya TV Seri No" type="text" style="flex:1"/></div>
-<div class="form-row"><label class="label">TV Modeli:</label><input id="inpModel" class="input" placeholder="Örn: Samsung QLED 55" type="text" style="flex:1"/></div>
+<div class="form-row"><label class="label">TV Kod/Seri No:</label><input id="inpCode" class="input" placeholder="TV Seri No"></div>
+<div class="form-row"><label class="label">TV Modeli:</label><input id="inpModel" class="input" placeholder="Örn: Samsung QLED 55"></div>
 <div class="form-row"><label class="label">Yapılan İşlem:</label>
-<select id="inpProcess" class="select" style="flex:1">
-<option value="Led Değişim">Led Değişim</option>
+<select id="inpProcess" class="select">
+<option value="LED Değişim">LED Değişim</option>
 <option value="Panel Değişim">Panel Değişim</option>
-<option value="Kamera Okuma">Kamera/Barkod Okuma</option>
+<option value="Kamera Onarım">Kamera Onarım</option>
 <option value="Diğer">Diğer</option>
-</select>
+</select></div>
+<div class="form-row"><label class="label">İşlem Detayları:</label><textarea id="inpNotes" class="textarea"></textarea></div>
+<div class="form-row"><label class="label">Garanti Bitiş Tarihi:</label><input id="inpWarrantyDate" class="input" type="date" placeholder="Opsiyonel"></div>
+<div style="display:flex;gap:10px;margin-top:20px">
+<button class="btn" id="addRecordBtn" style="flex:1">Kaydı Ekle</button>
+<button class="btn btn-secondary" id="clearBtn" style="flex:1">Formu Temizle</button>
 </div>
-<h3 style="color:var(--muted);margin-top:30px;border-bottom:1px solid var(--border);padding-bottom:5px;">Ek Detaylar & Garanti</h3>
-<div class="form-row"><label class="label">İşlem Detayları (El ile):</label><textarea id="inpNotes" class="textarea" placeholder="Ekstra Notlar" style="flex:1"></textarea></div>
-<div class="form-row"><label class="label">Garanti Bitiş Tarihi:</label><input id="inpWarrantyDate" class="input" type="date" style="flex:1"/></div>
-<p class="muted" style="font-size:0.9rem;margin-top:-10px;">*(Manuel tarih girilmezse, otomatik 1 yıl garanti eklenir.)</p>
-<div style="display:flex;gap:10px;margin-top:20px"><button class="btn" id="addRecordBtn" style="flex:1">Kaydı Sisteme Ekle</button><button class="btn btn-secondary" id="clearBtn" style="flex:1">Formu Temizle</button></div>
 </div>
 </div>
 </section>
 
+<section id="settings" class="panel-content hidden-panel">
+<div class="card">
+<h2 style="color:var(--primary)">🛠️ Sistem Ayarları</h2>
+<button id="exportBtn" class="btn" style="margin-top:10px">Verileri Dışa Aktar (JSON)</button>
+<hr style="margin:20px 0;border-top:1px dashed var(--border)">
+<button id="openAdminPanel" class="btn">Admin Paneline Git</button>
+</div>
+</section>
+
+<section id="admin-panel" class="panel-content hidden-panel">
+<div class="card">
+<h2 style="color:#FFD700">⚙️ Admin Ayarları</h2>
+<div class="form-row"><label class="label">Renk Paleti (HEX)</label>
+<input type="color" id="color-primary" value="#FF5733"><input type="text" id="color-primary-hex" value="#FF5733" style="flex:1;max-width:120px"></div>
+<div class="form-row"><label class="label">Arka Plan</label>
+<input type="color" id="color-bg" value="#0A0A0A"><input type="text" id="color-bg-hex" value="#0A0A0A" style="flex:1;max-width:120px"></div>
+<button id="saveColorsBtn" class="btn" style="width:100%;margin-top:15px">Renkleri Kaydet</button>
+
+<h3 style="color:var(--primary);margin-top:20px">Admin Şifre Değiştir</h3>
+<input type="password" id="newAdminCode" class="input" placeholder="Yeni Şifre" style="width:100%;margin-bottom:10px">
+<button id="changeAdminCodeBtn" class="btn btn-secondary" style="width:100%">Güncelle</button>
+</div>
+</section>
 </main>
 
+<div id="authModal" class="modal">
+<div class="modal-box">
+<h3 style="color:var(--primary)">🔒 Admin Girişi</h3>
+<input type="password" id="authCodeInput" class="input" placeholder="Şifre"><br><br>
+<div style="display:flex;justify-content:flex-end;gap:10px">
+<button class="btn btn-secondary" id="authCancel">İptal</button>
+<button class="btn" id="authSubmit">Giriş</button>
+</div>
+<p id="authErr" style="color:#dc3545;display:none;margin-top:10px;text-align:right">Hatalı şifre!</p>
+</div>
+</div>
+
 <script>
-// LocalStorage ve Admin Ayarları
-const LOCAL_STORAGE_KEY_RECORDS = 'eroglu_records_v4';
-const LOCAL_STORAGE_KEY_ADMIN = 'eroglu_admin_code_v4';
-let records = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_RECORDS)||'[]');
-let ADMIN_CODE = localStorage.getItem(LOCAL_STORAGE_KEY_ADMIN)||'6161';
+const DEFAULT_COLORS={primary:'#FF5733',bg:'#0A0A0A',card:'#1C1C1C',text:'#F0F0F0'};
+const LOCAL_STORAGE_KEY_COLORS='eroglu_colors_v5';
+const LOCAL_STORAGE_KEY_ADMIN='eroglu_admin_code_v5';
+const LOCAL_STORAGE_KEY_RECORDS='eroglu_records_v5';
+
+let records=JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_RECORDS)||'[]');
+let ADMIN_CODE=localStorage.getItem(LOCAL_STORAGE_KEY_ADMIN)||'6161';
 let isAdminLoggedIn=false;
 
-// Tarih format
-function formatDate(dateString){if(!dateString)return'N/A';try{return new Date(dateString).toLocaleDateString('tr-TR',{year:'numeric',month:'short',day:'numeric'});}catch{return dateString;}}
+const htmlEl=document.documentElement;
+const sidebar=document.getElementById('sidebar');
+const hamb=document.getElementById('hambBtn');
+const sideBtns=Array.from(document.querySelectorAll('.side-btn[data-panel]'));
+const panels={dashboard:document.getElementById('dashboard'),records:document.getElementById('records'),add:document.getElementById('add'),settings:document.getElementById('settings'),'admin-panel':document.getElementById('admin-panel')};
+const recordsTableBody=document.querySelector('#recordsTable tbody');
+const authModal=document.getElementById('authModal');
+const adminSettingsBtn=document.getElementById('adminSettingsBtn');
 
-// Records render
-function renderRecords(){const tbody=document.querySelector('#recordsTable tbody');tbody.innerHTML='';const today=new Date();records.forEach((r,i)=>{const warrantyEnd=new Date(r.warrantyDate);const isWarrantyActive=warrantyEnd>today;const badgeClass=isWarrantyActive?'active':'passive';const badgeText=isWarrantyActive?'SÜRÜYOR':'BİTTİ';const tr=document.createElement('tr');tr.innerHTML=`<td>${r.code}</td><td>${r.model}</td><td>${r.process}</td><td>${formatDate(r.created)}</td><td><span class="badge ${badgeClass}">${formatDate(r.warrantyDate)} - ${badgeText}</span></td><td><button class="btn" style="padding:6px 10px;font-size:0.8rem;" onclick="viewNotes(${i})">Detay</button><button class="btn btn-secondary" style="padding:6px 10px;font-size:0.8rem;" onclick="delRecord(${i})">Sil</button></td>`;tbody.appendChild(tr);});}
+function formatDate(dateString){if(!dateString)return 'N/A';const options={year:'numeric',month:'short',day:'numeric'};try{return new Date(dateString).toLocaleDateString('tr-TR',options)}catch{return dateString}}
 
-// Add record
-document.getElementById('addRecordBtn').addEventListener('click',()=>{const code=document.getElementById('inpCode').value.trim();const model=document.getElementById('inpModel').value.trim();const process=document.getElementById('inpProcess').value;const notes=document.getElementById('inpNotes').value.trim();const manualWarrantyDate=document.getElementById('inpWarrantyDate').value;if(!code||!model||!process){alert('Hata: Kod, Model ve İşlem alanları zorunludur!');return;}let warrantyDate;if(manualWarrantyDate){const manualDate=new Date(manualWarrantyDate);manualDate.setMinutes(manualDate.getMinutes()+manualDate.getTimezoneOffset());warrantyDate=manualDate.toISOString();}else{const oneYearLater=new Date();oneYearLater.setFullYear(oneYearLater.getFullYear()+1);warrantyDate=oneYearLater.toISOString();}records.push({code,model,process,notes,created:new Date().toISOString(),warrantyDate});localStorage.setItem(LOCAL_STORAGE_KEY_RECORDS,JSON.stringify(records));document.getElementById('inpCode').value='';document.getElementById('inpModel').value='';document.getElementById('inpProcess').value='Led Değişim';document.getElementById('inpNotes').value='';document.getElementById('inpWarrantyDate').value='';renderRecords();alert('Yeni servis kaydı başarıyla eklendi!');});
-document.getElementById('clearBtn').addEventListener('click',()=>{document.getElementById('inpCode').value='';document.getElementById('inpModel').value='';document.getElementById('inpProcess').value='Led Değişim';document.getElementById('inpNotes').value='';document.getElementById('inpWarrantyDate').value='';});
-function delRecord(i){if(!confirm('Bu servis kaydını silmek istediğinizden emin misiniz?'))return;records.splice(i,1);localStorage.setItem(LOCAL_STORAGE_KEY_RECORDS,JSON.stringify(records));renderRecords();}
-function viewNotes(i){const record=records[i];alert(`--- İşlem Detayları ---\n\nKod/Seri: ${record.code}\nModel: ${record.model}\nİşlem: ${record.process}\nKayıt Tarihi: ${formatDate(record.created)}\nGaranti Bitişi: ${formatDate(record.warrantyDate)}\n\n--- El ile Notlar ---\n\n${record.notes||'Not bulunmamaktadır.'}`);}
+function loadColors(){let colors=DEFAULT_COLORS;try{colors=JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_COLORS))||DEFAULT_COLORS}catch(e){console.error(e)}
+htmlEl.style.setProperty('--primary',colors.primary);htmlEl.style.setProperty('--bg',colors.bg);htmlEl.style.setProperty('--card',colors.card);htmlEl.style.setProperty('--text',colors.text);
+document.getElementById('color-primary').value=colors.primary;document.getElementById('color-bg').value=colors.bg;document.getElementById('color-primary-hex').value=colors.primary;document.getElementById('color-bg-hex').value=colors.bg;
+if(window.visitorsChart) renderChart()}
 
-// Splash ekran
-window.addEventListener('load',()=>{setTimeout(()=>{document.getElementById('splash').style.opacity='0';setTimeout(()=>document.getElementById('splash').style.display='none',500);},3000);renderRecords();});
+function saveAndApplyColors(){const newColors={primary:document.getElementById('color-primary-hex').value.toUpperCase(),bg:document.getElementById('color-bg-hex').value.toUpperCase(),card:document.getElementById('color-card-hex')?.value.toUpperCase()||'#1C1C1C',text:document.getElementById('color-text-hex')?.value.toUpperCase()||'#F0F0F0'}
+for(const key in newColors){if(!/^#[0-9A-F]{6}$/.test(newColors[key])){alert('HEX kodu hatalı!');return}}
+localStorage.setItem(LOCAL_STORAGE_KEY_COLORS,JSON.stringify(newColors));loadColors();alert('Renkler kaydedildi')}
 
-</script>
-</body>
-</html>
+function showAuthModal(){authModal.classList.add('visible');document.getElementById('authCodeInput').value='';document.getElementById('authErr').style.display='none'}
+function handleAuthSubmit(){const enteredCode=document.getElementById('authCodeInput').value.trim();if(enteredCode===ADMIN_CODE){isAdminLoggedIn=true;authModal.classList.remove('visible');adminSettingsBtn.classList.remove('hidden');showPanel('admin-panel');alert('Admin girişi başarılı')}else{document.getElementById('authErr').style.display='block'}}
+function changeAdminCode(){const newCode=document.getElementById('newAdminCode').value.trim();if(newCode&&newCode.length>=4){ADMIN_CODE=newCode;localStorage.setItem(LOCAL_STORAGE_KEY_ADMIN,newCode);document.getElementById('newAdminCode').value='';alert('Admin şifresi güncellendi')}else{alert('Şifre en az 4 karakter olmalı')}}
+function renderRecords(){recordsTableBody.innerHTML='';const today=new Date();records.forEach((r,i)=>{const warrantyEnd=new Date(r.warrantyDate);const isWarrantyActive=warrantyEnd>today;const badgeClass=isWarrantyActive?'active':'passive';const badgeText=isWarrantyActive?'SÜRÜYOR':'BİTTİ';const tr=document.createElement('tr');tr.innerHTML=`<td>${r.code}</td><td>${r.model}</td><td>${r.process}</td><td>${formatDate(r.created)}</td><td><span class="badge ${badgeClass}">${formatDate(r.warrantyDate)} - ${badgeText}</span></td><td><button class="btn" style="padding:6px 10px;font-size:0.8rem;" onclick="viewNotes(${i})">Detay</button> <button class="btn
