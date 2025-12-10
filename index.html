@@ -3,14 +3,14 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Eroğlu | Yönetim Paneli</title>
+    <title>Eroğlu | TV Servis Yönetimi</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     
     <style>
         .icon-dashboard::before { content: "🎯"; }
-        .icon-users::before { content: "👤"; }
-        .icon-add::before { content: "✨"; }
+        .icon-users::before { content: "📺"; }
+        .icon-add::before { content: "➕"; }
         .icon-settings::before { content: "🛠️"; }
         .icon-admin::before { content: "⚙️"; }
         .icon-menu::before { content: "☰"; }
@@ -19,7 +19,7 @@
     <style>
         /* MİNİMALİST KESKİN SİYAH TEMA */
         :root{
-            /* Varsayılan Renkler (Başlangıçta Siyah & Lacivert) */
+            /* Varsayılan Renkler */
             --primary: #5BC0DE; /* Vurgu Rengi (Açık Mavi) */
             --bg: #000000; /* Ana Arka Plan (Siyah) */
             --card: #141414; /* Kart Arka Planı (Koyu Gri/Siyah) */
@@ -39,19 +39,29 @@
         *{box-sizing:border-box}
         html,body{height:100%;margin:0;font-family:var(--font-body);color:var(--text);background:var(--bg); transition: background-color 0.3s}
         
-        /* SPLASH SCREEN - LOGO KUTUSUZ */
+        /* SPLASH SCREEN - DAHA COOL LOGO */
         #splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:9999; opacity:1; transition: opacity 0.5s ease-out 2.5s;} 
         .splash-title{
             font-weight:900;
-            letter-spacing: 10px; /* Daha havalı bir boşluk */
+            letter-spacing: 10px;
             font-size:clamp(50px, 12vw, 100px);
             color: var(--primary);
-            text-shadow: 0 0 15px rgba(91, 192, 222, 0.7); /* Güçlü neon ışıltı */
-            animation: scaleIn 0.5s ease both;
+            text-shadow: 0 0 15px rgba(91, 192, 222, 0.7), 0 0 25px rgba(91, 192, 222, 0.5); 
+            animation: glitch 1.5s infinite alternate, scaleIn 0.5s ease both; /* Glitch Eklendi */
         }
+
         @keyframes scaleIn {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
+        }
+        /* COOL GLITCH EFFECT */
+        @keyframes glitch {
+            0% { transform: translate(1px, 1px); text-shadow: 0 0 10px var(--primary); }
+            20% { transform: translate(-1px, 2px); }
+            40% { transform: translate(-2px, 0); text-shadow: 0 0 8px var(--primary); }
+            60% { transform: translate(2px, -1px); }
+            80% { transform: translate(1px, -2px); text-shadow: 0 0 12px var(--primary); }
+            100% { transform: translate(-1px, 1px); }
         }
 
         /* HEADER */
@@ -69,6 +79,7 @@
 
         /* MAIN CONTENT & CARDS */
         .main{margin-left:240px;padding:30px;flex:1;min-height:calc(100vh - 60px); transition: margin-left 0.3s; background: var(--bg)}
+        .panel-content .card{margin-bottom:0 !important;} /* Panelin içindeki kartların alt boşluğunu kaldırma */
         .card{background:var(--card);padding:25px;border-radius:2px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:25px;}
         .grid-3{display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:20px}
         
@@ -79,8 +90,9 @@
 
         /* FORMLAR & BUTONLAR */
         .form-row{display:flex; gap:15px; margin-bottom:15px; align-items:center; flex-wrap:wrap;}
-        .input, .select{padding:12px 15px;border-radius:2px;border:1px solid var(--border);background:var(--bg);color:var(--text); font-size:1rem; transition: border-color 0.2s}
-        .input:focus, .select:focus { border-color: var(--primary); outline: none;}
+        .input, .select, .textarea{padding:12px 15px;border-radius:2px;border:1px solid var(--border);background:var(--bg);color:var(--text); font-size:1rem; transition: border-color 0.2s; width:100%;}
+        .input:focus, .select:focus, .textarea:focus { border-color: var(--primary); outline: none;}
+        .textarea { resize: vertical; min-height: 80px;}
         .btn{padding:12px 20px;border-radius:2px;cursor:pointer;background:var(--primary);border:none;color:var(--card); font-weight:600; transition: background-color 0.2s}
         .btn:hover{background:var(--primary-dark)}
         .btn-secondary{background:var(--muted); color:var(--card)}
@@ -120,7 +132,7 @@
 
 <header class="header">
     <button class="hamburger" id="hambBtn" aria-label="menü"><span class="icon-menu"></span></button>
-    <div class="brand">EROĞLU PANEL</div>
+    <div class="brand">EROĞLU SERVİS</div>
     <div class="actions">
         <button id="adminSettingsBtn" class="btn hidden" style="padding:8px 15px; font-size:0.9rem;">
             <span class="icon-admin"></span> Admin Ayarları
@@ -130,8 +142,8 @@
 
 <nav id="sidebar" class="sidebar hidden">
     <button class="side-btn active" data-panel="dashboard"><span class="icon-dashboard"></span> Dashboard</button>
-    <button class="side-btn" data-panel="users"><span class="icon-users"></span> Kullanıcılar</button>
-    <button class="side-btn" data-panel="add"><span class="icon-add"></span> Yeni Kayıt</button>
+    <button class="side-btn" data-panel="records"><span class="icon-users"></span> Servis Kayıtları</button>
+    <button class="side-btn" data-panel="add"><span class="icon-add"></span> Yeni Servis</button>
     <button class="side-btn" data-panel="settings"><span class="icon-settings"></span> Ayarlar</button>
 </nav>
 
@@ -141,31 +153,31 @@
             <h2 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">🎯 Genel Bakış</h2>
             <div class="grid-3" style="margin-top:20px">
                 <div class="stat-card">
-                    <div class="stat-title">TOPLAM KULLANICI</div>
-                    <div class="stat-value" id="statUsers">0</div>
+                    <div class="stat-title">TOPLAM KAYIT</div>
+                    <div class="stat-value" id="statRecords">0</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-title">AKTİF KAYITLAR</div>
-                    <div class="stat-value" id="statActive">0</div>
+                    <div class="stat-title">AKTİF GARANTİ</div>
+                    <div class="stat-value" id="statActiveWarranty">0</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-title">BUGÜN EK.</div>
-                    <div class="stat-value" id="statToday">0</div>
+                    <div class="stat-title">BU AY EKLENEN</div>
+                    <div class="stat-value" id="statThisMonth">0</div>
                 </div>
             </div>
             <div class="card" style="margin-top:25px">
-                <h3 style="margin-top:0; color:var(--primary)">Haftalık Aktivite Grafiği</h3>
+                <h3 style="margin-top:0; color:var(--primary)">Haftalık Servis Grafiği</h3>
                 <canvas id="visitorsChart" height="100"></canvas>
             </div>
         </div>
     </section>
 
-    <section id="users" class="panel-content hidden-panel">
+    <section id="records" class="panel-content hidden-panel">
         <div class="card">
-            <h2 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">👤 Kullanıcı Yönetimi</h2>
+            <h2 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">📺 Servis Kayıtları</h2>
             <div style="overflow-x:auto;margin-top:20px">
-                <table class="table" id="usersTable">
-                    <thead><tr><th>İsim</th><th>Email</th><th>Durum</th><th>İşlem</th></tr></thead>
+                <table class="table" id="recordsTable">
+                    <thead><tr><th>Kod/Seri</th><th>Model</th><th>İşlem</th><th>Kayıt Tarihi</th><th>Garanti Bitiş</th><th>İşlem</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -174,13 +186,39 @@
 
     <section id="add" class="panel-content hidden-panel">
         <div class="card">
-            <h2 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">✨ Yeni Veri Kaydı</h2>
-            <div class="form-row" style="margin-top:20px;flex-direction:column; gap:15px">
-                <input id="inpName" class="input" placeholder="Kullanıcı Adı" />
-                <input id="inpMail" class="input" placeholder="E-posta Adresi" type="email" />
-                <div style="display:flex;gap:10px;margin-top:10px">
-                    <button class="btn" id="addBtn" style="flex:1">Kaydı Sisteme Ekle</button>
-                    <button class="btn btn-secondary" id="clearBtn" style="flex:1">Temizle</button>
+            <h2 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">➕ Yeni Servis Kaydı</h2>
+            <div style="margin-top:20px;">
+                <div class="form-row">
+                    <label class="label">TV Kodu/Seri:</label>
+                    <input id="inpCode" class="input" placeholder="Müşteri Kodu veya TV Seri No" type="text" style="flex:1" />
+                </div>
+                <div class="form-row">
+                    <label class="label">TV Modeli:</label>
+                    <input id="inpModel" class="input" placeholder="Örn: Samsung QLED 55" type="text" style="flex:1" />
+                </div>
+                <div class="form-row">
+                    <label class="label">Yapılan İşlem:</label>
+                    <select id="inpProcess" class="select" style="flex:1">
+                        <option value="Led Değişim">Led Değişim</option>
+                        <option value="Panel Değişim">Panel Değişim</option>
+                        <option value="Mainboard Onarım">Mainboard Onarım</option>
+                        <option value="Diğer">Diğer (Açıklamaya Yazılacak)</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label class="label">İşlem Detayları (El ile):</label>
+                    <textarea id="inpNotes" class="textarea" placeholder="Ekstra Notlar, Müşteri Bilgisi vb." style="flex:1"></textarea>
+                </div>
+                
+                <h3 style="color:var(--primary); margin-top:20px;">Garanti Ayarları (Varsayılan: +1 Yıl)</h3>
+                <div class="form-row">
+                    <label class="label">Manuel Garanti Bitiş:</label>
+                    <input id="inpWarrantyDate" class="input" type="date" style="flex:1" />
+                </div>
+
+                <div style="display:flex;gap:10px;margin-top:20px">
+                    <button class="btn" id="addRecordBtn" style="flex:1">Kaydı Sisteme Ekle (1 Yıl Garanti)</button>
+                    <button class="btn btn-secondary" id="clearBtn" style="flex:1">Formu Temizle</button>
                 </div>
             </div>
         </div>
@@ -259,9 +297,11 @@
 <script>
 // --- App state & helpers ---
 const DEFAULT_COLORS = {primary: '#5BC0DE', bg: '#000000', card: '#141414', text: '#F0F0F0'};
-const LOCAL_STORAGE_KEY_COLORS = 'eroglu_colors_v2';
-const LOCAL_STORAGE_KEY_ADMIN = 'eroglu_admin_code_v2';
-let users = JSON.parse(localStorage.getItem('rp_users_v2')||'[]');
+const LOCAL_STORAGE_KEY_COLORS = 'eroglu_colors_v3';
+const LOCAL_STORAGE_KEY_ADMIN = 'eroglu_admin_code_v3';
+const LOCAL_STORAGE_KEY_RECORDS = 'eroglu_records_v3';
+
+let records = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_RECORDS)||'[]');
 let ADMIN_CODE = localStorage.getItem(LOCAL_STORAGE_KEY_ADMIN) || '6161'; 
 let isAdminLoggedIn = false;
 
@@ -273,17 +313,21 @@ const hamb = document.getElementById('hambBtn');
 const sideBtns = Array.from(document.querySelectorAll('.side-btn[data-panel]'));
 const panels = {
     dashboard: document.getElementById('dashboard'), 
-    users: document.getElementById('users'), 
+    records: document.getElementById('records'), 
     add: document.getElementById('add'), 
     settings: document.getElementById('settings'),
     'admin-panel': document.getElementById('admin-panel')
 };
-const usersTableBody = document.querySelector('#usersTable tbody');
+const recordsTableBody = document.querySelector('#recordsTable tbody');
 const authModal = document.getElementById('authModal');
 const adminSettingsBtn = document.getElementById('adminSettingsBtn');
 
-
-// --- CORE FUNCTIONS ---
+// Tarih formatlama yardımcı fonksiyonu
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('tr-TR', options);
+}
 
 // 1. Renkleri Yönetme
 function loadColors() {
@@ -308,7 +352,6 @@ function loadColors() {
     document.getElementById('color-card-hex').value = colors.card;
     document.getElementById('color-text-hex').value = colors.text;
     
-    // Grafik renklerini güncelle
     if(window.visitorsChart) renderChart();
 }
 
@@ -320,7 +363,6 @@ function saveAndApplyColors() {
         text: document.getElementById('color-text-hex').value.toUpperCase(),
     };
     
-    // HEX kontrolü (Basit)
     for (const key in newColors) {
         if (!/^#[0-9A-F]{6}$/.test(newColors[key])) {
             alert('Hata: Lütfen tüm renkler için geçerli 6 haneli HEX kodu girin (örn: #AABBCC).');
@@ -329,7 +371,7 @@ function saveAndApplyColors() {
     }
 
     localStorage.setItem(LOCAL_STORAGE_KEY_COLORS, JSON.stringify(newColors));
-    loadColors(); // Yeni renkleri uygula
+    loadColors(); 
     alert('Tema renkleri başarıyla güncellendi ve kaydedildi.');
 }
 
@@ -345,10 +387,8 @@ function handleAuthSubmit() {
     if (enteredCode === ADMIN_CODE) {
         isAdminLoggedIn = true;
         authModal.classList.remove('visible');
-        adminSettingsBtn.classList.remove('hidden'); // Admin butonu gör
+        adminSettingsBtn.classList.remove('hidden'); 
         showPanel('admin-panel');
-        // İlgili ayar panelini açtıktan sonra tekrar Dashboard'a dönebilir
-        // showPanel('dashboard');
         alert('Admin girişi başarılı! Artık Ayarlar panelini kullanabilirsiniz.');
     } else {
         document.getElementById('authErr').style.display = 'block';
@@ -367,164 +407,124 @@ function changeAdminCode() {
     }
 }
 
-
-// --- EVENT LISTENERS ---
-
-// Splash screen (3 saniye)
-window.addEventListener('load',()=>{
-    setTimeout(()=>{
-        document.getElementById('splash').style.opacity='0';
-        setTimeout(()=>document.getElementById('splash').style.display='none', 500); 
-    }, 3000); 
-    
-    loadColors(); // Renkleri yükle
-    renderAll(); // Veri ve grafikleri yükle
-});
-
-// Sidebar toggle (Mobile/PC)
-hamb.addEventListener('click',()=>{
-    sidebar.classList.toggle('hidden');
-    if (window.innerWidth < 900) {
-        document.body.style.overflow = sidebar.classList.contains('hidden') ? 'auto' : 'hidden';
-    }
-});
-
-// Side nav & panel switching
-sideBtns.forEach(b=>b.addEventListener('click',(e)=>{
-    sideBtns.forEach(btn => btn.classList.remove('active'));
-    e.currentTarget.classList.add('active');
-    
-    showPanel(b.dataset.panel); 
-    if(window.innerWidth < 900) {
-        sidebar.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }
-}));
-
-function showPanel(id){
-    Object.values(panels).forEach(p=>p.classList.add('hidden-panel')); 
-    panels[id].classList.remove('hidden-panel');
-    document.querySelector('.main').scrollTop=0; 
-    
-    // Admin paneline geçiş yaparken renkleri tekrar yükle
-    if (id === 'admin-panel') loadColors(); 
-}
-
-// İlk açılışta PC'de sidebar'ı göster
-if(window.innerWidth > 900) sidebar.classList.remove('hidden');
-
-// Admin Ayarları Yetki Akışı
-document.getElementById('openAdminPanel').addEventListener('click', () => {
-    if (isAdminLoggedIn) {
-        showPanel('admin-panel');
-    } else {
-        showAuthModal();
-    }
-});
-adminSettingsBtn.addEventListener('click', () => {
-    if (isAdminLoggedIn) {
-        showPanel('admin-panel');
-    } else {
-         // Eğer admin butonu tıklanıyorsa ve giriş yapılmadıysa, settings paneline düşür.
-         showPanel('settings');
-         alert('Admin ayarlarını görmek için öncelikle yetkili kod ile giriş yapmalısınız.');
-    }
-});
-document.getElementById('authSubmit').addEventListener('click', handleAuthSubmit);
-document.getElementById('authCancel').addEventListener('click', () => authModal.classList.remove('visible'));
-
-// Renk Inputları Senkronizasyonu (Renk seçiciden HEX inputa)
-document.querySelectorAll('.form-settings input[type="color"]').forEach(input => {
-    input.addEventListener('input', (e) => {
-        document.getElementById(e.target.id + '-hex').value = e.target.value.toUpperCase();
+// 3. Servis Kayıtlarını Yönetme
+function renderRecords(){
+    recordsTableBody.innerHTML='';
+    const today = new Date();
+    records.forEach((r,i)=>{
+        const warrantyEnd = new Date(r.warrantyDate);
+        const isWarrantyActive = warrantyEnd > today;
+        const badgeClass = isWarrantyActive ? 'active' : 'passive';
+        const badgeText = isWarrantyActive ? 'GARANTİLİ' : 'BİTTİ';
         
-        // Önizleme için hemen uygula (Kaydet butonuna basmadan)
-        htmlEl.style.setProperty('--' + e.target.id.replace('color-', ''), e.target.value);
-        if(window.visitorsChart) renderChart();
-    });
-});
-
-// Renk Inputları Senkronizasyonu (HEX inputtan renk seçiciye)
-document.querySelectorAll('.form-settings input[type="text"]').forEach(input => {
-    input.addEventListener('input', (e) => {
-        const hex = e.target.value.toUpperCase();
-        // Basit validasyon: # ile başla ve 6 karakter hex olsun
-        if (/^#[0-9A-F]{6}$/i.test(hex)) {
-            document.getElementById(e.target.id.replace('-hex', '')).value = hex;
-            
-            // Önizleme için hemen uygula
-            htmlEl.style.setProperty('--' + e.target.id.replace('color-', '').replace('-hex', ''), hex);
-            if(window.visitorsChart) renderChart();
-        }
-    });
-});
-
-document.getElementById('saveColorsBtn').addEventListener('click', saveAndApplyColors);
-document.getElementById('changeAdminCodeBtn').addEventListener('click', changeAdminCode);
-
-
-// --- VERİ VE KULLANICI İŞLEMLERİ (Önceki Koddan) ---
-
-function renderUsers(){
-    usersTableBody.innerHTML='';
-    users.forEach((u,i)=>{
-        const badgeClass = u.active ? 'active' : 'passive';
-        const badgeText = u.active ? 'AKTİF' : 'PASİF';
         const tr=document.createElement('tr');
         tr.innerHTML=`
-            <td>${u.name}</td>
-            <td>${u.mail}</td>
-            <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+            <td>${r.code}</td>
+            <td>${r.model}</td>
+            <td>${r.process}</td>
+            <td>${formatDate(r.created)}</td>
+            <td><span class="badge ${badgeClass}">${formatDate(r.warrantyDate)} - ${badgeText}</span></td>
             <td>
-                <button class="btn" style="padding:6px 10px; font-size:0.8rem;" onclick="editUser(${i})">Düzenle</button> 
-                <button class="btn btn-secondary" style="padding:6px 10px; font-size:0.8rem;" onclick="delUser(${i})">Sil</button>
+                <button class="btn" style="padding:6px 10px; font-size:0.8rem;" onclick="viewNotes(${i})">Detay</button> 
+                <button class="btn btn-secondary" style="padding:6px 10px; font-size:0.8rem;" onclick="delRecord(${i})">Sil</button>
             </td>
         `;
-        usersTableBody.appendChild(tr);
+        recordsTableBody.appendChild(tr);
     });
     updateStats();
 }
 
 function updateStats(){
-    document.getElementById('statUsers').innerText = users.length;
-    document.getElementById('statActive').innerText = users.filter(u=>u.active).length;
-    const today = new Date().toDateString();
-    document.getElementById('statToday').innerText = users.filter(u=>{
-        const d = new Date(u.created); 
-        return d.toDateString() === today;
+    document.getElementById('statRecords').innerText = records.length;
+    
+    const today = new Date();
+    document.getElementById('statActiveWarranty').innerText = records.filter(r => new Date(r.warrantyDate) > today).length;
+    
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    document.getElementById('statThisMonth').innerText = records.filter(r=>{
+        const d = new Date(r.created); 
+        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
     }).length
 }
 
-document.getElementById('addBtn').addEventListener('click',()=>{
-    const name=document.getElementById('inpName').value.trim();
-    const mail=document.getElementById('inpMail').value.trim();
-    if(!name||!mail){alert('Lütfen tüm alanları doldurun!');return;}
-    users.push({name,mail,active:true,created:new Date().toISOString()});
-    localStorage.setItem('rp_users_v2',JSON.stringify(users));
-    document.getElementById('inpName').value='';
-    document.getElementById('inpMail').value='';
-    renderUsers();
+document.getElementById('addRecordBtn').addEventListener('click',()=>{
+    const code=document.getElementById('inpCode').value.trim();
+    const model=document.getElementById('inpModel').value.trim();
+    const process=document.getElementById('inpProcess').value;
+    const notes=document.getElementById('inpNotes').value.trim();
+    const manualWarrantyDate=document.getElementById('inpWarrantyDate').value;
+    
+    if(!code||!model||!process){alert('Hata: Kod, Model ve İşlem alanları zorunludur!');return;}
+    
+    let warrantyDate;
+    if (manualWarrantyDate) {
+        warrantyDate = new Date(manualWarrantyDate).toISOString();
+    } else {
+        // Otomatik 1 yıl garanti
+        const oneYearLater = new Date();
+        oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
+        warrantyDate = oneYearLater.toISOString();
+    }
+
+    records.push({
+        code, 
+        model, 
+        process, 
+        notes,
+        created: new Date().toISOString(),
+        warrantyDate: warrantyDate 
+    });
+    
+    localStorage.setItem(LOCAL_STORAGE_KEY_RECORDS, JSON.stringify(records));
+    
+    // Formu temizle
+    document.getElementById('inpCode').value='';
+    document.getElementById('inpModel').value='';
+    document.getElementById('inpProcess').value='Led Değişim';
+    document.getElementById('inpNotes').value='';
+    document.getElementById('inpWarrantyDate').value='';
+    
+    renderRecords();
+    showPanel('records');
+    alert('Yeni servis kaydı başarıyla eklendi!');
 });
 
-document.getElementById('clearBtn').addEventListener('click',()=>{document.getElementById('inpName').value='';document.getElementById('inpMail').value=''});
-function delUser(i){if(!confirm('Bu kaydı silmek istediğinizden emin misiniz?')) return;users.splice(i,1);localStorage.setItem('rp_users_v2',JSON.stringify(users));renderUsers()}
-function editUser(i){const n=prompt('Yeni isim girin:',users[i].name);const m=prompt('Yeni email girin:',users[i].mail);if(n&&m){users[i].name=n;users[i].mail=m;localStorage.setItem('rp_users_v2',JSON.stringify(users));renderUsers()}}
+document.getElementById('clearBtn').addEventListener('click',()=>{
+    document.getElementById('inpCode').value='';
+    document.getElementById('inpModel').value='';
+    document.getElementById('inpProcess').value='Led Değişim';
+    document.getElementById('inpNotes').value='';
+    document.getElementById('inpWarrantyDate').value='';
+});
+
+function delRecord(i){
+    if(!confirm('Bu servis kaydını silmek istediğinizden emin misiniz?')) return;
+    records.splice(i,1);
+    localStorage.setItem(LOCAL_STORAGE_KEY_RECORDS,JSON.stringify(records));
+    renderRecords();
+}
+
+function viewNotes(i){
+    const record = records[i];
+    alert(`--- İşlem Detayları ---\n\nKod/Seri: ${record.code}\nModel: ${record.model}\nİşlem: ${record.process}\nKayıt Tarihi: ${formatDate(record.created)}\nGaranti Bitişi: ${formatDate(record.warrantyDate)}\n\n--- El ile Notlar ---\n\n${record.notes || 'Not bulunmamaktadır.'}`);
+}
 
 document.getElementById('exportBtn').addEventListener('click',()=>{
-    const data='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(users, null, 2));
+    const data='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(records, null, 2));
     const a=document.createElement('a');
     a.href=data;
-    a.download='eroglu_data_export.json';
+    a.download='eroglu_servis_data_export.json';
     a.click();
 });
 
+// 4. Grafik Yönetimi
 let visitorsChart;
 function renderChart(){
     const ctx=document.getElementById('visitorsChart').getContext('2d');
     const labels=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
     const values = [45,60,50,75,65,90,80]; 
     
-    // Temadan renkleri çekme
     const themeColor = getComputedStyle(htmlEl).getPropertyValue('--primary').trim();
     const mutedColor = getComputedStyle(htmlEl).getPropertyValue('--muted').trim();
     const borderColor = getComputedStyle(htmlEl).getPropertyValue('--border').trim();
@@ -536,7 +536,7 @@ function renderChart(){
         data:{
             labels, 
             datasets:[{
-                label:'Haftalık Aktivite',
+                label:'Haftalık Servis Kaydı',
                 data:values,
                 fill:true,
                 backgroundColor: themeColor + '30', 
@@ -561,8 +561,94 @@ function renderChart(){
     });
 }
 
+
+// --- EVENT LISTENERS & INITIALIZATION ---
+
+window.addEventListener('load',()=>{
+    // Splash screen (3 saniye)
+    setTimeout(()=>{
+        document.getElementById('splash').style.opacity='0';
+        setTimeout(()=>document.getElementById('splash').style.display='none', 500); 
+    }, 3000); 
+    
+    loadColors(); 
+    renderAll(); 
+});
+
+hamb.addEventListener('click',()=>{
+    sidebar.classList.toggle('hidden');
+    if (window.innerWidth < 900) {
+        document.body.style.overflow = sidebar.classList.contains('hidden') ? 'auto' : 'hidden';
+    }
+});
+
+sideBtns.forEach(b=>b.addEventListener('click',(e)=>{
+    sideBtns.forEach(btn => btn.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+    
+    showPanel(b.dataset.panel); 
+    if(window.innerWidth < 900) {
+        sidebar.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+}));
+
+function showPanel(id){
+    Object.values(panels).forEach(p=>p.classList.add('hidden-panel')); 
+    panels[id].classList.remove('hidden-panel');
+    document.querySelector('.main').scrollTop=0; 
+    
+    if (id === 'admin-panel') loadColors(); 
+}
+
+if(window.innerWidth > 900) sidebar.classList.remove('hidden');
+
+// Admin Ayarları Yetki Akışı
+document.getElementById('openAdminPanel').addEventListener('click', () => {
+    if (isAdminLoggedIn) {
+        showPanel('admin-panel');
+    } else {
+        showAuthModal();
+    }
+});
+adminSettingsBtn.addEventListener('click', () => {
+    if (isAdminLoggedIn) {
+        showPanel('admin-panel');
+    } else {
+         showPanel('settings');
+         alert('Admin ayarlarını görmek için öncelikle yetkili kod ile giriş yapmalısınız.');
+    }
+});
+
+document.getElementById('authSubmit').addEventListener('click', handleAuthSubmit);
+document.getElementById('authCancel').addEventListener('click', () => authModal.classList.remove('visible'));
+
+// Renk Inputları Senkronizasyonu (Renk seçiciden HEX inputa)
+document.querySelectorAll('.form-settings input[type="color"]').forEach(input => {
+    input.addEventListener('input', (e) => {
+        document.getElementById(e.target.id + '-hex').value = e.target.value.toUpperCase();
+        htmlEl.style.setProperty('--' + e.target.id.replace('color-', ''), e.target.value);
+        if(window.visitorsChart) renderChart();
+    });
+});
+
+// Renk Inputları Senkronizasyonu (HEX inputtan renk seçiciye)
+document.querySelectorAll('.form-settings input[type="text"]').forEach(input => {
+    input.addEventListener('input', (e) => {
+        const hex = e.target.value.toUpperCase();
+        if (/^#[0-9A-F]{6}$/i.test(hex)) {
+            document.getElementById(e.target.id.replace('-hex', '')).value = hex;
+            htmlEl.style.setProperty('--' + e.target.id.replace('color-', '').replace('-hex', ''), hex);
+            if(window.visitorsChart) renderChart();
+        }
+    });
+});
+
+document.getElementById('saveColorsBtn').addEventListener('click', saveAndApplyColors);
+document.getElementById('changeAdminCodeBtn').addEventListener('click', changeAdminCode);
+
 function renderAll() {
-    renderUsers();
+    renderRecords();
     renderChart();
 }
 </script>
