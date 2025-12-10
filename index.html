@@ -3,38 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eroğlu Sistem | Profesyonel Yönetim</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+<title>Eroğlu Sistem | Digital Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-  /* GENEL SIFIRLAMA ve FONT */
+  /* GENEL STİL VE FONT */
   body { 
     margin: 0; 
-    font-family: 'Roboto', sans-serif; 
-    background: #0a0a0a; /* Koyu Arka Plan */
-    color: #f0f0f0; /* Açık Yazı Rengi */
+    font-family: 'Montserrat', sans-serif; 
+    background: #121212; /* Derin Koyu Arka Plan */
+    color: #e0e0e0; /* Açık Gri Yazı */
     transition: background-color 0.5s ease;
+    overflow-x: hidden; /* Yatay kaydırmayı engelle */
   }
   
-  /* SPLASH EKRANI */
+  /* SPLASH EKRANI - 3 SANİYE LOGO */
   #splash { 
     display: flex; 
+    flex-direction: column;
     justify-content: center; 
     align-items: center; 
     height: 100vh; 
-    background: linear-gradient(135deg, #0a0a0a 0%, #1e1e1e 100%); 
-    color: #ff6b00; /* Canlı Turuncu Aksan */
-    font-size: 5em; 
-    font-weight: 700; 
-    letter-spacing: 5px;
+    background: linear-gradient(135deg, #1f1f1f 0%, #000000 100%); 
     opacity: 1;
-    transition: opacity 1s ease-in-out;
+    transition: opacity 0.5s ease-in-out;
   }
-  #splash span { 
-    animation: pulse 1.5s infinite alternate; 
+  .splash-logo {
+    font-size: 6em; 
+    font-weight: 900; 
+    color: #4CAF50; /* Neon Yeşil - Ana Logo Rengi */
+    letter-spacing: 8px;
+    text-shadow: 0 0 15px rgba(76, 175, 80, 0.7); /* Neon Efekti */
+    animation: neon-glow 1.5s infinite alternate; 
+    margin-bottom: 0.2em;
   }
-  @keyframes pulse {
-    from { text-shadow: 0 0 5px #ff6b00; }
-    to { text-shadow: 0 0 20px #ff9e00, 0 0 40px #ff6b00; }
+  .splash-slogan {
+    font-size: 1.2em;
+    color: #90caf9; /* Mavi alt başlık */
+    letter-spacing: 4px;
+    font-weight: 400;
+  }
+  @keyframes neon-glow {
+    from { transform: scale(1); text-shadow: 0 0 5px #4CAF50, 0 0 10px #4CAF50; }
+    to { transform: scale(1.05); text-shadow: 0 0 10px #4CAF50, 0 0 20px #4CAF50; }
   }
 
   /* HAMBURGER BUTONU */
@@ -42,27 +52,31 @@
     position: fixed; 
     top: 1.5em; 
     left: 1.5em; 
-    font-size: 1.8em; 
+    font-size: 2em; 
     cursor: pointer; 
-    color: #00bfff; /* Canlı Mavi Aksan */
+    color: #90caf9; /* Açık Mavi */
     z-index: 1000; 
-    transition: color 0.3s;
+    transition: color 0.3s, transform 0.3s;
     padding: 5px;
+    border-radius: 4px;
   }
-  #hamburger:hover { color: #f0f0f0; }
+  #hamburger:hover { 
+    color: #e0e0e0; 
+    transform: rotate(90deg);
+  }
   
   /* YAN MENÜ (NAVİGASYON) */
   #menu { 
     position: fixed; 
     top: 0; 
     left: 0; 
-    width: 250px; 
+    width: 280px; /* Daha geniş menü */
     height: 100%; 
-    background: #1e1e1e; /* Koyu Menü Arka Planı */
-    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
-    transform: translateX(-250px); 
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Yumuşak Hareket */
-    padding: 3em 1em 1em 1em;
+    background: #1f1f1f; /* Koyu Menü Arka Planı */
+    box-shadow: 10px 0 20px rgba(0, 0, 0, 0.7);
+    transform: translateX(-280px); 
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Yaylanmalı (Spring) Efekt */
+    padding: 5em 1em 1em 1em;
     z-index: 999;
   }
   #menu.open {
@@ -74,127 +88,131 @@
     margin-top: 2em;
   }
   #menu ul li { 
-    margin: 1.5em 0; 
+    margin: 1.2em 0; 
     cursor: pointer; 
-    padding: 10px 15px;
-    border-radius: 8px;
-    transition: background 0.3s, color 0.3s;
-    font-weight: 400;
+    padding: 15px 20px;
+    border-radius: 10px;
+    transition: background 0.3s, color 0.3s, transform 0.2s;
+    font-weight: 700;
+    font-size: 1.1em;
+    border-left: 5px solid transparent;
   }
   #menu ul li:hover { 
-    background: #00bfff; 
-    color: #0a0a0a; 
-    font-weight: 700;
+    background: rgba(76, 175, 80, 0.1); 
+    color: #4CAF50; 
+    border-left: 5px solid #4CAF50;
+    transform: translateX(5px);
   }
   
   /* ANA İÇERİK ALANI */
   #content { 
     margin-left: 0; 
-    transition: margin-left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    padding: 2em;
+    transition: margin-left 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55), transform 0.5s;
+    padding: 3em;
     min-height: 100vh;
   }
-  .menu-open #content {
-    margin-left: 250px;
-    transform: scale(0.98); /* Hafif Yakınlaştırma Etkisi */
+  body.menu-open #content {
+    margin-left: 280px;
+    transform: perspective(1000px) scale(0.95) rotateY(-5deg); /* 3D derinlik hissi */
+    box-shadow: -10px 0 20px rgba(0, 0, 0, 0.5);
   }
 
   /* ORTAK FORM ELEMANLARI */
-  h2 { color: #ff6b00; border-bottom: 2px solid #00bfff; padding-bottom: 0.5em; margin-bottom: 1em; }
+  h2 { 
+    color: #4CAF50; 
+    border-bottom: 3px solid #90caf9; 
+    padding-bottom: 0.5em; 
+    margin-bottom: 1.5em; 
+    font-weight: 700;
+  }
   input, select { 
-    background: #1e1e1e; 
+    background: #1f1f1f; 
     border: 1px solid #333; 
-    color: #f0f0f0; 
-    border-radius: 5px; 
-    padding: 0.75em; 
-    width: calc(100% - 1.5em); 
+    color: #e0e0e0; 
+    border-radius: 8px; 
+    padding: 1em; 
+    width: calc(100% - 2em); 
     margin: 0.75em 0;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
     transition: border-color 0.3s, box-shadow 0.3s;
   }
   input:focus, select:focus { 
-    border-color: #ff6b00; 
+    border-color: #4CAF50; 
     outline: none; 
-    box-shadow: 0 0 10px rgba(255, 107, 0, 0.5); 
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5), inset 0 2px 5px rgba(0, 0, 0, 0.3); 
   }
   button { 
-    background: #00bfff; 
-    color: #0a0a0a; 
+    background: #90caf9; /* Mavi Buton */
+    color: #121212; 
     border: none; 
-    padding: 1em; 
+    padding: 1.2em; 
     width: 100%; 
-    border-radius: 5px; 
+    border-radius: 8px; 
     cursor: pointer; 
-    margin-top: 1em;
+    margin-top: 1.5em;
     font-weight: 700;
     letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     transition: background 0.3s, transform 0.1s;
   }
   button:hover { 
-    background: #ff6b00; 
-    color: #f0f0f0; 
-    transform: translateY(-2px); 
+    background: #4CAF50; /* Yeşil Hover */
+    color: #e0e0e0; 
+    transform: translateY(-3px); 
+    box-shadow: 0 6px 15px rgba(76, 175, 80, 0.5);
   }
   
-  /* KAYIT BÖLÜMÜ */
+  /* KAYIT VE KAMERA BÖLÜMÜ */
   #camera { 
     width: 100%; 
-    max-width: 400px; 
-    height: 250px; 
+    max-width: 450px; 
+    height: 300px; 
     background: #333; 
-    border: 5px dashed #555; 
-    margin: 1em auto; /* Ortalamak için */
+    border: 3px solid #4CAF50; 
+    margin: 1em auto;
     display: flex; 
     justify-content: center; 
     align-items: center; 
-    font-size: 1.2em;
-    color: #aaa;
-    border-radius: 10px;
+    font-size: 1.4em;
+    color: #90caf9;
+    border-radius: 12px;
+    text-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
   }
 
-  /* GARANTİ LİSTESİ */
+  /* GARANTİ LİSTESİ STİLİ */
   #garantiList {
-    background: #1e1e1e;
-    padding: 1em;
-    border-radius: 8px;
-    min-height: 150px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    background: #1f1f1f;
+    padding: 1.5em;
+    border-radius: 10px;
+    min-height: 200px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   }
   .kayit-item {
-    padding: 10px;
+    padding: 12px;
     border-bottom: 1px solid #333;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background 0.2s;
   }
+  .kayit-item:hover { background: #2a2a2a; }
   .kayit-item:last-child { border-bottom: none; }
   .garanti-sure {
-    color: #ff6b00;
+    color: #4CAF50;
     font-weight: 700;
+    background: #121212;
+    padding: 5px 10px;
+    border-radius: 5px;
   }
-
-  /* ADMIN PANELİ */
-  #adminContent {
-    background: #1e1e1e;
-    padding: 1.5em;
-    margin-top: 1em;
-    border-radius: 8px;
-  }
-  #adminContent h3 { color: #00bfff; }
   
-  /* Renk paleti inputları yan yana */
-  #adminContent input[type="color"] {
-    width: 20%; 
-    height: 40px; 
-    padding: 0;
-    margin-right: 2%;
-    border: none;
-    cursor: pointer;
-  }
 </style>
 </head>
 <body>
 
-<div id="splash"><span>Eroğlu</span></div>
+<div id="splash">
+    <div class="splash-logo">Eroğlu</div>
+    <div class="splash-slogan">Digital Solutions</div>
+</div>
 
 <div id="hamburger">&#9776;</div>
 
@@ -211,10 +229,10 @@
     
     <div id="kayit" style="display:none;">
       <h2>📝 Yeni Kayıt Girişi</h2>
-      <input type="text" id="tvModel" placeholder="TV Marka / Model (Örn: Samsung QLED 55)">
-      <input type="text" id="tvSN" placeholder="TV SN Kod (Seri Numarası)">
+      <input type="text" id="tvModel" placeholder="TV Marka / Model">
+      <input type="text" id="tvSN" placeholder="TV Seri Numarası">
       
-      <div id="camera">Barkod/Seri Numarası Tarama Alanı</div>
+      <div id="camera">Barkod / SN Tarama Alanı</div>
       
       <select id="islem">
         <option value="led">💡 LED Değişim</option>
@@ -235,10 +253,10 @@
         <h3>🎨 Tema Renk Paletleri</h3>
         <p style="font-size:0.8em; color:#aaa;">Uygulamanın ana renklerini buradan değiştirin.</p>
         <div style="display:flex; justify-content:space-between;">
-          <input type="color" id="renk1" value="#0a0a0a" title="Arka Plan">
-          <input type="color" id="renk2" value="#1e1e1e" title="Menü/Kart">
-          <input type="color" id="renk3" value="#ff6b00" title="Aksan 1 (Turuncu)">
-          <input type="color" id="renk4" value="#00bfff" title="Aksan 2 (Mavi)">
+          <input type="color" id="renk1" value="#121212" title="Arka Plan">
+          <input type="color" id="renk2" value="#1f1f1f" title="Menü/Kart">
+          <input type="color" id="renk3" value="#4CAF50" title="Aksan 1 (Yeşil)">
+          <input type="color" id="renk4" value="#90caf9" title="Aksan 2 (Mavi)">
         </div>
         <button onclick="renkDegistir()">🚀 Renkleri Uygula</button>
       </div>
@@ -249,8 +267,11 @@
       <p style="color:#aaa;">Sisteme kayıtlı tüm garanti bilgilerini buradan takip edebilirsiniz.</p>
       <div id="garantiList">
         <div class="kayit-item">
-            <span>Örnek Kayıt: Samsung 55" Panel</span>
-            <span class="garanti-sure">2 Yıl</span>
+            <div style="flex-grow:1;">
+                <span style="font-weight:700;">Örnek TV Model (SN12345)</span><br>
+                <span style="font-size:0.9em; color:#90caf9;">İşlem: LED - Tarih: 01.01.2025</span>
+            </div>
+            <span class="garanti-sure">2 YIL</span>
         </div>
       </div>
     </div>
@@ -278,18 +299,17 @@
   const splash = document.getElementById('splash');
   const application = document.getElementById('app');
   const menu = document.getElementById('menu');
-  const content = document.getElementById('content');
   const body = document.body;
 
-  // 1. SPLASH EKRANI GECİKME
+  // 1. SPLASH EKRANI GECİKME (3 saniye)
   setTimeout(() => { 
     splash.style.opacity = '0'; // Yumuşak geçiş için
     setTimeout(() => { 
         splash.style.display = 'none'; 
         application.style.display = 'block'; 
         showSection('kayit'); // Başlangıçta Kayıt ekranını göster
-    }, 1000); // Opaklık geçişi sonrası gizle
-  }, 1000); // 1 saniye sonra başlat
+    }, 500); // Opaklık geçişi süresi
+  }, 3000); // Tam 3 saniye sonra başla
 
   // 2. HAMBURGER MENÜ FONKSİYONU
   document.getElementById('hamburger').onclick = () => {
@@ -303,7 +323,7 @@
     menu.classList.remove('open');
     body.classList.remove('menu-open');
     if(id === 'garanti') {
-        loadGarantiList(); // Garanti sayfasına geçince listeyi yükle
+        loadGarantiList(); 
     }
   }
 
@@ -323,20 +343,16 @@
   function renkDegistir(){
     const r1 = document.getElementById('renk1').value; // Arka Plan
     const r2 = document.getElementById('renk2').value; // Menü/Kart
-    const r3 = document.getElementById('renk3').value; // Aksan 1
-    const r4 = document.getElementById('renk4').value; // Aksan 2
+    const r3 = document.getElementById('renk3').value; // Aksan 1 (Yeşil)
+    const r4 = document.getElementById('renk4').value; // Aksan 2 (Mavi)
     
-    // CSS Değişiklikleri
     document.body.style.background = r1;
     document.getElementById('menu').style.background = r2;
-    document.querySelector('#splash').style.background = `linear-gradient(135deg, ${r1} 0%, ${r2} 100%)`;
-    document.querySelector('#splash').style.color = r3;
+    document.querySelector('.splash-logo').style.color = r3;
     document.querySelector('#hamburger').style.color = r4;
     document.querySelector('h2').style.color = r3;
-    document.querySelector('h2').style.borderBottom = `2px solid ${r4}`;
+    document.querySelector('h2').style.borderBottom = `3px solid ${r4}`;
     document.querySelector('button').style.background = r4;
-    
-    // Not: Tüm hover ve focus renklerini dinamik değiştirmek daha fazla CSS değişkeni gerektirir.
     
     alert('🎨 Yeni Renkler Başarıyla Uygulandı!');
   }
@@ -357,8 +373,8 @@
         tvModel, 
         tvSN, 
         islem, 
-        garanti: garanti || 'Belirtilmedi', // Boşsa 'Belirtilmedi'
-        tarih: new Date().toLocaleDateString('tr-TR') // Kayıt tarihini ekle
+        garanti: garanti || 'Belirtilmedi',
+        tarih: new Date().toLocaleDateString('tr-TR') 
     });
     alert('✅ Yeni Kayıt Başarılı!');
     document.getElementById('tvModel').value='';
@@ -369,19 +385,18 @@
   // 6. GARANTİ LİSTESİNİ YÜKLE
   function loadGarantiList() {
       const listElement = document.getElementById('garantiList');
-      listElement.innerHTML = 'Kayıtlar yükleniyor...';
+      listElement.innerHTML = '<p style="color:#90caf9;">Kayıtlar yükleniyor...</p>';
 
       db.ref('kayitlar').once('value', (snapshot) => {
-          listElement.innerHTML = ''; // Önceki içeriği temizle
+          listElement.innerHTML = ''; 
           
           if (!snapshot.exists()) {
-              listElement.innerHTML = '<p style="color:#ff6b00;">Henüz hiç kayıt bulunmamaktadır.</p>';
+              listElement.innerHTML = '<p style="color:#4CAF50;">Henüz hiç kayıt bulunmamaktadır.</p>';
               return;
           }
           
           snapshot.forEach((childSnapshot) => {
               const kayit = childSnapshot.val();
-              const key = childSnapshot.key;
               
               const item = document.createElement('div');
               item.classList.add('kayit-item');
@@ -389,10 +404,10 @@
               item.innerHTML = `
                   <div style="flex-grow:1;">
                       <span style="font-weight:700;">${kayit.tvModel}</span> 
-                      <span style="font-size:0.8em; color:#aaa;">(${kayit.tvSN})</span><br>
-                      <span style="font-size:0.9em; color:#00bfff;">İşlem: ${kayit.islem.toUpperCase()} - Tarih: ${kayit.tarih}</span>
+                      <span style="font-size:0.8em; color:#90caf9;">(${kayit.tvSN})</span><br>
+                      <span style="font-size:0.9em; color:#aaa;">İşlem: ${kayit.islem.toUpperCase()} - Tarih: ${kayit.tarih}</span>
                   </div>
-                  <span class="garanti-sure">${kayit.garanti} YIL</span>
+                  <span class="garanti-sure">${kayit.garanti} ${kayit.garanti.toLowerCase().includes('yıl') ? '' : 'YIL'}</span>
               `;
               listElement.appendChild(item);
           });
