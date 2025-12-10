@@ -3,151 +3,139 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eroğlu Servis</title>
+<title>Eroğlu Sistem</title>
 <style>
-    * { box-sizing: border-box; margin:0; padding:0; font-family: Arial, sans-serif; }
-    body { background: #121212; color: #fff; display: flex; flex-direction: column; min-height: 100vh; }
-    #splash { position: fixed; width: 100%; height: 100%; background: #0d0d0d; display: flex; justify-content: center; align-items: center; font-size: 3rem; z-index: 1000; }
-    header { background: #1a1a1a; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
-    #menu-btn { font-size: 1.5rem; cursor: pointer; }
-    nav { position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #222; transition: 0.3s; padding-top: 60px; }
-    nav a { display: block; padding: 15px; color: #fff; text-decoration: none; border-bottom: 1px solid #333; }
-    nav a:hover { background: #333; }
-    main { flex: 1; padding: 20px; }
-    .hidden { display: none; }
-    .section { margin-bottom: 20px; }
-    input, select, button { padding: 8px; margin: 5px 0; width: 100%; border-radius: 5px; border: none; }
-    button { cursor: pointer; background: #007bff; color: #fff; }
-    .admin-panel { background: #1e1e1e; padding: 20px; border-radius: 10px; }
-    .color-palette { display: flex; gap: 10px; margin-top: 10px; }
-    .color-box { width: 40px; height: 40px; cursor: pointer; border-radius: 5px; }
-    .camera-box { width: 100%; height: 250px; background: #000; display: flex; justify-content: center; align-items: center; color: #888; font-size: 1.2rem; margin-bottom: 10px; }
+  body { margin:0; font-family: Arial, sans-serif; }
+  #splash { display:flex; justify-content:center; align-items:center; height:100vh; background:#0d0d0d; color:#fff; font-size:3em; }
+  #app { display:none; }
+  #menu { position:fixed; top:0; left:0; width:250px; height:100%; background:#111; color:#fff; transform:translateX(-250px); transition:0.3s; padding:1em; }
+  #menu ul { list-style:none; padding:0; }
+  #menu ul li { margin:1em 0; cursor:pointer; }
+  #hamburger { position:fixed; top:1em; left:1em; font-size:2em; cursor:pointer; color:#111; z-index:10; }
+  #content { margin-left:0; transition:0.3s; padding:2em; }
+  input, select, button { margin:0.5em 0; padding:0.5em; width:100%; }
+  #camera { width:100%; max-width:400px; height:400px; border:2px solid #111; margin:1em 0; }
 </style>
 </head>
 <body>
 
-<div id="splash">EROĞLU</div>
+<div id="splash">Eroğlu</div>
 
-<header>
-    <div>Eroğlu</div>
-    <div id="menu-btn">&#9776;</div>
-</header>
+<div id="hamburger">&#9776;</div>
 
-<nav id="side-menu">
-    <a href="#" data-section="new-record">Yeni Kayıt</a>
-    <a href="#" data-section="operations">Yapılan İşlem</a>
-    <a href="#" data-section="admin">Admin Paneli</a>
-</nav>
+<div id="menu">
+  <ul>
+    <li onclick="showSection('kayit')">Yeni Kayıt</li>
+    <li onclick="showSection('admin')">Admin Paneli</li>
+    <li onclick="showSection('garanti')">Garanti</li>
+  </ul>
+</div>
 
-<main>
-    <!-- Yeni Kayıt -->
-    <div id="new-record" class="section">
-        <h2>Yeni Kayıt</h2>
-        <div class="camera-box" id="camera-box">Kamerayı Açmak İçin Basın</div>
-        <input type="text" id="tv-sn" placeholder="TV Seri No (kamera ile okutulabilir)">
-        <input type="text" id="tv-model" placeholder="TV Marka / Model (kamera ile okutulabilir)">
-        <select id="guarantee">
-            <option value="1">1 Yıl Garanti</option>
-            <option value="2">2 Yıl Garanti</option>
-            <option value="manual">Manuel Ayarla</option>
-        </select>
-        <input type="text" id="manual-guarantee" placeholder="Manuel Garanti Süresi (yıl)" class="hidden">
-        <button onclick="saveRecord()">Kaydet</button>
+<div id="app">
+  <div id="content">
+    <div id="kayit" style="display:none;">
+      <h2>Yeni Kayıt</h2>
+      <input type="text" id="tvModel" placeholder="TV Marka / Model">
+      <input type="text" id="tvSN" placeholder="TV SN Kod">
+      <div id="camera"></div>
+      <select id="islem">
+        <option value="led">LED Değişim</option>
+        <option value="panel">Panel Değişim</option>
+        <option value="diger">Diğer</option>
+      </select>
+      <input type="number" id="garanti" placeholder="Garanti Yılı (Manuel)">
+      <button onclick="kaydet()">Kaydet</button>
     </div>
 
-    <!-- Yapılan İşlem -->
-    <div id="operations" class="section hidden">
-        <h2>Yapılan İşlem</h2>
-        <button onclick="selectOperation('Led Değişim')">Led Değişim</button>
-        <button onclick="selectOperation('Panel Değişim')">Panel Değişim</button>
-        <button onclick="selectOperation('Diğer')">Diğer</button>
-        <input type="text" id="manual-operation-guarantee" placeholder="Garanti Süresi (yıl)" class="hidden">
+    <div id="admin" style="display:none;">
+      <h2>Admin Paneli</h2>
+      <input type="password" id="adminPass" placeholder="Şifre">
+      <button onclick="girisAdmin()">Giriş</button>
+      <div id="adminContent" style="display:none;">
+        <h3>Renk Paletleri</h3>
+        <input type="color" id="renk1">
+        <input type="color" id="renk2">
+        <input type="color" id="renk3">
+        <input type="color" id="renk4">
+        <button onclick="renkDegistir()">Uygula</button>
+      </div>
     </div>
 
-    <!-- Admin Paneli -->
-    <div id="admin" class="section hidden">
-        <h2>Admin Paneli</h2>
-        <input type="password" id="admin-pass" placeholder="Şifre">
-        <button onclick="loginAdmin()">Giriş</button>
-
-        <div id="admin-controls" class="admin-panel hidden">
-            <h3>Renk Paletleri</h3>
-            <div class="color-palette">
-                <div class="color-box" style="background:#007bff" onclick="changePalette('#007bff')"></div>
-                <div class="color-box" style="background:#28a745" onclick="changePalette('#28a745')"></div>
-                <div class="color-box" style="background:#ffc107" onclick="changePalette('#ffc107')"></div>
-                <div class="color-box" style="background:#dc3545" onclick="changePalette('#dc3545')"></div>
-            </div>
-        </div>
+    <div id="garanti" style="display:none;">
+      <h2>Garanti Kayıtları</h2>
+      <div id="garantiList"></div>
     </div>
-</main>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-    // Splash ekran
-    setTimeout(()=>{ document.getElementById('splash').style.display='none'; }, 3000);
+  const firebaseConfig = {
+    apiKey: "AIzaSyCkS2QqyYNAWvIGYHmXtg0tFwAUtxYnYhE",
+    authDomain: "ef-8914e.firebaseapp.com",
+    projectId: "ef-8914e",
+    storageBucket: "ef-8914e.appspot.com",
+    messagingSenderId: "131514808744",
+    appId: "1:131514808744:web:7b45d2f5fbedff9abf859d",
+    measurementId: "G-3XWC0SF1PY"
+  };
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-    // Menü açma
-    const menuBtn = document.getElementById('menu-btn');
-    const sideMenu = document.getElementById('side-menu');
-    menuBtn.addEventListener('click', ()=> {
-        sideMenu.style.left = sideMenu.style.left === '0px' ? '-250px' : '0px';
-    });
+  // Splash ekranı
+  setTimeout(() => { document.getElementById('splash').style.display='none'; document.getElementById('app').style.display='block'; }, 3000);
 
-    // Menü navigasyon
-    document.querySelectorAll('nav a').forEach(link => {
-        link.addEventListener('click', e => {
-            e.preventDefault();
-            document.querySelectorAll('main .section').forEach(sec => sec.classList.add('hidden'));
-            const secId = e.target.getAttribute('data-section');
-            document.getElementById(secId).classList.remove('hidden');
-            sideMenu.style.left = '-250px';
-        });
-    });
+  // Hamburger menü
+  const menu = document.getElementById('menu');
+  const content = document.getElementById('content');
+  document.getElementById('hamburger').onclick = () => {
+    if(menu.style.transform==='translateX(0px)'){ menu.style.transform='translateX(-250px)'; content.style.marginLeft='0'; }
+    else{ menu.style.transform='translateX(0px)'; content.style.marginLeft='250px'; }
+  };
 
-    // Garanti manuel ayar
-    const guarantee = document.getElementById('guarantee');
-    const manualInput = document.getElementById('manual-guarantee');
-    guarantee.addEventListener('change', ()=> {
-        manualInput.classList.toggle('hidden', guarantee.value !== 'manual');
-    });
+  function showSection(id){
+    ['kayit','admin','garanti'].forEach(s => document.getElementById(s).style.display='none');
+    document.getElementById(id).style.display='block';
+    menu.style.transform='translateX(-250px)'; content.style.marginLeft='0';
+  }
 
-    // Yapılan işlem manuel garanti
-    function selectOperation(name) {
-        alert(name + ' seçildi.');
-        document.getElementById('manual-operation-guarantee').classList.toggle('hidden', name !== 'Diğer');
-    }
+  // Admin giriş
+  function girisAdmin(){
+    const pass = document.getElementById('adminPass').value;
+    if(pass==='6161'){ document.getElementById('adminContent').style.display='block'; alert('Admin Giriş Başarılı'); }
+    else{ alert('Hatalı Şifre'); }
+  }
 
-    // Admin paneli
-    function loginAdmin() {
-        const pass = document.getElementById('admin-pass').value;
-        if(pass==='6161'){
-            document.getElementById('admin-controls').classList.remove('hidden');
-            alert('Admin girişi başarılı');
-        } else alert('Şifre yanlış');
-    }
+  function renkDegistir(){
+    const r1 = document.getElementById('renk1').value;
+    const r2 = document.getElementById('renk2').value;
+    const r3 = document.getElementById('renk3').value;
+    const r4 = document.getElementById('renk4').value;
+    document.body.style.background=r1;
+    // Diğer renkleri istediğin alanda uygula
+    alert('Renkler Uygulandı!');
+  }
 
-    // Renk paleti değiştirme
-    function changePalette(color) {
-        document.body.style.background = color;
-    }
+  // Kayıt fonksiyonu
+  function kaydet(){
+    const tvModel = document.getElementById('tvModel').value;
+    const tvSN = document.getElementById('tvSN').value;
+    const islem = document.getElementById('islem').value;
+    const garanti = document.getElementById('garanti').value;
+    db.ref('kayitlar').push({ tvModel, tvSN, islem, garanti });
+    alert('Kayıt Başarılı!');
+    document.getElementById('tvModel').value='';
+    document.getElementById('tvSN').value='';
+    document.getElementById('garanti').value='';
+  }
 
-    // Kayıt kaydetme
-    function saveRecord() {
-        const sn = document.getElementById('tv-sn').value;
-        const model = document.getElementById('tv-model').value;
-        const guaranteeValue = guarantee.value==='manual' ? manualInput.value : guarantee.value;
-        alert(`Kayıt Başarıyla Eklendi!\nSN: ${sn}\nModel: ${model}\nGaranti: ${guaranteeValue} Yıl`);
-        // Buraya Firebase veya localStorage kaydı eklenebilir
-    }
-
-    // Kamera barkod okuma simülasyonu
-    const cameraBox = document.getElementById('camera-box');
-    cameraBox.addEventListener('click', ()=>{
-        const simulatedCode = 'SN123456789';
-        document.getElementById('tv-sn').value = simulatedCode;
-        document.getElementById('tv-model').value = 'Samsung 55"';
-        alert('Barkod okundu: ' + simulatedCode);
-    });
+  // Barkod / Kamera işlevi örneği (basit)
+  // Daha gelişmiş için bir barkod kütüphanesi entegre edilebilir
 </script>
+
 </body>
 </html>
+
+
