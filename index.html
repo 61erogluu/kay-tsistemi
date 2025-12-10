@@ -1,417 +1,223 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>EROĞLU TV Garanti - Yönetim Paneli</title>
+<title>Reis Yönetim Paneli — Responsive</title>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-:root{--bg:#0b1220;--card:#0f1724;--muted:#9bb0d1;--text:#eaf2ff;--accent:#3a86ff;--accent-2:#2b6ed6;--glass:rgba(255,255,255,0.03);}
+:root{--bg:#0b1220;--card:#0f1724;--muted:#9bb0d1;--accent:#3a86ff;--accent-2:#2b6ed6;--panel:#0b1220;--text:#eaf2ff}
+:root.light{--bg:#f3f6fb;--card:#fff;--muted:#55607a;--accent:#0d3b66;--accent-2:#0b3257;--panel:#fff;--text:#0e1a2f}
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;}
-body{background:linear-gradient(180deg,#071226 0%, #07182a 100%);color:var(--text);}
-.app{display:flex;height:100vh;align-items:stretch;}
-.sidebar{width:300px;background:linear-gradient(180deg,#071028,#0b1830);border-right:1px solid rgba(255,255,255,0.03);padding:28px 18px;display:flex;flex-direction:column;gap:12px}
-.brand{font-weight:800;font-size:20px;letter-spacing:1px;margin-bottom:6px}
-.sidebar .btn{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.03);cursor:pointer;color:var(--text)}
-.sidebar .btn:hover{background:rgba(255,255,255,0.02)}
-.select, input, button, textarea{font-family:inherit}
-.content{flex:1;padding:28px;overflow:auto}
-.header{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:18px}
-.header .left{display:flex;align-items:center;gap:14px}
-.header h1{margin:0;font-size:20px}
-.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);border-radius:12px;padding:18px;box-shadow:0 6px 20px rgba(2,6,23,0.6)}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.full{grid-column:1/-1}
-.form-row{display:flex;gap:12px}
-.form-row input, .form-row select{flex:1}
-label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-.input, input, select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text);outline:none}
-.action{background:var(--accent);border:0;color:white;padding:10px 12px;border-radius:8px;cursor:pointer}
-.table-wrap{overflow:auto}
-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
-th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left}
-th{font-size:13px;color:var(--muted)}
-.controls{display:flex;gap:8px;align-items:center}
-.kv{display:flex;gap:8px;align-items:center}
-.kv strong{display:block}
-.footer-stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
-.stat{background:var(--glass);padding:10px;border-radius:8px;min-width:120px}
-.small{font-size:13px;color:var(--muted)}
-@media (max-width:1000px){.sidebar{width:72px;padding:18px}.sidebar .label{display:none}.grid{grid-template-columns:1fr}.content{padding:18px}}
+html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;color:var(--text);background:var(--bg)}
+/* Splash */
+#splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d3b66,#1e81b0);z-index:9999}
+.splash-title{font-weight:800;letter-spacing:4px;font-size:clamp(28px,6vw,48px);color:#fff;text-align:center}
+/* Layout */
+.header{height:64px;display:flex;align-items:center;gap:12px;padding:0 16px;background:linear-gradient(180deg,rgba(0,0,0,.25),transparent);position:fixed;top:0;left:0;right:0;z-index:900;border-bottom:1px solid rgba(255,255,255,.03)}
+.header .brand{font-weight:700}
+.header .actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.container{display:flex;padding-top:72px}
+/* Sidebar */
+.sidebar{width:260px;background:var(--card);height:100vh;padding:20px;position:fixed;left:0;top:72px;border-right:1px solid rgba(255,255,255,.03);overflow:auto;transition:transform .28s ease;z-index:800}
+.sidebar.hidden{transform:translateX(-110%)}
+.side-logo{font-weight:800;margin-bottom:14px}
+.side-btn{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:transparent;border:0;color:var(--text);cursor:pointer;width:100%;text-align:left}
+.side-btn:hover{background:rgba(255,255,255,.03)}
+/* Mobile hamburger */
+.hamburger{display:none;padding:8px;border-radius:8px;cursor:pointer}
+/* Main */
+.main{margin-left:280px;padding:20px;flex:1;min-height:calc(100vh - 72px)}
+.card{background:var(--panel);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,.03);box-shadow:0 8px 30px rgba(0,0,0,.4);margin-bottom:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:10px;border-bottom:1px solid rgba(255,255,255,.03);text-align:left}
+.form-row{display:flex;gap:8px}
+.input, .select, .btn{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.04);background:transparent;color:var(--text)}
+.btn{cursor:pointer;background:var(--accent);border:0;color:#fff}
+/* Login modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000}
+.modal-box{width:96%;max-width:420px;background:var(--panel);padding:20px;border-radius:12px}
+/* Animations */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.fadeIn{animation:fadeIn .28s ease both}
+.pop{animation:pop .28s ease both}
+/* Responsive */
+@media (max-width: 900px){.sidebar{position:fixed;top:64px;left:0;z-index:1000}.main{margin-left:0;padding:12px}.hamburger{display:block}.sidebar.hidden{transform:translateX(-120%)} }
+@media (max-width:480px){.grid-3{grid-template-columns:1fr}.table th,.table td{font-size:13px}}
+/* small helpers */
+.hidden{display:none}
+.center{text-align:center}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.04)}
 </style>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar card" aria-label="Panel">
-    <div>
-      <div class="brand">EROĞLU • TV Garanti</div>
-      <div class="small">Yönetim Paneli</div>
+
+<div id="splash"><div class="splash-title">REİS PANEL</div></div>
+
+<header class="header">
+  <div class="hamburger" id="hambBtn" aria-label="menu">☰</div>
+  <div class="brand">REİS Yönetim Paneli</div>
+  <div class="actions">
+    <button id="themeBtn" class="side-btn">🌙</button>
+    <button id="openLogin" class="side-btn">Admin Giriş</button>
+  </div>
+</header>
+
+<!-- Sidebar -->
+<nav id="sidebar" class="sidebar hidden">
+  <div class="side-logo">REİS</div>
+  <button class="side-btn" data-panel="dashboard">🏠 Dashboard</button>
+  <button class="side-btn" data-panel="users">👥 Kullanıcılar</button>
+  <button class="side-btn" data-panel="add">➕ Yeni Kayıt</button>
+  <button class="side-btn" data-panel="settings">⚙️ Ayarlar</button>
+  <div style="margin-top:14px">
+    <small class="center muted">Tema</small>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button id="light" class="side-btn">Açık</button>
+      <button id="dark" class="side-btn">Koyu</button>
     </div>
-    <button class="btn" data-panel="new">➕ Yeni Kayıt</button>
-    <button class="btn" data-panel="records">📋 Kayıtlılar</button>
-    <button class="btn" data-panel="expired">⏰ Garantisi Bitenler</button>
-    <button class="btn" data-panel="stats">📊 İstatistikler</button>
-    <button class="btn" data-panel="monthly">🗓️ İş Tablosu</button>
-    <div style="margin-top:auto">
-      <div class="small">Tema</div>
-      <select id="themeSelect" class="input" aria-label="Tema">
-        <option value="dark">Koyu</option>
-        <option value="light">Açık</option>
-      </select>
-      <div style="height:14px"></div>
-      <button id="exportCsv" class="btn">⬇️ CSV Dışa Aktar</button>
-      <button id="clearAll" class="btn" style="margin-top:8px">🧹 Tüm Kayıtları Sil</button>
+  </div>
+</nav>
+
+<main class="main">
+  <!-- Panels -->
+  <section id="dashboard" class="card fadeIn">
+    <h2>Dashboard</h2>
+    <div class="grid-3" style="margin-top:12px">
+      <div class="card">
+        <div>Toplam Kullanıcı</div>
+        <div style="font-weight:800;font-size:22px" id="statUsers">0</div>
+      </div>
+      <div class="card">
+        <div>Aktif</div>
+        <div style="font-weight:800;font-size:22px" id="statActive">0</div>
+      </div>
+      <div class="card">
+        <div>Bugün</div>
+        <div style="font-weight:800;font-size:22px" id="statToday">0</div>
+      </div>
     </div>
-  </aside>
+    <div class="card" style="margin-top:12px">
+      <canvas id="visitorsChart" height="80"></canvas>
+    </div>
+  </section>
 
-  <main class="content">
-    <header class="header">
-      <div class="left">
-        <h1>TV Tamir Yönetimi</h1>
-        <div class="small">PC sürümü - Geniş ekran için optimise</div>
-      </div>
-      <div class="controls">
-        <div class="kv"><span class="small">Kayıt sayısı</span><strong id="count">0</strong></div>
-        <div class="kv"><span class="small">Toplam TL</span><strong id="sumTL">0</strong></div>
-      </div>
-    </header>
+  <section id="users" class="card hidden">
+    <h2>Kullanıcılar</h2>
+    <div style="overflow:auto;margin-top:12px">
+      <table class="table" id="usersTable"><thead><tr><th>İsim</th><th>Email</th><th>Durum</th><th>İşlem</th></tr></thead><tbody></tbody></table>
+    </div>
+  </section>
 
-    <!-- Yeni Kayıt -->
-    <section id="panel-new" class="card">
-      <h2 style="margin-top:0">Yeni Kayıt</h2>
-      <div class="grid">
-        <div>
-          <label>Usta</label>
-          <select id="usta" class="input">
-            <option>Osman Usta</option>
-            <option>Mehmet Usta</option>
-          </select>
-        </div>
-        <div>
-          <label>SN Kodu</label>
-          <input id="sn" class="input" placeholder="Örn: SN123456">
-        </div>
-        <div>
-          <label>Tamir Türü</label>
-          <select id="tamir" class="input">
-            <option value="Yazılım">Yazılım (6 Ay)</option>
-            <option value="Besleme">Besleme Tamir (1 Yıl)</option>
-            <option value="LED">LED Değişimi (1 Yıl)</option>
-            <option value="Panel">Panel Değişimi (1 Yıl)</option>
-            <option value="Anakart">Anakart (1 Yıl)</option>
-            <option value="Diger">Diğer</option>
-          </select>
-        </div>
-        <div id="otherWrap" style="display:none">
-          <label>Diğer Tamir Türü</label>
-          <input id="otherTamir" class="input" placeholder="Diğer tamir türünü yazınız">
-        </div>
-
-        <div>
-          <label>Fiyat (TL)</label>
-          <input id="fiyat" type="number" class="input" placeholder="0">
-        </div>
-        <div>
-          <label>Tarih</label>
-          <input id="tarih" type="date" class="input">
-        </div>
-
-        <div class="full" style="display:flex;gap:10px">
-          <button id="saveBtn" class="action">Kaydet</button>
-          <button id="updateBtn" class="action" style="display:none;background:var(--accent-2)">Güncelle</button>
-          <button id="resetBtn" class="btn">Temizle</button>
-        </div>
+  <section id="add" class="card hidden">
+    <h2>Yeni Kayıt</h2>
+    <div class="form-row" style="margin-top:12px;flex-direction:column">
+      <input id="inpName" class="input" placeholder="İsim" />
+      <input id="inpMail" class="input" placeholder="E-posta" />
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" id="addBtn">Kayıt Ekle</button>
+        <button class="btn" id="clearBtn" style="background:#666">Temizle</button>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Kayıtlılar -->
-    <section id="panel-records" class="card" style="margin-top:14px;display:none">
-      <h2>Kayıtlılar</h2>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <input id="search" class="input" placeholder="SN ile ara...">
-        <select id="filterUsta" class="input"><option value="all">Tümü</option><option>Osman Usta</option><option>Mehmet Usta</option></select>
-        <select id="filterType" class="input"><option value="all">Tümü</option><option>Yazılım</option><option>Besleme</option><option>LED</option><option>Panel</option><option>Anakart</option></select>
-      </div>
-      <div class="table-wrap">
-        <table id="recordsTable" aria-live="polite">
-          <thead><tr><th>SN</th><th>Usta</th><th>Tamir</th><th>Garanti</th><th>Fiyat</th><th>Tarih</th><th>İşlem</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
+  <section id="settings" class="card hidden">
+    <h2>Ayarlar</h2>
+    <div style="margin-top:12px">
+      <label>Dark mode otomatik</label>
+      <div style="height:12px"></div>
+      <button id="exportBtn" class="btn">Verileri Dışa Aktar (JSON)</button>
+    </div>
+  </section>
+</main>
 
-    <!-- Garantisi Bitenler -->
-    <section id="panel-expired" class="card" style="margin-top:14px;display:none">
-      <h2>Garantisi Bitenler</h2>
-      <div class="table-wrap">
-        <table id="expiredTable"><thead><tr><th>SN</th><th>Usta</th><th>Tamir</th><th>Garanti</th></tr></thead><tbody></tbody></table>
-      </div>
-    </section>
-
-    <!-- İstatistikler -->
-    <section id="panel-stats" class="card" style="margin-top:14px;display:none">
-      <h2>İstatistikler</h2>
-      <div class="footer-stats">
-        <div class="stat"><div class="small">LED</div><strong id="totalLED">0</strong></div>
-        <div class="stat"><div class="small">Besleme</div><strong id="totalBesleme">0</strong></div>
-        <div class="stat"><div class="small">Panel</div><strong id="totalPanel">0</strong></div>
-        <div class="stat"><div class="small">Yazılım</div><strong id="totalYazilim">0</strong></div>
-        <div class="stat"><div class="small">Anakart</div><strong id="totalAnakart">0</strong></div>
-        <div class="stat"><div class="small">Toplam TL</div><strong id="totalTL">0</strong></div>
-      </div>
-    </section>
-
-    <!-- İş Tablosu -->
-    <section id="panel-monthly" class="card" style="margin-top:14px;display:none">
-      <h2>İş Tablosu</h2>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <select id="timeFilter" class="input"><option value="all">Tüm Kayıtlar</option><option value="weekly">Haftalık</option><option value="monthly">Aylık</option></select>
-      </div>
-      <div class="table-wrap">
-        <table id="monthlyTable"><thead><tr><th>SN</th><th>Usta</th><th>Tamir</th><th>Tarih</th><th>Fiyat</th></tr></thead><tbody></tbody></table>
-      </div>
-    </section>
-
-  </main>
+<!-- Login Modal -->
+<div id="loginModal" class="modal hidden">
+  <div class="modal-box pop">
+    <h3 style="margin:0 0 8px">Admin Giriş</h3>
+    <input id="loginUser" class="input" placeholder="Kullanıcı" />
+    <input id="loginPass" class="input" placeholder="Şifre" type="password" />
+    <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
+      <button id="loginCancel" class="btn" style="background:#666">İptal</button>
+      <button id="loginSubmit" class="btn">Giriş</button>
+    </div>
+    <p id="loginErr" style="color:#ff8b8b;margin-top:8px;display:none">Bilgiler hatalı</p>
+  </div>
 </div>
 
 <script>
-// Helper: get/set storage with ISO dates
-const STORAGE_KEY = 'tvRecords_v2';
-let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-let editIndex = null;
+// --- App state & helpers ---
+const ADMIN = {user:'admin', pass:'1234'};
+let users = JSON.parse(localStorage.getItem('rp_users')||'[]');
+let theme = localStorage.getItem('rp_theme') || 'dark';
+if(theme==='light') document.documentElement.classList.add('light');
 
-// UI elements
-const panels = {
-  new: document.getElementById('panel-new'),
-  records: document.getElementById('panel-records'),
-  expired: document.getElementById('panel-expired'),
-  stats: document.getElementById('panel-stats'),
-  monthly: document.getElementById('panel-monthly')
-};
+// DOM refs
+const sidebar = document.getElementById('sidebar');
+const hamb = document.getElementById('hambBtn');
+const sideBtns = Array.from(document.querySelectorAll('.side-btn[data-panel]'));
+const panels = {dashboard:document.getElementById('dashboard'), users:document.getElementById('users'), add:document.getElementById('add'), settings:document.getElementById('settings')};
+const usersTableBody = document.querySelector('#usersTable tbody');
+const statUsers = document.getElementById('statUsers');
+const statActive = document.getElementById('statActive');
+const statToday = document.getElementById('statToday');
+const loginModal = document.getElementById('loginModal');
+const openLoginBtn = document.getElementById('openLogin');
 
-document.querySelectorAll('.sidebar .btn').forEach(b=>{
-  b.addEventListener('click', ()=>{
-    const p = b.getAttribute('data-panel'); showPanel(p);
-  })
-});
+// Splash
+window.addEventListener('load',()=>{setTimeout(()=>{document.getElementById('splash').style.display='none'},900)});
 
-function showPanel(id){
-  Object.values(panels).forEach(el=>el.style.display='none');
-  panels[id].style.display='block';
-}
+// Sidebar toggle mobile
+hamb.addEventListener('click',()=>{sidebar.classList.toggle('hidden')});
+// side nav
+sideBtns.forEach(b=>b.addEventListener('click',()=>{showPanel(b.dataset.panel); if(window.innerWidth<900) sidebar.classList.add('hidden')}));
+function showPanel(id){Object.values(panels).forEach(p=>p.classList.add('hidden')); panels[id].classList.remove('hidden');}
 
-// Tamir türü 'Diğer' kontrol
-const tamirEl = document.getElementById('tamir');
-const otherWrap = document.getElementById('otherWrap');
-const otherEl = document.getElementById('otherTamir');
+// Initial
+showPanel('dashboard');
 
-tamirEl.addEventListener('change', ()=>{
-  otherWrap.style.display = tamirEl.value === 'Diger' ? 'block' : 'none';
-});
+// Theme toggles
+document.getElementById('light').addEventListener('click',()=>{document.documentElement.classList.add('light'); localStorage.setItem('rp_theme','light')});
+document.getElementById('dark').addEventListener('click',()=>{document.documentElement.classList.remove('light'); localStorage.setItem('rp_theme','dark')});
 
-// Save / Update
-const saveBtn = document.getElementById('saveBtn');
-const updateBtn = document.getElementById('updateBtn');
-const resetBtn = document.getElementById('resetBtn');
+// Login modal
+openLoginBtn.addEventListener('click',()=>{loginModal.classList.remove('hidden')});
+document.getElementById('loginCancel').addEventListener('click',()=>{loginModal.classList.add('hidden')});
+document.getElementById('loginSubmit').addEventListener('click',()=>{const u=document.getElementById('loginUser').value;const p=document.getElementById('loginPass').value;if(u===ADMIN.user&&p===ADMIN.pass){localStorage.setItem('rp_admin','1');loginModal.classList.add('hidden');openAdmin();}else{document.getElementById('loginErr').style.display='block'}});
 
-saveBtn.addEventListener('click', addRecord);
-updateBtn.addEventListener('click', updateRecord);
-resetBtn.addEventListener('click', clearForm);
+function openAdmin(){sidebar.classList.remove('hidden');document.querySelector('.main').scrollTop=0;showPanel('dashboard');renderAll();}
+if(localStorage.getItem('rp_admin')) openAdmin();
 
-function addRecord(){
-  const sn = document.getElementById('sn').value.trim();
-  const usta = document.getElementById('usta').value;
-  let tamir = document.getElementById('tamir').value;
-  if(tamir === 'Diger') tamir = otherEl.value.trim() || 'Diğer';
-  const fiyat = parseFloat(document.getElementById('fiyat').value) || 0;
-  const tarihInput = document.getElementById('tarih').value;
-  const tarih = tarihInput ? new Date(tarihInput).toISOString().slice(0,10) : new Date().toISOString().slice(0,10);
+// Users render
+function renderUsers(){usersTableBody.innerHTML='';users.forEach((u,i)=>{const tr=document.createElement('tr');tr.innerHTML=<td>${u.name}</td><td>${u.mail}</td><td>${u.active?'<span class="badge">Aktif</span>':'<span class="badge">Pasif</span>'}</td><td><button onclick="editUser(${i})">Düzenle</button> <button onclick="delUser(${i})">Sil</button></td>;usersTableBody.appendChild(tr)});updateStats();}
+function updateStats(){statUsers.innerText = users.length;statActive.innerText = users.filter(u=>u.active).length;statToday.innerText = users.filter(u=>{const d = new Date(u.created); const n=new Date(); return d.toDateString()===n.toDateString()}).length}
 
-  if(!sn || !tamir){ alert('SN ve Tamir türü gerekli'); return; }
+// Add user
+document.getElementById('addBtn').addEventListener('click',()=>{const name=document.getElementById('inpName').value.trim();const mail=document.getElementById('inpMail').value.trim();if(!name||!mail){alert('Eksik bilgi');return;}users.push({name,mail,active:true,created:new Date().toISOString()});localStorage.setItem('rp_users',JSON.stringify(users));document.getElementById('inpName').value='';document.getElementById('inpMail').value='';renderUsers();alert('Kullanıcı eklendi')});
 
-  records.push({sn,usta,tamir,fiyat,tarih});
-  persist();
-  renderAll();
-  clearForm();
-}
+document.getElementById('clearBtn').addEventListener('click',()=>{document.getElementById('inpName').value='';document.getElementById('inpMail').value=''});
 
-function updateRecord(){
-  if(editIndex === null) return;
-  const sn = document.getElementById('sn').value.trim();
-  const usta = document.getElementById('usta').value;
-  let tamir = document.getElementById('tamir').value;
-  if(tamir === 'Diger') tamir = otherEl.value.trim() || 'Diğer';
-  const fiyat = parseFloat(document.getElementById('fiyat').value) || 0;
-  const tarihInput = document.getElementById('tarih').value;
-  const tarih = tarihInput ? new Date(tarihInput).toISOString().slice(0,10) : new Date().toISOString().slice(0,10);
-  records[editIndex] = {sn,usta,tamir,fiyat,tarih};
-  persist(); renderAll(); clearForm();
-}
+// Edit / Delete
+function delUser(i){if(!confirm('Silinsin mi?')) return;users.splice(i,1);localStorage.setItem('rp_users',JSON.stringify(users));renderUsers()}
+function editUser(i){const n=prompt('Yeni isim',users[i].name);const m=prompt('Yeni email',users[i].mail);if(n&&m){users[i].name=n;users[i].mail=m;localStorage.setItem('rp_users',JSON.stringify(users));renderUsers()}}
 
-function clearForm(){
-  document.getElementById('sn').value='';
-  document.getElementById('fiyat').value='';
-  document.getElementById('otherTamir').value='';
-  document.getElementById('tarih').value='';
-  document.getElementById('tamir').value='Yazılım';
-  otherWrap.style.display='none';
-  editIndex = null; updateBtn.style.display='none'; saveBtn.style.display='inline-block';
-}
+// Export
+document.getElementById('exportBtn').addEventListener('click',()=>{const data='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(users));const a=document.createElement('a');a.href=data;a.download='users.json';a.click()});
 
-function persist(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
+// Chart
+let visitorsChart;
+function renderChart(){const ctx=document.getElementById('visitorsChart').getContext('2d');const labels=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];const values = [3,5,2,6,4,7,5]; if(visitorsChart) visitorsChart.destroy(); visitorsChart=new Chart(ctx,{type:'line',data:{labels, datasets:[{label:'Ziyaretçi',data:values,fill:true,backgroundColor:'rgba(58,134,255,.12)',borderColor:'#3a86ff',tension:0.4}]},options:{responsive:true,plugins:{legend:{display:false}},animation:{duration:800}}});}
 
-// Rendering
-const recordsTbody = document.querySelector('#recordsTable tbody');
-const expiredTbody = document.querySelector('#expiredTable tbody');
-const monthlyTbody = document.querySelector('#monthlyTable tbody');
+function renderAll(){renderUsers();renderChart();}
 
-function garantiText(tamir, tarihISO){
-  const date = new Date(tarihISO + 'T00:00:00');
-  let months = 6;
-  if(['Besleme','LED','Panel','Anakart'].some(t=>tamir.includes(t))) months = 12;
-  const due = new Date(date);
-  due.setMonth(due.getMonth() + months);
-  return new Date() > due ? 'Bitti' : due.toLocaleDateString('tr-TR');
-}
+// initial load
+renderAll();
 
-function renderRecords(){
-  const filter = document.getElementById('search').value.toLowerCase();
-  const filterUsta = document.getElementById('filterUsta').value;
-  const filterType = document.getElementById('filterType').value;
-  recordsTbody.innerHTML='';
-  records.forEach((r,i)=>{
-    if(filter && !r.sn.toLowerCase().includes(filter)) return;
-    if(filterUsta !== 'all' && r.usta !== filterUsta) return;
-    if(filterType !== 'all' && !r.tamir.includes(filterType)) return;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${r.sn}</td><td>${r.usta}</td><td>${r.tamir}</td><td>${garantiText(r.tamir,r.tarih)}</td><td>${r.fiyat.toFixed(2)}</td><td>${new Date(r.tarih).toLocaleDateString('tr-TR')}</td>
-      <td>
-        <button data-i="${i}" class="editBtn">Düzenle</button>
-        <button data-i="${i}" class="delBtn">Sil</button>
-      </td>`;
-    recordsTbody.appendChild(tr);
-  });
-  attachRecordActions();
-}
-
-function renderExpired(){
-  expiredTbody.innerHTML='';
-  records.forEach(r=>{
-    if(garantiText(r.tamir,r.tarih) === 'Bitti'){
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${r.sn}</td><td>${r.usta}</td><td>${r.tamir}</td><td>Bitti</td>`;
-      expiredTbody.appendChild(tr);
-    }
-  });
-}
-
-function renderMonthly(){
-  const filter = document.getElementById('timeFilter').value;
-  monthlyTbody.innerHTML='';
-  const now = new Date();
-  records.forEach(r=>{
-    const t = new Date(r.tarih + 'T00:00:00');
-    const days = (now - t)/(1000*60*60*24);
-    if(filter === 'weekly' && days > 7) return;
-    if(filter === 'monthly' && days > 30) return;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${r.sn}</td><td>${r.usta}</td><td>${r.tamir}</td><td>${new Date(r.tarih).toLocaleDateString('tr-TR')}</td><td>${r.fiyat.toFixed(2)}</td>`;
-    monthlyTbody.appendChild(tr);
-  });
-}
-
-function renderStats(){
-  const totals = {LED:0,Besleme:0,Panel:0,Yazilim:0,Anakart:0,TL:0};
-  records.forEach(r=>{
-    if(r.tamir.includes('LED')) totals.LED++;
-    else if(r.tamir.includes('Besleme')) totals.Besleme++;
-    else if(r.tamir.includes('Panel')) totals.Panel++;
-    else if(r.tamir.includes('Yazılım')||r.tamir.includes('Yazilim')) totals.Yazilim++;
-    else if(r.tamir.includes('Anakart')) totals.Anakart++;
-    totals.TL += parseFloat(r.fiyat) || 0;
-  });
-  document.getElementById('totalLED').textContent = totals.LED;
-  document.getElementById('totalBesleme').textContent = totals.Besleme;
-  document.getElementById('totalPanel').textContent = totals.Panel;
-  document.getElementById('totalYazilim').textContent = totals.Yazilim;
-  document.getElementById('totalAnakart').textContent = totals.Anakart;
-  document.getElementById('totalTL').textContent = totals.TL.toFixed(2);
-  document.getElementById('count').textContent = records.length;
-  document.getElementById('sumTL').textContent = totals.TL.toFixed(2);
-}
-
-function renderAll(){ renderRecords(); renderExpired(); renderMonthly(); renderStats(); }
-
-function attachRecordActions(){
-  document.querySelectorAll('.editBtn').forEach(b=>b.addEventListener('click', e=>{
-    const i = parseInt(b.getAttribute('data-i'));
-    startEdit(i);
-  }));
-  document.querySelectorAll('.delBtn').forEach(b=>b.addEventListener('click', e=>{
-    const i = parseInt(b.getAttribute('data-i'));
-    if(confirm('Kaydı silmek istiyor musunuz?')){ records.splice(i,1); persist(); renderAll(); }
-  }));
-}
-
-function startEdit(i){
-  const r = records[i];
-  document.getElementById('sn').value = r.sn;
-  document.getElementById('usta').value = r.usta;
-  if(['Yazılım','Besleme','LED','Panel','Anakart'].includes(r.tamir)){
-    document.getElementById('tamir').value = r.tamir;
-    otherWrap.style.display = 'none';
-  } else {
-    document.getElementById('tamir').value = 'Diger';
-    otherWrap.style.display = 'block';
-    otherEl.value = r.tamir;
-  }
-  document.getElementById('fiyat').value = r.fiyat;
-  document.getElementById('tarih').value = r.tarih;
-  editIndex = i; updateBtn.style.display='inline-block'; saveBtn.style.display='none'; showPanel('new');
-}
-
-// Filters
-['search','filterUsta','filterType','timeFilter'].forEach(id=>{
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.addEventListener('input', ()=>{ renderAll(); });
-});
-
-document.getElementById('timeFilter').addEventListener('change', renderMonthly);
-
-// Export CSV & Clear All
-document.getElementById('exportCsv').addEventListener('click', ()=>{
-  if(!records.length){ alert('Kayıt yok'); return; }
-  const rows = [['SN','Usta','Tamir','Fiyat','Tarih']];
-  records.forEach(r=> rows.push([r.sn,r.usta,r.tamir,r.fiyat,r.tarih]));
-  const csv = rows.map(r=> r.map(c=> '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'tv_records.csv'; a.click(); URL.revokeObjectURL(url);
-});
-
-document.getElementById('clearAll').addEventListener('click', ()=>{
-  if(confirm('Tüm kayıtları silmek istediğinize emin misiniz?')){ records = []; persist(); renderAll(); }
-});
-
-// Theme
-const themeSelect = document.getElementById('themeSelect');
-themeSelect.addEventListener('change', ()=>{
-  if(themeSelect.value === 'light') document.body.style.background = '#f3f6fb', document.body.style.color='#0e1a2f';
-  else document.body.style.background = 'linear-gradient(180deg,#071226,#07182a)';
-});
-
-// Init
-(function(){
-  if(records.length && !records[0].tarih) {
-    // migrate older format if needed
-    records = records.map(r=>({...r,tarih: r.tarih ? new Date(r.tarih).toISOString().slice(0,10) : new Date().toISOString().slice(0,10)}));
-    persist();
-  }
-  renderAll();
-  showPanel('new');
-})();
+// accessibility: keyboard close modal
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){loginModal.classList.add('hidden')}});
 
 </script>
 </body>
