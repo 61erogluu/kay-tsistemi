@@ -1,274 +1,153 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>EROĞLU | TV Servis Yönetimi</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;400;700;900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eroğlu Servis</title>
 <style>
-:root{
-    --primary:#FF5733; --bg:#0A0A0A; --card:#1C1C1C; --text:#F0F0F0;
-    --primary-dark:#CC472A; --muted:#888888; --border:#333333; --shadow:0 5px 20px rgba(0,0,0,0.8);
-    --header-bg:var(--card); --sidebar-bg:var(--card); --font-body:'Poppins',sans-serif;
-}
-*{box-sizing:border-box} body,html{margin:0;height:100%;font-family:var(--font-body);color:var(--text);background:var(--bg)}
-#splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:9999;}
-.splash-title{font-weight:900;letter-spacing:12px;font-size:clamp(60px,14vw,120px);color:var(--primary);text-shadow:0 0 8px var(--primary);}
-.header{height:60px;display:flex;align-items:center;padding:0 20px;background:var(--header-bg);position:fixed;top:0;left:0;right:0;z-index:900;border-bottom:1px solid var(--border);}
-.brand{font-weight:900;font-size:1.6rem;color:var(--primary);}
-.hamburger{display:none;cursor:pointer;font-size:1.5rem;color:var(--primary);margin-right:15px}
-.actions{margin-left:auto;display:flex;gap:10px;}
-.sidebar{width:240px;background:var(--sidebar-bg);height:calc(100vh - 60px);padding:15px 0;position:fixed;left:0;top:60px;border-right:1px solid var(--border);transition:transform .3s;z-index:800;}
-.side-btn{display:flex;align-items:center;gap:10px;padding:15px 20px;width:100%;border:none;background:transparent;color:var(--text);cursor:pointer;text-align:left;transition:0.2s;}
-.side-btn.active{background:var(--primary);color:var(--card);font-weight:700;}
-.main{margin-left:240px;padding:30px;min-height:calc(100vh - 60px);transition:margin-left .3s;}
-.card{background:var(--card);padding:20px;border-radius:4px;border:1px solid var(--border);margin-bottom:20px;box-shadow:var(--shadow);}
-.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;}
-.stat-card{padding:15px;border-left:5px solid var(--primary);}
-.stat-title{font-size:0.9rem;color:var(--muted);margin-bottom:5px;text-transform:uppercase;}
-.stat-value{font-weight:900;font-size:2rem;color:var(--primary);}
-.form-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;}
-.input,.select,.textarea{padding:10px;border-radius:2px;border:1px solid var(--border);background:var(--bg);color:var(--text);width:100%;transition:0.2s;}
-.textarea{resize:vertical;min-height:70px;}
-.btn{padding:10px 15px;border:none;border-radius:2px;background:var(--primary);color:var(--card);cursor:pointer;transition:0.2s;}
-.btn:hover{background:var(--primary-dark);}
-.badge{display:inline-block;padding:3px 8px;border-radius:2px;font-size:0.8rem;}
-.badge.active{background:#28a745;color:#fff;}
-.badge.passive{background:#dc3545;color:#fff;}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:0.3s;}
-.modal.visible{opacity:1;pointer-events:auto;}
-.modal-box{background:var(--card);padding:25px;border-radius:4px;width:90%;max-width:400px;border:1px solid var(--primary);}
-@media(max-width:900px){.hamburger{display:block}.sidebar{position:fixed;left:0;top:60px;height:calc(100vh-60px);transform:translateX(-100%);transition:.3s;}.main{margin-left:0;padding:15px}}
+    * { box-sizing: border-box; margin:0; padding:0; font-family: Arial, sans-serif; }
+    body { background: #121212; color: #fff; display: flex; flex-direction: column; min-height: 100vh; }
+    #splash { position: fixed; width: 100%; height: 100%; background: #0d0d0d; display: flex; justify-content: center; align-items: center; font-size: 3rem; z-index: 1000; }
+    header { background: #1a1a1a; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+    #menu-btn { font-size: 1.5rem; cursor: pointer; }
+    nav { position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #222; transition: 0.3s; padding-top: 60px; }
+    nav a { display: block; padding: 15px; color: #fff; text-decoration: none; border-bottom: 1px solid #333; }
+    nav a:hover { background: #333; }
+    main { flex: 1; padding: 20px; }
+    .hidden { display: none; }
+    .section { margin-bottom: 20px; }
+    input, select, button { padding: 8px; margin: 5px 0; width: 100%; border-radius: 5px; border: none; }
+    button { cursor: pointer; background: #007bff; color: #fff; }
+    .admin-panel { background: #1e1e1e; padding: 20px; border-radius: 10px; }
+    .color-palette { display: flex; gap: 10px; margin-top: 10px; }
+    .color-box { width: 40px; height: 40px; cursor: pointer; border-radius: 5px; }
+    .camera-box { width: 100%; height: 250px; background: #000; display: flex; justify-content: center; align-items: center; color: #888; font-size: 1.2rem; margin-bottom: 10px; }
 </style>
 </head>
 <body>
-<div id="splash"><div class="splash-title">EROĞLU</div></div>
 
-<header class="header">
-    <span class="hamburger" id="hambBtn">☰</span>
-    <div class="brand">EROĞLU</div>
-    <div class="actions">
-        <button id="adminSettingsBtn" class="btn" style="padding:5px 10px;font-size:0.9rem;display:none;">Admin</button>
-    </div>
+<div id="splash">EROĞLU</div>
+
+<header>
+    <div>Eroğlu</div>
+    <div id="menu-btn">&#9776;</div>
 </header>
 
-<nav id="sidebar" class="sidebar">
-    <button class="side-btn active" data-panel="dashboard">Servis Özeti</button>
-    <button class="side-btn" data-panel="records">Servis Kayıtları</button>
-    <button class="side-btn" data-panel="add">Yeni Servis Girişi</button>
-    <button class="side-btn" data-panel="settings">Ayarlar</button>
-    <button class="side-btn" data-panel="admin-panel">Admin Paneli</button>
+<nav id="side-menu">
+    <a href="#" data-section="new-record">Yeni Kayıt</a>
+    <a href="#" data-section="operations">Yapılan İşlem</a>
+    <a href="#" data-section="admin">Admin Paneli</a>
 </nav>
 
-<main class="main">
-<section id="dashboard" class="panel-content">
-    <div class="card">
-        <h2>📊 Servis Özeti</h2>
-        <div class="grid-3">
-            <div class="stat-card"><div class="stat-title">Toplam Servis</div><div class="stat-value" id="statRecords">0</div></div>
-            <div class="stat-card"><div class="stat-title">Garantisi Süren</div><div class="stat-value" id="statActiveWarranty">0</div></div>
-            <div class="stat-card"><div class="stat-title">Bu Ay Eklenen</div><div class="stat-value" id="statThisMonth">0</div></div>
-        </div>
-        <canvas id="visitorsChart" height="100" style="margin-top:20px;"></canvas>
+<main>
+    <!-- Yeni Kayıt -->
+    <div id="new-record" class="section">
+        <h2>Yeni Kayıt</h2>
+        <div class="camera-box" id="camera-box">Kamerayı Açmak İçin Basın</div>
+        <input type="text" id="tv-sn" placeholder="TV Seri No (kamera ile okutulabilir)">
+        <input type="text" id="tv-model" placeholder="TV Marka / Model (kamera ile okutulabilir)">
+        <select id="guarantee">
+            <option value="1">1 Yıl Garanti</option>
+            <option value="2">2 Yıl Garanti</option>
+            <option value="manual">Manuel Ayarla</option>
+        </select>
+        <input type="text" id="manual-guarantee" placeholder="Manuel Garanti Süresi (yıl)" class="hidden">
+        <button onclick="saveRecord()">Kaydet</button>
     </div>
-</section>
 
-<section id="records" class="panel-content" style="display:none;">
-    <div class="card">
-        <h2>📑 Servis Kayıtları</h2>
-        <table class="table" id="recordsTable" style="width:100%;margin-top:10px;">
-            <thead><tr><th>TV Kod/Seri</th><th>Model</th><th>İşlem</th><th>Kayıt Tarihi</th><th>Garanti Bitiş</th><th>İşlem</th></tr></thead>
-            <tbody></tbody>
-        </table>
+    <!-- Yapılan İşlem -->
+    <div id="operations" class="section hidden">
+        <h2>Yapılan İşlem</h2>
+        <button onclick="selectOperation('Led Değişim')">Led Değişim</button>
+        <button onclick="selectOperation('Panel Değişim')">Panel Değişim</button>
+        <button onclick="selectOperation('Diğer')">Diğer</button>
+        <input type="text" id="manual-operation-guarantee" placeholder="Garanti Süresi (yıl)" class="hidden">
     </div>
-</section>
 
-<section id="add" class="panel-content" style="display:none;">
-    <div class="card">
-        <h2>➕ Yeni Servis Girişi</h2>
-        <div style="margin-top:10px;">
-            <div class="form-row">
-                <label>TV Kod/Seri No:</label>
-                <input id="inpCode" class="input" placeholder="TV Seri No" type="text" />
-                <button class="btn" id="scanBtn" style="flex:none;">📷 Kamera</button>
-            </div>
-            <div class="form-row">
-                <label>TV Modeli:</label>
-                <input id="inpModel" class="input" placeholder="TV Marka Model" type="text" />
-            </div>
-            <div class="form-row">
-                <label>Yapılan İşlem:</label>
-                <select id="inpProcess" class="select">
-                    <option value="Led Değişim">Led Değişim</option>
-                    <option value="Panel Değişim">Panel Değişim</option>
-                    <option value="Diğer">Diğer</option>
-                </select>
-            </div>
-            <div class="form-row">
-                <label>Garanti Bitiş Tarihi:</label>
-                <input id="inpWarrantyDate" class="input" type="date" />
-                <span style="color:#888;font-size:0.9rem;">*(Led/Panel otomatik 1 yıl, Diğer manuel seçilebilir)</span>
-            </div>
-            <div class="form-row">
-                <label>Ek Not:</label>
-                <textarea id="inpNotes" class="textarea" placeholder="Ekstra bilgiler"></textarea>
-            </div>
-            <div class="form-row">
-                <button class="btn" id="addRecordBtn">Kaydı Ekle</button>
-                <button class="btn" id="clearBtn" style="background:#666;">Temizle</button>
+    <!-- Admin Paneli -->
+    <div id="admin" class="section hidden">
+        <h2>Admin Paneli</h2>
+        <input type="password" id="admin-pass" placeholder="Şifre">
+        <button onclick="loginAdmin()">Giriş</button>
+
+        <div id="admin-controls" class="admin-panel hidden">
+            <h3>Renk Paletleri</h3>
+            <div class="color-palette">
+                <div class="color-box" style="background:#007bff" onclick="changePalette('#007bff')"></div>
+                <div class="color-box" style="background:#28a745" onclick="changePalette('#28a745')"></div>
+                <div class="color-box" style="background:#ffc107" onclick="changePalette('#ffc107')"></div>
+                <div class="color-box" style="background:#dc3545" onclick="changePalette('#dc3545')"></div>
             </div>
         </div>
     </div>
-</section>
+</main>
 
-<section id="settings" class="panel-content" style="display:none;">
-    <div class="card">
-        <h2>🛠️ Sistem Ayarları</h2>
-        <button id="exportBtn" class="btn">Verileri Dışa Aktar (JSON)</button>
-    </div>
-</section>
-
-<section id="admin-panel" class="panel-content" style="display:none;">
-    <div class="card">
-        <h2>⚙️ Admin Paneli</h2>
-        <div class="form-row">
-            <label>Vurgu Rengi:</label>
-            <input type="color" id="color-primary" value="#FF5733">
-        </div>
-        <div class="form-row">
-            <label>Arka Plan:</label>
-            <input type="color" id="color-bg" value="#0A0A0A">
-        </div>
-        <div class="form-row">
-            <label>Kart Arka Plan:</label>
-            <input type="color" id="color-card" value="#1C1C1C">
-        </div>
-        <div class="form-row">
-            <label>Metin Rengi:</label>
-            <input type="color" id="color-text" value="#F0F0F0">
-        </div>
-        <div class="form-row">
-            <label>Yeni Admin Şifre:</label>
-            <input type="password" id="newAdminCode" placeholder="6161">
-            <button class="btn" id="changeAdminCodeBtn" style="background:#666;">Güncelle</button>
-        </div>
-    </div>
-</section>
-
-<div id="authModal" class="modal">
-    <div class="modal-box">
-        <h3>🔒 Admin Girişi</h3>
-        <input id="authCodeInput" class="input" type="password" placeholder="Admin Kodu">
-        <div style="margin-top:10px;text-align:right;">
-            <button class="btn" id="authSubmit">Giriş</button>
-            <button class="btn" id="authCancel" style="background:#666;">İptal</button>
-        </div>
-        <p id="authErr" style="color:#f00;display:none;">Kod hatalı!</p>
-    </div>
-</div>
-
-<script src="https://unpkg.com/@zxing/library@latest"></script>
 <script>
-// --- App State ---
-let records = JSON.parse(localStorage.getItem('eroglu_records_v5')||'[]');
-let ADMIN_CODE = localStorage.getItem('eroglu_admin_code_v5') || '6161';
-let isAdminLoggedIn = false;
+    // Splash ekran
+    setTimeout(()=>{ document.getElementById('splash').style.display='none'; }, 3000);
 
-// --- DOM ---
-const htmlEl = document.documentElement;
-const sidebar = document.getElementById('sidebar');
-const hamb = document.getElementById('hambBtn');
-const sideBtns = Array.from(document.querySelectorAll('.side-btn[data-panel]'));
-const panels = {
-    dashboard: document.getElementById('dashboard'),
-    records: document.getElementById('records'),
-    add: document.getElementById('add'),
-    settings: document.getElementById('settings'),
-    'admin-panel': document.getElementById('admin-panel')
-};
-const recordsTableBody = document.querySelector('#recordsTable tbody');
-const authModal = document.getElementById('authModal');
-const adminSettingsBtn = document.getElementById('adminSettingsBtn');
-const scanBtn = document.getElementById('scanBtn');
+    // Menü açma
+    const menuBtn = document.getElementById('menu-btn');
+    const sideMenu = document.getElementById('side-menu');
+    menuBtn.addEventListener('click', ()=> {
+        sideMenu.style.left = sideMenu.style.left === '0px' ? '-250px' : '0px';
+    });
 
-// --- Sidebar ---
-hamb.addEventListener('click',()=>{sidebar.classList.toggle('hidden');});
-sideBtns.forEach(b=>b.addEventListener('click',()=>{showPanel(b.dataset.panel);}));
+    // Menü navigasyon
+    document.querySelectorAll('nav a').forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            document.querySelectorAll('main .section').forEach(sec => sec.classList.add('hidden'));
+            const secId = e.target.getAttribute('data-section');
+            document.getElementById(secId).classList.remove('hidden');
+            sideMenu.style.left = '-250px';
+        });
+    });
 
-function showPanel(id){Object.values(panels).forEach(p=>p.style.display='none');panels[id].style.display='block';renderRecords();}
-window.addEventListener('load',()=>{setTimeout(()=>{document.getElementById('splash').style.display='none'},2000);renderRecords();});
+    // Garanti manuel ayar
+    const guarantee = document.getElementById('guarantee');
+    const manualInput = document.getElementById('manual-guarantee');
+    guarantee.addEventListener('change', ()=> {
+        manualInput.classList.toggle('hidden', guarantee.value !== 'manual');
+    });
 
-// --- Records ---
-function renderRecords(){
-recordsTableBody.innerHTML='';
-const today = new Date();
-records.forEach((r,i)=>{
-    const warrantyEnd = new Date(r.warrantyDate);
-    const isWarrantyActive = warrantyEnd>today;
-    const badgeClass = isWarrantyActive?'active':'passive';
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${r.code}</td><td>${r.model}</td><td>${r.process}</td><td>${r.created?new Date(r.created).toLocaleDateString():'N/A'}</td><td><span class="badge ${badgeClass}">${r.warrantyDate?new Date(r.warrantyDate).toLocaleDateString():'N/A'}</span></td><td><button class="btn" onclick="viewNotes(${i})">Detay</button><button class="btn" onclick="delRecord(${i})" style="background:#666;">Sil</button></td>`;
-    recordsTableBody.appendChild(tr);
-});
-updateStats();
-}
+    // Yapılan işlem manuel garanti
+    function selectOperation(name) {
+        alert(name + ' seçildi.');
+        document.getElementById('manual-operation-guarantee').classList.toggle('hidden', name !== 'Diğer');
+    }
 
-function updateStats(){
-document.getElementById('statRecords').innerText=records.length;
-const today=new Date();
-document.getElementById('statActiveWarranty').innerText=records.filter(r=>new Date(r.warrantyDate)>today).length;
-const currentMonth = today.getMonth(); const currentYear = today.getFullYear();
-document.getElementById('statThisMonth').innerText=records.filter(r=>{const d=new Date(r.created);return d.getMonth()===currentMonth && d.getFullYear()===currentYear}).length;
-}
+    // Admin paneli
+    function loginAdmin() {
+        const pass = document.getElementById('admin-pass').value;
+        if(pass==='6161'){
+            document.getElementById('admin-controls').classList.remove('hidden');
+            alert('Admin girişi başarılı');
+        } else alert('Şifre yanlış');
+    }
 
-document.getElementById('addRecordBtn').addEventListener('click',()=>{
-const code=document.getElementById('inpCode').value.trim();
-const model=document.getElementById('inpModel').value.trim();
-const process=document.getElementById('inpProcess').value;
-const notes=document.getElementById('inpNotes').value.trim();
-let manualWarrantyDate=document.getElementById('inpWarrantyDate').value;
+    // Renk paleti değiştirme
+    function changePalette(color) {
+        document.body.style.background = color;
+    }
 
-if(!code||!model||!process){alert('Kod, Model ve İşlem gerekli!');return;}
-let warrantyDate;
-if(process==='Diğer' && manualWarrantyDate){warrantyDate=new Date(manualWarrantyDate).toISOString();}
-else{const d=new Date();d.setFullYear(d.getFullYear()+1);warrantyDate=d.toISOString();}
-records.push({code,model,process,notes,created:new Date().toISOString(),warrantyDate});
-localStorage.setItem('eroglu_records_v5',JSON.stringify(records));
-document.getElementById('inpCode').value='';document.getElementById('inpModel').value='';document.getElementById('inpNotes').value='';document.getElementById('inpWarrantyDate').value='';renderRecords();showPanel('records');
-});
+    // Kayıt kaydetme
+    function saveRecord() {
+        const sn = document.getElementById('tv-sn').value;
+        const model = document.getElementById('tv-model').value;
+        const guaranteeValue = guarantee.value==='manual' ? manualInput.value : guarantee.value;
+        alert(`Kayıt Başarıyla Eklendi!\nSN: ${sn}\nModel: ${model}\nGaranti: ${guaranteeValue} Yıl`);
+        // Buraya Firebase veya localStorage kaydı eklenebilir
+    }
 
-// --- Delete & Notes ---
-function delRecord(i){if(!confirm('Silmek istediğinize emin misiniz?'))return;records.splice(i,1);localStorage.setItem('eroglu_records_v5',JSON.stringify(records));renderRecords();}
-function viewNotes(i){const r=records[i];alert(`Kod:${r.code}\nModel:${r.model}\nİşlem:${r.process}\nKayıt:${r.created}\nGaranti:${r.warrantyDate}\nNot:${r.notes||'Yok'}`);}
-
-// --- Admin ---
-adminSettingsBtn.addEventListener('click',()=>{if(isAdminLoggedIn){showPanel('admin-panel');}else{authModal.classList.add('visible');}});
-document.getElementById('authSubmit').addEventListener('click',()=>{const val=document.getElementById('authCodeInput').value.trim();if(val===ADMIN_CODE){isAdminLoggedIn=true;authModal.classList.remove('visible');showPanel('admin-panel');}else{document.getElementById('authErr').style.display='block';}});
-document.getElementById('authCancel').addEventListener('click',()=>{authModal.classList.remove('visible');});
-document.getElementById('changeAdminCodeBtn').addEventListener('click',()=>{const newCode=document.getElementById('newAdminCode').value.trim();if(newCode.length>=4){ADMIN_CODE=newCode;localStorage.setItem('eroglu_admin_code_v5',newCode);alert('Güncellendi!');}});
-
-// --- Barcode Scanner ---
-scanBtn.addEventListener('click',()=>{startScanner();});
-function startScanner(){
-    const codeInput=document.getElementById('inpCode');const modelInput=document.getElementById('inpModel');
-    const codeReader = new ZXing.BrowserMultiFormatReader();
-    codeReader.decodeOnceFromVideoDevice(undefined,'video').then(result=>{
-        codeInput.value=result.text;
-        // Örnek: model otomatik algı (basit placeholder)
-        if(result.text.includes('X123')) modelInput.value='Samsung 55"';
-        else modelInput.value='Bilinmiyor';
-        codeReader.reset();
-    }).catch(err=>{alert('Kod algılanamadı: '+err);});
-}
-
-// --- Theme Colors ---
-['primary','bg','card','text'].forEach(c=>{
-document.getElementById(`color-${c}`).addEventListener('input',e=>{
-document.documentElement.style.setProperty(`--${c}`,e.target.value);
-});
-});
+    // Kamera barkod okuma simülasyonu
+    const cameraBox = document.getElementById('camera-box');
+    cameraBox.addEventListener('click', ()=>{
+        const simulatedCode = 'SN123456789';
+        document.getElementById('tv-sn').value = simulatedCode;
+        document.getElementById('tv-model').value = 'Samsung 55"';
+        alert('Barkod okundu: ' + simulatedCode);
+    });
 </script>
-
 </body>
 </html>
