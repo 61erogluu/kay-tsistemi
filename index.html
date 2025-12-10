@@ -1,597 +1,171 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>REİS — Yönetim Paneli</title>
-
-<!-- Chart.js CDN -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Eroğlu Servis Yönetim</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module">
+  // --- Firebase Import ---
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyCkS2QqyYNAWvIGYHmXtg0tFwAUtxYnYhE",
+    authDomain: "ef-8914e.firebaseapp.com",
+    projectId: "ef-8914e",
+    storageBucket: "ef-8914e.appspot.com",
+    messagingSenderId: "131514808744",
+    appId: "1:131514808744:web:7b45d2f5fbedff9abf859d",
+    measurementId: "G-3XWC0SF1PY",
+    databaseURL: "https://ef-8914e-default-rtdb.firebaseio.com/"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  window.firebaseDB = db;
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;400;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --primary: #FF5733;
-  --primary-dark: #CC472A;
-  --bg: #0A0A0A;
-  --card: #1C1C1C;
-  --text: #F0F0F0;
-  --muted: #9aa6bf;
-  --border: #333333;
-  --shadow: 0 8px 30px rgba(0,0,0,.6);
+  --primary:#FF5733; --bg:#0A0A0A; --card:#1C1C1C; --text:#F0F0F0;
 }
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
-a{color:inherit}
-
-/* Splash */
-#splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d3b66,#1e81b0);z-index:9999}
-.splash-title{font-weight:900;letter-spacing:8px;font-size:clamp(28px,9vw,72px);color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.5);animation:popIn .6s ease both}
-@keyframes popIn{from{transform:translateY(12px) scale(.98);opacity:0}to{transform:none;opacity:1}}
-
-/* Header */
-.header{height:64px;display:flex;align-items:center;padding:0 16px;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);position:fixed;top:0;left:0;right:0;z-index:900;border-bottom:1px solid rgba(255,255,255,.02)}
-.brand{font-weight:800;color:var(--primary);font-size:1.1rem}
-.header .actions{margin-left:auto;display:flex;gap:8px;align-items:center}
-.hamburger{display:none;padding:8px;border-radius:8px;cursor:pointer}
-
-/* Layout */
-.container{display:flex;padding-top:80px;min-height:calc(100vh - 80px)}
-.sidebar{width:260px;background:var(--card);height:calc(100vh - 80px);padding:18px;position:fixed;left:0;top:80px;border-right:1px solid var(--border);transition:transform .28s ease;z-index:800;overflow:auto}
-.sidebar.hidden{transform:translateX(-120%)}
-.side-logo{font-weight:900;margin-bottom:16px;color:var(--primary)}
-.side-btn{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;background:transparent;border:0;color:var(--text);cursor:pointer;width:100%;text-align:left;transition:background .15s}
-.side-btn:hover{background:rgba(255,255,255,.02)}
-.side-btn.active{background:var(--primary);color:var(--card);font-weight:700}
-
-/* Main */
-.main{margin-left:260px;padding:20px;flex:1;min-height:calc(100vh - 80px)}
-.card{background:var(--card);padding:18px;border-radius:10px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:16px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.stat-card{padding:16px;border-left:5px solid var(--primary);border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,.01),transparent)}
-.stat-title{font-size:13px;color:var(--muted);margin-bottom:8px}
-.stat-value{font-weight:800;font-size:24px;color:var(--primary)}
-
-/* Form */
-.form-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.label{width:150px;color:var(--muted);font-weight:700}
-.input, .select, .textarea{padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);width:100%;outline:none}
-.textarea{min-height:80px;resize:vertical}
-.btn{padding:10px 14px;border-radius:8px;border:0;background:var(--primary);color:var(--card);cursor:pointer}
-.btn-secondary{background:rgba(255,255,255,.04);color:var(--text)}
-
-/* Table */
-.table{width:100%;border-collapse:collapse}
-.table th,.table td{padding:12px;border-bottom:1px solid var(--border);text-align:left}
-.table th{background:transparent;color:var(--primary);font-weight:800}
-
-/* Modal */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:1200;opacity:0;pointer-events:none;transition:opacity .18s}
-.modal.visible{opacity:1;pointer-events:auto}
-.modal-box{width:92%;max-width:420px;background:var(--card);padding:18px;border-radius:10px;border:1px solid var(--primary)}
-
-/* small helpers */
-.hidden{display:none}
-.center{text-align:center}
-.badge{display:inline-block;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,.03);font-weight:700}
-.badge.active{background:#28a745;color:#fff}
-.badge.passive{background:#dc3545;color:#fff}
-
-/* animations */
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.fadeIn{animation:fadeIn .25s ease both}
-
-/* responsive */
-@media (max-width:900px){
-  .sidebar{position:fixed;left:0;top:64px;height:calc(100vh - 64px);z-index:1000}
-  .main{margin-left:0;padding:12px}
-  .hamburger{display:block}
-}
-@media (max-width:480px){
-  .grid-3{grid-template-columns:1fr}
-  .label{width:120px}
+*{box-sizing:border-box;}
+body{margin:0;padding:0;font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);}
+.header{height:60px;background:var(--card);display:flex;align-items:center;padding:0 20px;position:fixed;width:100%;top:0;z-index:1000;box-shadow:0 5px 20px rgba(0,0,0,0.8);}
+.header .brand{font-weight:900;color:var(--primary);font-size:1.6rem;letter-spacing:1px;}
+.main{margin-top:70px;padding:15px;}
+.card{background:var(--card);padding:20px;border-radius:10px;margin-bottom:20px;box-shadow:0 5px 15px rgba(0,0,0,0.7);transition:0.3s;}
+.card:hover{box-shadow:0 10px 30px rgba(0,0,0,0.9);}
+.btn{padding:10px 15px;border:none;border-radius:5px;background:var(--primary);color:#fff;cursor:pointer;transition:0.2s;}
+.btn:hover{opacity:0.8;}
+.btn-secondary{background:#888;}
+.input,textarea{padding:10px;border-radius:5px;border:1px solid #333;background:var(--bg);color:var(--text);width:100%;margin-bottom:10px;transition:0.2s;}
+.input:focus,textarea:focus{border-color:var(--primary);outline:none;}
+.hidden{display:none;}
+.table{width:100%;border-collapse:collapse;margin-top:10px;}
+.table th,.table td{padding:10px;border-bottom:1px solid #333;text-align:left;}
+.table th{color:var(--primary);}
+.badge{padding:3px 6px;border-radius:5px;color:#fff;font-size:0.75rem;}
+.badge.active{background:#28a745;}
+.badge.passive{background:#dc3545;}
+@media(max-width:600px){
+  .header .brand{font-size:1.2rem;}
+  .btn,input,textarea{font-size:0.9rem;}
 }
 </style>
 </head>
 <body>
 
-<!-- Splash -->
-<div id="splash"><div class="splash-title">REİS</div></div>
-
-<!-- Header -->
-<header class="header">
-  <button id="hambBtn" class="hamburger" aria-label="menu">☰</button>
-  <div class="brand">Eroğlu | TV Servis Yönetimi</div>
-  <div class="actions">
-    <button id="themeToggle" class="side-btn" title="Tema değiştir">🌓</button>
-    <button id="openAuth" class="side-btn">🔒 Admin</button>
-  </div>
-</header>
-
-<div class="container">
-  <!-- Sidebar -->
-  <nav id="sidebar" class="sidebar hidden">
-    <div class="side-logo">REİS</div>
-    <button class="side-btn active" data-panel="dashboard">📊 Servis Özeti</button>
-    <button class="side-btn" data-panel="records">📑 Kayıtlar</button>
-    <button class="side-btn" data-panel="add">➕ Yeni Kayıt</button>
-    <button class="side-btn" data-panel="settings">⚙️ Ayarlar</button>
-    <hr style="border:none;border-top:1px solid var(--border);margin:12px 0">
-    <div style="font-size:13px;color:var(--muted)">Tema</div>
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button id="lightBtn" class="side-btn" style="flex:1">Açık</button>
-      <button id="darkBtn" class="side-btn" style="flex:1">Koyu</button>
-    </div>
-  </nav>
-
-  <!-- Main -->
-  <main class="main">
-    <!-- Dashboard -->
-    <section id="dashboard" class="card fadeIn">
-      <h2 style="color:var(--primary);margin:0 0 10px">Servis Özeti</h2>
-      <div class="grid-3">
-        <div class="stat-card"><div class="stat-title">Toplam Kayıt</div><div class="stat-value" id="statRecords">0</div></div>
-        <div class="stat-card"><div class="stat-title">Garantisi Süren</div><div class="stat-value" id="statActive">0</div></div>
-        <div class="stat-card"><div class="stat-title">Bu Ay</div><div class="stat-value" id="statMonth">0</div></div>
-      </div>
-      <div class="card" style="margin-top:14px">
-        <h3 style="margin:0 0 8px;color:var(--primary)">Haftalık İş Grafiği</h3>
-        <div style="height:200px"><canvas id="chartCanvas"></canvas></div>
-      </div>
-    </section>
-
-    <!-- Records -->
-    <section id="records" class="card hidden">
-      <h2 style="color:var(--primary);margin:0 0 10px">Servis Kayıtları</h2>
-      <div style="overflow:auto">
-        <table class="table" id="recordsTable">
-          <thead><tr><th>Seri</th><th>Model</th><th>İşlem</th><th>Kayıt</th><th>Garanti</th><th>İşlem</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Add -->
-    <section id="add" class="card hidden">
-      <h2 style="color:var(--primary);margin:0 0 10px">Yeni Servis Girişi</h2>
-      <div style="margin-top:12px">
-        <div class="form-row">
-          <label class="label">TV Seri / Kod</label>
-          <input id="inpCode" class="input" placeholder="Örn: SN123456" />
-        </div>
-        <div class="form-row">
-          <label class="label">TV Model</label>
-          <input id="inpModel" class="input" placeholder="Örn: Samsung QLED" />
-        </div>
-        <div class="form-row">
-          <label class="label">Yapılan İşlem</label>
-          <select id="inpProcess" class="select">
-            <option>Yazılım</option>
-            <option>Besleme</option>
-            <option>LED Değişim</option>
-            <option>Panel Değişim</option>
-            <option>Anakart</option>
-            <option>Diğer</option>
-          </select>
-        </div>
-
-        <div class="form-row">
-          <label class="label">Notlar</label>
-          <textarea id="inpNotes" class="textarea" placeholder="Ek açıklama..."></textarea>
-        </div>
-
-        <div class="form-row">
-          <label class="label">Garanti Bitiş</label>
-          <input id="inpWarranty" type="date" class="input" />
-        </div>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button id="addRecordBtn" class="btn">Kaydı Ekle</button>
-          <button id="clearBtn" class="btn btn-secondary">Temizle</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Settings -->
-    <section id="settings" class="card hidden">
-      <h2 style="color:var(--primary);margin:0 0 10px">Ayarlar & Yönetim</h2>
-
-      <div style="margin-top:12px">
-        <div style="font-weight:800;margin-bottom:6px">Verileri Yönet</div>
-        <div style="display:flex;gap:8px">
-          <button id="exportBtn" class="btn">JSON Dışa Aktar</button>
-          <button id="importBtn" class="btn btn-secondary">JSON Yükle</button>
-          <input id="importFile" type="file" accept=".json" style="display:none" />
-        </div>
-      </div>
-
-      <hr style="border:none;border-top:1px dashed var(--border);margin:14px 0">
-
-      <div style="margin-top:12px">
-        <div style="font-weight:800;margin-bottom:6px">Admin Paneli</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button id="openAdminSettings" class="btn btn-secondary">Renkler & Admin Kodu</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Admin settings panel (hidden) -->
-    <section id="adminPanel" class="card hidden">
-      <h2 style="color:var(--primary);margin:0 0 10px">Admin Ayarları</h2>
-
-      <div class="form-row">
-        <label class="label">Vurgu Rengi</label>
-        <input id="colorPrimary" type="color" value="#FF5733" />
-        <input id="colorPrimaryHex" class="input" placeholder="#FF5733" style="max-width:120px" />
-      </div>
-      <div class="form-row">
-        <label class="label">Arka Plan</label>
-        <input id="colorBg" type="color" value="#0A0A0A" />
-        <input id="colorBgHex" class="input" placeholder="#0A0A0A" style="max-width:120px" />
-      </div>
-      <div class="form-row">
-        <label class="label">Kart Rengi</label>
-        <input id="colorCard" type="color" value="#1C1C1C" />
-        <input id="colorCardHex" class="input" placeholder="#1C1C1C" style="max-width:120px" />
-      </div>
-      <div class="form-row">
-        <label class="label">Metin Rengi</label>
-        <input id="colorText" type="color" value="#F0F0F0" />
-        <input id="colorTextHex" class="input" placeholder="#F0F0F0" style="max-width:120px" />
-      </div>
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button id="saveThemeBtn" class="btn">Tema Kaydet</button>
-        <button id="resetThemeBtn" class="btn btn-secondary">Sıfırla</button>
-      </div>
-
-      <hr style="border:none;border-top:1px dashed var(--border);margin:14px 0">
-
-      <div>
-        <label class="label" style="display:block;margin-bottom:6px">Admin Kodu (giriş için)</label>
-        <input id="adminCodeInput" class="input" placeholder="Mevcut kodu görmezsiniz" type="password" />
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button id="changeAdminBtn" class="btn">Değiştir</button>
-          <button id="revokeAdminBtn" class="btn btn-secondary">Oturumu Kapat</button>
-        </div>
-      </div>
-    </section>
-
-  </main>
+<div class="header">
+  <div class="brand">EROĞLU SERVİS</div>
 </div>
 
-<!-- Auth Modal -->
-<div id="authModal" class="modal">
-  <div class="modal-box">
-    <h3 style="margin:0 0 8px;color:var(--primary)">🔐 Admin Yetkili Girişi</h3>
-    <input id="authInput" class="input" placeholder="Admin kodu girin" type="password" />
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
-      <button id="authCancel" class="btn btn-secondary">İptal</button>
-      <button id="authSubmit" class="btn">Giriş</button>
-    </div>
-    <p id="authErr" style="color:#ff8b8b;margin-top:8px;display:none">Kod hatalı</p>
+<main class="main">
+
+<div class="card" id="addRecordCard">
+  <h2>Yeni Servis Girişi</h2>
+  <input class="input" id="inpCode" placeholder="TV Kod/Seri">
+  <input class="input" id="inpModel" placeholder="TV Modeli">
+  <input class="input" id="inpProcess" placeholder="Yapılan İşlem">
+  <input class="input" type="date" id="inpWarrantyDate">
+  <textarea class="input" id="inpNotes" placeholder="Notlar"></textarea>
+  <button class="btn" id="addRecordBtn">Kaydı Ekle</button>
+</div>
+
+<div class="card" id="recordsCard">
+  <h2>Servis Kayıtları</h2>
+  <table class="table" id="recordsTable">
+    <thead>
+      <tr>
+        <th>Kod</th><th>Model</th><th>İşlem</th><th>Tarih</th><th>Garanti</th><th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div class="card" id="adminPanelCard">
+  <h2>Admin Paneli</h2>
+  <input class="input" type="password" id="adminInput" placeholder="Admin Şifre">
+  <button class="btn" id="adminLoginBtn">Giriş</button>
+  <div id="adminTools" class="hidden">
+    <hr>
+    <label>Renk Seçin:</label>
+    <input class="input" type="color" id="colorPrimary" value="#FF5733">
+    <button class="btn" id="saveColorBtn">Renk Kaydet</button>
   </div>
 </div>
 
-<script>
-/* -------------------------
-   App constants & storage
-   ------------------------- */
-const KEY_RECORDS = 'eroglu_records_v1';
-const KEY_THEME = 'eroglu_theme_v1';
-const KEY_ADMIN = 'eroglu_admin_v1';
+</main>
 
-let records = JSON.parse(localStorage.getItem(KEY_RECORDS) || '[]');
-let adminCode = localStorage.getItem(KEY_ADMIN) || '6161'; // default admin kod
-let isAdmin = sessionStorage.getItem('isAdmin') === '1';
+<script type="module">
+import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+const db = window.firebaseDB;
+let isAdmin=false;
 
-/* DOM refs */
-const splash = document.getElementById('splash');
-const sidebar = document.getElementById('sidebar');
-const hambBtn = document.getElementById('hambBtn');
-const sideBtns = Array.from(document.querySelectorAll('.side-btn[data-panel]'));
-const panels = {
-  dashboard: document.getElementById('dashboard'),
-  records: document.getElementById('records'),
-  add: document.getElementById('add'),
-  settings: document.getElementById('settings'),
-  adminPanel: document.getElementById('adminPanel')
-};
-const recordsTableBody = document.querySelector('#recordsTable tbody');
-const statRecords = document.getElementById('statRecords');
-const statActive = document.getElementById('statActive');
-const statMonth = document.getElementById('statMonth');
-const chartCanvas = document.getElementById('chartCanvas').getContext('2d');
+const recordsTableBody=document.querySelector('#recordsTable tbody');
+const addBtn=document.getElementById('addRecordBtn');
+const adminInput=document.getElementById('adminInput');
+const adminLoginBtn=document.getElementById('adminLoginBtn');
+const colorPrimary=document.getElementById('colorPrimary');
+const saveColorBtn=document.getElementById('saveColorBtn');
+const adminTools=document.getElementById('adminTools');
 
-/* init */
-window.addEventListener('load', () => {
-  setTimeout(()=>{splash.style.opacity=0; setTimeout(()=>splash.remove(),400)}, 1800);
-  loadTheme();
-  renderAll();
-  if (window.innerWidth > 900) sidebar.classList.remove('hidden');
-});
+function formatDate(d){return new Date(d).toLocaleDateString('tr-TR');}
 
-/* Sidebar toggle */
-hambBtn.addEventListener('click', ()=>{ sidebar.classList.toggle('hidden'); document.body.style.overflow = sidebar.classList.contains('hidden') ? 'auto' : 'hidden'; });
-
-/* Side nav */
-sideBtns.forEach(b => b.addEventListener('click', (e)=>{
-  sideBtns.forEach(x=>x.classList.remove('active'));
-  e.currentTarget.classList.add('active');
-  showPanel(e.currentTarget.dataset.panel);
-  if(window.innerWidth<900){ sidebar.classList.add('hidden'); document.body.style.overflow='auto'; }
-}));
-
-function showPanel(id){
-  Object.values(panels).forEach(p=>p.classList.add('hidden'));
-  const panel = panels[id] || panels['dashboard'];
-  panel.classList.remove('hidden');
-  // scroll to top
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-/* -------------------------
-   Records: add / render / delete
-   ------------------------- */
-document.getElementById('addRecordBtn').addEventListener('click', ()=>{
-  const code = document.getElementById('inpCode').value.trim();
-  const model = document.getElementById('inpModel').value.trim();
-  const process = document.getElementById('inpProcess').value;
-  const notes = document.getElementById('inpNotes').value.trim();
-  const manual = document.getElementById('inpWarranty').value;
-
-  if(!code || !model){ alert('Kod ve Model giriniz.'); return; }
-
-  let warrantyDate;
-  if (manual) {
-    // use manual date (keep local timezone)
-    warrantyDate = new Date(manual);
-    warrantyDate.setHours(23,59,59,999);
-  } else {
-    const d = new Date();
-    d.setFullYear(d.getFullYear()+1);
-    warrantyDate = d;
-  }
-
-  const rec = {
-    id: Date.now(),
-    code, model, process, notes,
-    created: new Date().toISOString(),
-    warranty: warrantyDate.toISOString()
-  };
-  records.unshift(rec);
-  localStorage.setItem(KEY_RECORDS, JSON.stringify(records));
-  clearForm();
-  renderRecords();
-  showPanel('records');
-  alert('Kayıt eklendi.');
-});
-
-function clearForm(){
-  document.getElementById('inpCode').value='';
-  document.getElementById('inpModel').value='';
-  document.getElementById('inpProcess').value='Yazılım';
-  document.getElementById('inpNotes').value='';
-  document.getElementById('inpWarranty').value='';
-}
-document.getElementById('clearBtn').addEventListener('click', clearForm);
-
-function renderRecords(){
+function renderRecords(records){
   recordsTableBody.innerHTML='';
-  const now = new Date();
-  records.forEach((r, idx) => {
-    const war = new Date(r.warranty);
-    const active = war > now;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${escapeHtml(r.code)}</td>
-      <td>${escapeHtml(r.model)}</td>
-      <td>${escapeHtml(r.process)}</td>
+  records.forEach(r=>{
+    const warrantyEnd=new Date(r.warrantyDate);
+    const isWarrantyActive=warrantyEnd>new Date();
+    const badgeClass=isWarrantyActive?'active':'passive';
+    const badgeText=isWarrantyActive?'SÜRÜYOR':'BİTTİ';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.code}</td><td>${r.model}</td><td>${r.process}</td>
       <td>${formatDate(r.created)}</td>
-      <td><span class="badge ${active?'active':'passive'}">${formatDate(r.warranty)} ${active?'- SÜRÜYOR':'- BİTTİ'}</span></td>
-      <td>
-        <button class="btn" onclick="viewRecord(${r.id})" style="margin-right:6px">Detay</button>
-        <button class="btn btn-secondary" onclick="deleteRecord(${r.id})">Sil</button>
-      </td>`;
+      <td><span class="badge ${badgeClass}">${formatDate(r.warrantyDate)} - ${badgeText}</span></td>
+      <td><button class="btn btn-secondary" onclick="deleteRecord('${r.key}')">Sil</button></td>`;
     recordsTableBody.appendChild(tr);
   });
-  updateStats();
 }
 
-/* escape helper */
-function escapeHtml(s){ if(!s) return ''; return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
-
-/* view / delete by id */
-window.viewRecord = function(id){
-  const r = records.find(x=>x.id===id);
-  if(!r){ alert('Kayıt bulunamadı'); return; }
-  let txt = `Seri: ${r.code}\nModel: ${r.model}\nİşlem: ${r.process}\nKayıt: ${formatDate(r.created)}\nGaranti: ${formatDate(r.warranty)}\n\nNotlar:\n${r.notes||'(yok)'}`;
-  alert(txt);
-};
-window.deleteRecord = function(id){
-  if(!confirm('Silmek istediğinize emin misiniz?')) return;
-  records = records.filter(x=>x.id!==id);
-  localStorage.setItem(KEY_RECORDS, JSON.stringify(records));
-  renderRecords();
-};
-
-/* -------------------------
-   Stats & Chart
-   ------------------------- */
-function updateStats(){
-  statRecords.innerText = records.length;
-  const now = new Date();
-  statActive.innerText = records.filter(r=> new Date(r.warranty) > now ).length;
-  const thisMonth = records.filter(r=>{
-    const d = new Date(r.created);
-    const n = new Date();
-    return d.getMonth()===n.getMonth() && d.getFullYear()===n.getFullYear();
-  }).length;
-  statMonth.innerText = thisMonth;
-  renderChart();
-}
-
-/* Chart */
-let chartInstance = null;
-function renderChart(){
-  const labels = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
-  // create sample data based on created dates (count per weekday)
-  const counts = [0,0,0,0,0,0,0];
-  records.forEach(r=>{
-    const d = new Date(r.created);
-    counts[d.getDay()?d.getDay()-1:6]++; // Sun -> index 6
-  });
-  // if all zero, show sample
-  const hasData = counts.some(v=>v>0);
-  const data = hasData ? counts : [3,5,2,6,4,7,5];
-
-  if(chartInstance) chartInstance.destroy();
-  chartInstance = new Chart(chartCanvas, {
-    type: 'line',
-    data: { labels, datasets:[{
-      label:'Haftalık Kayıt',
-      data,
-      fill:true,
-      backgroundColor: hexToRgba(getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#FF5733', .12),
-      borderColor: getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#FF5733',
-      pointRadius:4,
-      tension:0.35
-    }]},
-    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{color:getComputedStyle(document.documentElement).getPropertyValue('--muted')}},x:{ticks:{color:getComputedStyle(document.documentElement).getPropertyValue('--muted')}}},animation:{duration:700}}
-  });
-}
-
-function hexToRgba(hex, a){ if(!hex) hex='#FF5733'; hex = hex.replace('#',''); if(hex.length===3) hex = hex.split('').map(c=>c+c).join(''); const r=parseInt(hex.slice(0,2),16), g=parseInt(hex.slice(2,4),16), b=parseInt(hex.slice(4,6),16); return `rgba(${r},${g},${b},${a})`; }
-
-/* -------------------------
-   Theme management
-   ------------------------- */
-function loadTheme(){
-  try{
-    const saved = JSON.parse(localStorage.getItem(KEY_THEME) || '{}');
-    if(saved.primary) document.documentElement.style.setProperty('--primary', saved.primary);
-    if(saved.bg) document.documentElement.style.setProperty('--bg', saved.bg);
-    if(saved.card) document.documentElement.style.setProperty('--card', saved.card);
-    if(saved.text) document.documentElement.style.setProperty('--text', saved.text);
-
-    // fill admin inputs if available
-    if(saved.primary) document.getElementById('colorPrimary').value = saved.primary;
-    if(saved.bg) document.getElementById('colorBg').value = saved.bg;
-    if(saved.card) document.getElementById('colorCard').value = saved.card;
-    if(saved.text) document.getElementById('colorText').value = saved.text;
-
-    document.getElementById('colorPrimaryHex').value = saved.primary || '#FF5733';
-    document.getElementById('colorBgHex').value = saved.bg || '#0A0A0A';
-    document.getElementById('colorCardHex').value = saved.card || '#1C1C1C';
-    document.getElementById('colorTextHex').value = saved.text || '#F0F0F0';
-  }catch(e){ console.error('Tema yükleme hatası',e) }
-}
-
-document.getElementById('saveThemeBtn')?.addEventListener('click', ()=>{
-  const newTheme = {
-    primary: document.getElementById('colorPrimaryHex').value.trim() || '#FF5733',
-    bg: document.getElementById('colorBgHex').value.trim() || '#0A0A0A',
-    card: document.getElementById('colorCardHex').value.trim() || '#1C1C1C',
-    text: document.getElementById('colorTextHex').value.trim() || '#F0F0F0'
-  };
-  // validate hex
-  for(const k in newTheme){
-    if(!/^#[0-9A-F]{6}$/i.test(newTheme[k])){ alert('Geçerli HEX girin (örn: #AABBCC)'); return; }
-  }
-  localStorage.setItem(KEY_THEME, JSON.stringify(newTheme));
-  loadTheme();
-  renderChart();
-  alert('Tema kaydedildi');
-});
-document.getElementById('resetThemeBtn')?.addEventListener('click', ()=>{
-  localStorage.removeItem(KEY_THEME); loadTheme(); renderChart(); alert('Tema sıfırlandı');
+const recordsRef=ref(db,'records');
+onValue(recordsRef,snapshot=>{
+  const data=snapshot.val()||{};
+  const arr=Object.keys(data).map(k=>({...data[k],key:k}));
+  renderRecords(arr);
 });
 
-/* color inputs sync */
-['colorPrimary','colorBg','colorCard','colorText'].forEach(id=>{
-  const pick = document.getElementById(id);
-  if(!pick) return;
-  pick.addEventListener('input', e=>{
-    const hex = e.target.value.toUpperCase();
-    document.getElementById(id+'Hex').value = hex;
-    const prop = id==='colorPrimary'?'--primary': id==='colorBg'?'--bg': id==='colorCard'?'--card':'--text';
-    document.documentElement.style.setProperty(prop, hex);
-    renderChart();
-  });
-  const txt = document.getElementById(id+'Hex');
-  txt?.addEventListener('input', e=>{
-    const v = e.target.value.toUpperCase();
-    if(/^#[0-9A-F]{6}$/i.test(v)){
-      document.getElementById(id).value = v;
-      const prop = id==='colorPrimary'?'--primary': id==='colorBg'?'--bg': id==='colorCard'?'--card':'--text';
-      document.documentElement.style.setProperty(prop, v);
-      renderChart();
-    }
-  });
+addBtn.addEventListener('click',()=>{
+  const code=document.getElementById('inpCode').value.trim();
+  const model=document.getElementById('inpModel').value.trim();
+  const process=document.getElementById('inpProcess').value.trim();
+  const notes=document.getElementById('inpNotes').value.trim();
+  let warrantyDate=document.getElementById('inpWarrantyDate').value;
+  if(!warrantyDate){const d=new Date();d.setFullYear(d.getFullYear()+1);warrantyDate=d.toISOString();}
+  const created=new Date().toISOString();
+  if(!code||!model||!process){alert('Kod, Model ve İşlem gerekli!');return;}
+  const newRef=push(recordsRef);
+  set(newRef,{code,model,process,notes,warrantyDate,created});
+  document.getElementById('inpCode').value=''; document.getElementById('inpModel').value='';
+  document.getElementById('inpProcess').value=''; document.getElementById('inpNotes').value=''; document.getElementById('inpWarrantyDate').value='';
 });
 
-/* -------------------------
-   Admin auth (modal)
-   ------------------------- */
-const authModal = document.getElementById('authModal');
-document.getElementById('openAuth').addEventListener('click', ()=>{ authModal.classList.add('visible'); document.getElementById('authInput').value=''; document.getElementById('authErr').style.display='none'; });
-document.getElementById('authCancel').addEventListener('click', ()=>{ authModal.classList.remove('visible'); });
-document.getElementById('authSubmit').addEventListener('click', ()=>{
-  const v = document.getElementById('authInput').value.trim();
-  if(v === adminCode){ sessionStorage.setItem('isAdmin','1'); isAdmin=true; authModal.classList.remove('visible'); alert('Admin girişi başarılı'); showPanel('adminPanel'); } else { document.getElementById('authErr').style.display='block'; }
+window.deleteRecord=(key)=>{if(confirm('Silmek istiyor musunuz?')) remove(ref(db,'records/'+key));}
+
+adminLoginBtn.addEventListener('click',()=>{
+  if(adminInput.value==='6161'){isAdmin=true;alert('Admin Girişi Başarılı!');adminTools.classList.remove('hidden');} 
+  else alert('Hatalı şifre!');
 });
 
-/* admin settings open */
-document.getElementById('openAdminSettings').addEventListener('click', ()=>{
-  if(!isAdmin){ alert('Önce yetkili kod ile giriş yapın (Admin).'); showAuthModal(); return; }
-  showPanel('adminPanel');
+saveColorBtn.addEventListener('click',()=>{
+  if(!isAdmin){alert('Önce admin girişi yap!');return;}
+  const c=colorPrimary.value;
+  document.documentElement.style.setProperty('--primary',c);
+  alert('Renk değiştirildi!');
 });
-
-/* change admin code */
-document.getElementById('changeAdminBtn')?.addEventListener('click', ()=>{
-  if(!isAdmin){ alert('Yetkili değilsiniz.'); return; }
-  const n = document.getElementById('adminCodeInput').value.trim();
-  if(!n || n.length<4){ alert('Yeni kod en az 4 haneli olmalı'); return; }
-  adminCode = n; localStorage.setItem(KEY_ADMIN, adminCode); document.getElementById('adminCodeInput').value=''; alert('Admin kodu güncellendi'); 
-});
-
-/* revoke admin (logout) */
-document.getElementById('revokeAdminBtn')?.addEventListener('click', ()=>{ sessionStorage.removeItem('isAdmin'); isAdmin=false; alert('Admin oturumu kapatıldı'); });
-
-function showAuthModal(){ authModal.classList.add('visible'); document.getElementById('authInput').value=''; document.getElementById('authErr').style.display='none'; }
-
-/* -------------------------
-   Export / Import
-   ------------------------- */
-document.getElementById('exportBtn').addEventListener('click', ()=>{
-  const data = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(records, null, 2));
-  const a = document.createElement('a'); a.href = data; a.download = 'eroglu_records_export.json'; a.click();
-});
-document.getElementById('importBtn').addEventListener('click', ()=> document.getElementById('importFile').click());
-document.getElementById('importFile').addEventListener('change', (e)=>{
-  const f = e.target.files[0]; if(!f) return;
-  const reader = new FileReader();
-  reader.onload = function(){ try{ const imported = JSON.parse(reader.result); if(!Array.isArray(imported)) throw 'Invalid'; records = imported.concat(records); localStorage.setItem(KEY_RECORDS, JSON.stringify(records)); renderRecords(); alert('Import tamamlandı'); }catch(err){ alert('Geçersiz JSON dosyası'); } };
-  reader.readAsText(f);
-});
-
-/* -------------------------
-   Utilities
-   ------------------------- */
-function formatDate(iso){
-  try{ const d = new Date(iso); return d.toLocaleDateString('tr-TR',{year:'numeric',month:'short',day:'numeric'});}catch{ return iso; }
-}
-
-/* escapeHtml defined above */
-
-/* -------------------------
-   Render all
-   ------------------------- */
-function renderAll(){ renderRecords(); updateStats(); renderChart(); }
-
-// expose renderRecords to global for buttons
-window.renderRecords = renderRecords;
-
-/* initial render */
-renderAll();
-
 </script>
+
 </body>
 </html>
