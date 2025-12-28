@@ -2,173 +2,164 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>XCOOL | ULTIMATE DASHBOARD</title>
+    <title>XCOOL | FOLDER SYSTEM</title>
     <style>
-        :root { --neon: #00ffcc; --bg: #0a0a0b; --panel: #161618; --text: #e1e1e1; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; }
+        :root { --accent: #00ffcc; --bg: #0a0a0a; --card: #151515; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: #fff; display: flex; height: 100vh; }
 
-        /* Sol Menü (Klasörler/Sekmeler) */
-        .sidebar { width: 260px; background: #000; border-right: 1px solid #222; display: flex; flex-direction: column; padding: 20px; }
-        .logo { font-size: 24px; font-weight: 900; color: var(--neon); margin-bottom: 40px; text-align: center; border: 2px solid var(--neon); padding: 10px; }
-        .tab-btn { background: none; border: none; color: #666; padding: 15px; text-align: left; font-size: 16px; cursor: pointer; transition: 0.3s; border-radius: 8px; margin-bottom: 5px; font-weight: bold; }
-        .tab-btn:hover { background: #111; color: var(--neon); }
-        .tab-btn.active { background: var(--neon); color: #000; }
+        /* Sidebar */
+        .sidebar { width: 240px; background: #000; border-right: 1px solid #222; padding: 20px; }
+        .logo { font-size: 22px; font-weight: 900; color: var(--accent); margin-bottom: 30px; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        .nav-btn { width: 100%; padding: 12px; background: none; border: none; color: #888; text-align: left; cursor: pointer; border-radius: 5px; margin-bottom: 5px; }
+        .nav-btn.active { background: var(--accent); color: #000; font-weight: bold; }
 
         /* Ana Alan */
-        .main { flex: 1; display: flex; flex-direction: column; padding: 30px; overflow: hidden; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .container { flex: 1; display: flex; flex-direction: column; padding: 30px; }
         
-        /* Dosya Yükleme Alanı */
-        #drop-zone { border: 2px dashed #333; border-radius: 15px; padding: 30px; text-align: center; cursor: pointer; transition: 0.3s; background: rgba(255,255,255,0.02); margin-bottom: 20px; }
-        #drop-zone:hover { border-color: var(--neon); background: rgba(0, 255, 204, 0.05); }
+        /* Drop Alanı */
+        #drop-zone { 
+            border: 2px dashed #333; border-radius: 15px; padding: 40px; 
+            text-align: center; cursor: pointer; transition: 0.3s; 
+            background: rgba(255,255,255,0.02); margin-bottom: 20px;
+        }
+        #drop-zone:hover { border-color: var(--accent); background: rgba(0, 255, 204, 0.05); }
 
         /* Dosya Listesi */
-        .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; overflow-y: auto; flex: 1; }
-        .file-card { background: var(--panel); border-radius: 12px; padding: 15px; border: 1px solid #222; transition: 0.3s; position: relative; }
-        .file-card:hover { border-color: var(--neon); transform: translateY(-3px); }
-        .file-card b { display: block; font-size: 13px; margin: 10px 0; color: #fff; word-break: break-all; }
+        .file-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; overflow-y: auto; }
+        .file-item { 
+            background: var(--card); border: 1px solid #222; padding: 15px; 
+            border-radius: 10px; text-align: center; transition: 0.2s; position: relative;
+        }
+        .file-item:hover { border-color: var(--accent); transform: translateY(-3px); }
+        .file-item b { display: block; font-size: 12px; margin: 10px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        .card-actions { display: flex; gap: 5px; margin-top: 10px; }
-        .btn-sm { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: bold; text-decoration: none; text-align: center; }
-        .btn-view { background: #333; color: #fff; }
-        .btn-down { background: var(--neon); color: #000; }
+        .actions { display: flex; gap: 5px; }
+        .btn { flex: 1; padding: 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; text-decoration: none; text-align: center; }
+        .btn-open { background: #333; color: #fff; }
+        .btn-dl { background: var(--accent); color: #000; }
 
-        /* Önizleme Paneli (Overlay) */
-        .viewer-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; padding: 40px; }
-        .viewer-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        #viewer-content { flex: 1; background: #fff; border-radius: 10px; overflow: auto; display: flex; justify-content: center; align-items: center; color: #000; }
-        .close-view { color: var(--neon); cursor: pointer; font-weight: bold; font-size: 20px; }
+        /* Önizleme Modal */
+        #preview { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; padding: 20px; }
+        #preview-content { flex: 1; background: #fff; border-radius: 10px; overflow: auto; display: flex; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <div class="logo">XCOOL OS</div>
-    <button class="tab-btn active" onclick="switchTab('Genel')">📁 Genel Dosyalar</button>
-    <button class="tab-btn" onclick="switchTab('Belgeler')">📂 Belgeler</button>
-    <button class="tab-btn" onclick="switchTab('Medya')">🎬 Medya</button>
-    <button class="tab-btn" onclick="switchTab('Diger')">🧩 Diğer</button>
+    <div class="logo">XCOOL PRO</div>
+    <button class="nav-btn active" onclick="setTab('Tümü')">📂 Tümü</button>
+    <button class="nav-btn" onclick="setTab('Klasörler')">📁 Klasör İçeriği</button>
+    <div style="margin-top: 20px; font-size: 10px; color: #444;">KLASÖRÜ SÜRÜKLE BIRAK</div>
 </div>
 
-<div class="main">
-    <div class="header">
-        <h2 id="current-tab-title">Genel Dosyalar</h2>
-        <span id="file-count" style="color: #666; font-size: 14px;">0 Dosya</span>
+<div class="container">
+    <div id="drop-zone" onclick="document.getElementById('manual-inp').click()">
+        <h2 style="color: var(--accent);">DOSYA VEYA KLASÖR AT</h2>
+        <p style="color: #666; font-size: 14px;">Klasörü buraya bırakırsan içindeki tüm dosyaları tek tek açarım.</p>
+        <input type="file" id="manual-inp" hidden multiple webkitdirectory directory onchange="handleFiles(this.files)">
     </div>
 
-    <div id="drop-zone" onclick="document.getElementById('file-input').click()">
-        <p>Dosyaları Buraya At veya <b>Tıkla Seç</b></p>
-        <input type="file" id="file-input" multiple hidden onchange="handleFiles(this.files)">
-    </div>
-
-    <div class="file-grid" id="file-grid">
-        </div>
+    <div class="file-list" id="list"></div>
 </div>
 
-<div id="viewer" class="viewer-overlay">
-    <div class="viewer-header">
-        <h3 id="view-title">Dosya Önizleme</h3>
-        <span class="close-view" onclick="closeViewer()">KAPAT [X]</span>
+<div id="preview">
+    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <h3 id="p-title">Önizleme</h3>
+        <button onclick="closePreview()" style="background:red; color:white; border:none; padding:5px 15px; cursor:pointer;">KAPAT</button>
     </div>
-    <div id="viewer-content">
-        </div>
+    <div id="preview-content"></div>
 </div>
 
 <script>
-    let currentTab = 'Genel';
-    let database = { 'Genel': [], 'Belgeler': [], 'Medya': [], 'Diger': [] };
-
-    function switchTab(tabName) {
-        currentTab = tabName;
-        document.getElementById('current-tab-title').innerText = tabName;
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.innerText.includes(tabName));
+    let filesData = [];
+    
+    // Sürükle Bırak Ayarları
+    const zone = document.getElementById('drop-zone');
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
+        zone.addEventListener(e, (evt) => {
+            evt.preventDefault();
+            if(e === 'drop') {
+                // Klasör içindeki dosyaları derinlemesine okuma
+                const items = evt.dataTransfer.items;
+                if (items) {
+                    for (let i = 0; i < items.length; i++) {
+                        const item = items[i].webkitGetAsEntry();
+                        if (item) traverseFileTree(item);
+                    }
+                }
+            }
         });
-        renderFiles();
+    });
+
+    // Klasör yapısını tarayan fonksiyon
+    function traverseFileTree(item, path = "") {
+        if (item.isFile) {
+            item.file((file) => {
+                addFile(file);
+            });
+        } else if (item.isDirectory) {
+            let dirReader = item.createReader();
+            dirReader.readEntries((entries) => {
+                for (let i = 0; i < entries.length; i++) {
+                    traverseFileTree(entries[i], path + item.name + "/");
+                }
+            });
+        }
     }
 
     function handleFiles(files) {
-        for (let file of files) {
-            const fileObj = {
-                name: file.name,
-                type: file.type,
-                size: (file.size / 1024).toFixed(1) + " KB",
-                url: URL.createObjectURL(file),
-                rawFile: file
-            };
-            database[currentTab].push(fileObj);
-        }
-        renderFiles();
+        for(let f of files) addFile(f);
     }
 
-    function renderFiles() {
-        const grid = document.getElementById('file-grid');
-        grid.innerHTML = '';
-        const files = database[currentTab];
-        document.getElementById('file-count').innerText = files.length + " Dosya";
+    function addFile(file) {
+        const fileObj = {
+            name: file.name,
+            url: URL.createObjectURL(file),
+            type: file.type,
+            raw: file
+        };
+        filesData.push(fileObj);
+        render();
+    }
 
-        files.forEach((file, index) => {
+    function render() {
+        const list = document.getElementById('list');
+        list.innerHTML = '';
+        filesData.forEach((f, i) => {
             const card = document.createElement('div');
-            card.className = 'file-card';
-            
-            let icon = "📄";
-            if(file.type.includes('image')) icon = "🖼️";
-            if(file.type.includes('video')) icon = "🎥";
-            if(file.type.includes('pdf')) icon = "📕";
-
+            card.className = 'file-item';
             card.innerHTML = `
-                <div style="font-size: 40px;">${icon}</div>
-                <b>${file.name}</b>
-                <small style="color:#555">${file.size}</small>
-                <div class="card-actions">
-                    <button class="btn-sm btn-view" onclick="viewFile('${currentTab}', ${index})">AÇ</button>
-                    <a href="${file.url}" download="${file.name}" class="btn-sm btn-down">İNDİR</a>
+                <div style="font-size:30px">${f.type.includes('image') ? '🖼️' : '📄'}</div>
+                <b>${f.name}</b>
+                <div class="actions">
+                    <button class="btn btn-open" onclick="openFile(${i})">AÇ</button>
+                    <a href="${f.url}" download="${f.name}" class="btn btn-dl">İNDİR</a>
                 </div>
             `;
-            grid.appendChild(card);
+            list.appendChild(card);
         });
     }
 
-    function viewFile(tab, index) {
-        const file = database[tab][index];
-        const viewer = document.getElementById('viewer');
-        const content = document.getElementById('viewer-content');
-        document.getElementById('view-title').innerText = file.name;
-        
-        content.innerHTML = '';
-        viewer.style.display = 'flex';
+    function openFile(i) {
+        const f = filesData[i];
+        const p = document.getElementById('preview');
+        const c = document.getElementById('preview-content');
+        document.getElementById('p-title').innerText = f.name;
+        c.innerHTML = '';
+        p.style.display = 'flex';
 
-        if (file.type.includes('image')) {
-            content.innerHTML = `<img src="${file.url}" style="max-width:100%; max-height:100%;">`;
-        } else if (file.type.includes('video')) {
-            content.innerHTML = `<video src="${file.url}" controls style="max-width:100%; max-height:100%;"></video>`;
-        } else if (file.type.includes('text') || file.name.endsWith('.txt') || file.name.endsWith('.html')) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                content.innerHTML = `<pre style="padding:20px; white-space:pre-wrap; width:100%; height:100%; overflow:auto;">${e.target.result}</pre>`;
-            };
-            reader.readAsText(file.rawFile);
+        if(f.type.includes('image')) {
+            c.innerHTML = `<img src="${f.url}" style="max-width:100%; max-height:100%">`;
+        } else if(f.type.includes('video')) {
+            c.innerHTML = `<video src="${f.url}" controls style="max-width:100%"></video>`;
         } else {
-            content.innerHTML = `<div style="padding:40px; text-align:center;">
-                <p>Bu dosya türü doğrudan önizlenemiyor.</p>
-                <br>
-                <a href="${file.url}" download="${file.name}" class="btn-sm btn-down" style="padding:15px">BİLGİSAYARA İNDİR VE AÇ</a>
-            </div>`;
+            c.innerHTML = `<div style="padding:20px">Önizleme desteklenmiyor. İndirip açabilirsiniz.</div>`;
         }
     }
 
-    function closeViewer() {
-        document.getElementById('viewer').style.display = 'none';
-        document.getElementById('viewer-content').innerHTML = '';
-    }
-
-    // Sürükle-bırak desteği
-    window.addEventListener('dragover', e => e.preventDefault());
-    window.addEventListener('drop', e => {
-        e.preventDefault();
-        handleFiles(e.dataTransfer.files);
-    });
+    function closePreview() { document.getElementById('preview').style.display = 'none'; }
+    function setTab(t) { console.log(t + " seçildi"); }
 </script>
 
 </body>
