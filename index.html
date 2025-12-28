@@ -2,279 +2,194 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XCool | Pro Vault v2</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>XCOOL | ULTIMATE DIRECT VAULT</title>
     <style>
-        :root {
-            --bg: #050505;
-            --panel: #111111;
-            --accent: #00f2ff; /* Müqq Neon Turkuaz */
-            --text: #e0e0e0;
-            --border: #222;
-        }
-
+        :root { --neon: #00ffcc; --bg: #0a0a0a; --panel: #141414; --danger: #ff3e3e; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            height: 100vh;
+            background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif;
+            display: flex; height: 100vh; overflow: hidden;
         }
 
-        /* Kenar Menü */
+        /* Yan Panel - Terminal Log Sistemi */
         .sidebar {
-            width: 240px;
-            background: var(--panel);
-            border-right: 1px solid var(--border);
-            padding: 30px 20px;
-            display: flex;
-            flex-direction: column;
+            width: 300px; background: #000; border-right: 1px solid #333;
+            display: flex; flex-direction: column; padding: 20px;
+        }
+        .logo { color: var(--neon); font-size: 28px; font-weight: 900; margin-bottom: 20px; letter-spacing: 2px; }
+        #terminal {
+            flex: 1; background: #050505; border: 1px solid #222; border-radius: 5px;
+            padding: 10px; font-family: monospace; font-size: 11px; color: #00ff41;
+            overflow-y: auto; line-height: 1.4;
         }
 
-        .logo {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--accent);
-            text-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
-            margin-bottom: 50px;
-        }
-
-        .menu-item {
-            padding: 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-bottom: 10px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .menu-item:hover { background: #1a1a1a; color: var(--accent); }
-        .active { background: var(--accent) !important; color: #000 !important; }
-
-        /* Ana Alan */
-        .main {
-            flex: 1;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* Sürükle Bırak Alanı */
+        /* Ana İçerik */
+        .main { flex: 1; display: flex; flex-direction: column; padding: 30px; position: relative; }
+        
+        /* Gelişmiş Drop Zone */
         #drop-zone {
-            border: 2px dashed var(--accent);
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            background: rgba(0, 242, 255, 0.03);
-            transition: 0.3s;
-            cursor: pointer;
-            margin-bottom: 30px;
+            width: 100%; height: 120px; border: 2px dashed #444; border-radius: 15px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer; transition: 0.3s; margin-bottom: 30px; background: rgba(255,255,255,0.02);
         }
+        #drop-zone:hover { border-color: var(--neon); background: rgba(0, 255, 204, 0.05); }
 
-        #drop-zone.highlight {
-            background: rgba(0, 242, 255, 0.1);
-            transform: scale(1.01);
+        /* Dosya ve Klasör Görünümü */
+        #vault-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 25px; overflow-y: auto;
         }
-
-        /* Dosya Kartları */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
-            overflow-y: auto;
+        .folder-item {
+            background: var(--panel); border-radius: 12px; padding: 20px;
+            border: 1px solid #222; text-align: center; cursor: pointer;
+            transition: 0.3s; position: relative;
         }
+        .folder-item:hover { border-color: var(--neon); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .icon { font-size: 50px; display: block; margin-bottom: 10px; }
+        .name { font-size: 13px; font-weight: 600; color: #eee; word-break: break-all; }
+        .size { font-size: 10px; color: #666; margin-top: 5px; }
 
-        .card {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            padding: 25px 15px;
-            border-radius: 15px;
-            text-align: center;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            animation: fadeIn 0.5s ease forwards;
+        /* Şifre Ekranı Overlay */
+        .overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(10px);
         }
-
-        .card:hover {
-            border-color: var(--accent);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            transform: translateY(-8px);
+        .auth-card {
+            background: #1a1a1a; padding: 40px; border-radius: 20px;
+            border: 1px solid var(--neon); width: 350px; text-align: center;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.2);
         }
-
-        .card-icon { font-size: 45px; margin-bottom: 10px; display: block; }
-        .card-name { font-size: 13px; word-break: break-all; font-weight: 500; }
-
-        /* Modal / Şifre */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-
-        .modal-box {
-            background: var(--panel);
-            padding: 40px;
-            border-radius: 20px;
-            width: 350px;
-            border: 1px solid var(--accent);
-            text-align: center;
-        }
-
+        .auth-card h2 { margin-bottom: 20px; font-size: 18px; color: var(--neon); }
         input {
-            width: 100%;
-            padding: 15px;
-            background: #222;
-            border: 1px solid #444;
-            border-radius: 10px;
-            color: white;
-            margin: 20px 0;
-            text-align: center;
-            font-size: 20px;
-            letter-spacing: 5px;
+            width: 100%; padding: 15px; background: #000; border: 1px solid #333;
+            color: var(--neon); font-size: 28px; text-align: center; margin-bottom: 20px;
+            border-radius: 10px; outline: none; letter-spacing: 5px;
         }
-
-        .btn-pro {
-            background: var(--accent);
-            color: black;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
+        .btn-unlock {
+            background: var(--neon); color: #000; border: none; padding: 15px;
+            width: 100%; font-weight: 800; cursor: pointer; border-radius: 10px;
+            text-transform: uppercase; transition: 0.2s;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
+        .btn-unlock:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
     <div class="logo">XCOOL PRO</div>
-    <div class="menu-item active">📁 Ana Kasa</div>
-    <div class="menu-item">🔒 Gizli Belgeler</div>
-    <div class="menu-item">🎨 Tasarımlar</div>
-    <div class="menu-item" style="margin-top: auto;">⚙️ Ayarlar</div>
+    <div style="margin-bottom: 10px; font-size: 12px; color: #888;">SYSTEM LOGS:</div>
+    <div id="terminal"></div>
 </div>
 
 <div class="main">
-    <div id="drop-zone" onclick="document.getElementById('file-input').click()">
-        <h2 style="margin: 0; color: var(--accent);">DOSYALARI BURAYA SÜRÜKLE</h2>
-        <p style="opacity: 0.6;">veya tıklayarak manuel seç (Her format kabul edilir)</p>
-        <input type="file" id="file-input" hidden multiple onchange="handleFiles(this.files)">
+    <div id="drop-zone">
+        <span style="font-size: 32px; margin-bottom: 10px;">📂</span>
+        <p>Klasör veya Dosyaları Buraya Sürükle</p>
     </div>
 
-    <div class="grid" id="file-grid">
-        <div class="card" onclick="openLock('Sistem_Verileri.db')">
-            <span class="card-icon">🔐</span>
-            <div class="card-name">Sistem_Verileri.db</div>
+    <div id="vault-grid">
         </div>
-    </div>
 </div>
 
-<div id="lock-modal" class="modal">
-    <div class="modal-box">
-        <h2 id="file-title">Dosya Kilitli</h2>
-        <input type="password" id="pass-field" maxlength="4" placeholder="****">
-        <button class="btn-pro" onclick="unlock()">ERİŞİMİ AÇ</button>
-        <p onclick="closeLock()" style="margin-top: 15px; font-size: 12px; cursor:pointer; opacity:0.5;">İptal Et</p>
+<div id="overlay" class="overlay">
+    <div class="auth-card">
+        <h2 id="file-label">DOSYA KİLİTLİ</h2>
+        <input type="password" id="pass-code" maxlength="4" placeholder="****" autocomplete="off">
+        <button class="btn-unlock" onclick="validateAndDownload()">KİLİDİ AÇ VE İNDİR</button>
+        <p onclick="closeAuth()" style="margin-top: 20px; font-size: 12px; color: #444; cursor: pointer;">İŞLEMİ İPTAL ET</p>
     </div>
 </div>
 
 <script>
-    const KEY = "6161";
-    let selectedFile = "";
-    const dropZone = document.getElementById('drop-zone');
-    const grid = document.getElementById('file-grid');
+    const SECRET = "6161";
+    let database = {};
+    let activeKey = null;
 
-    // Sürükle Bırak Olayları
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, preventDefaults, false);
+    const term = document.getElementById('terminal');
+    const grid = document.getElementById('vault-grid');
+    const overlay = document.getElementById('overlay');
+    const passInput = document.getElementById('pass-code');
+
+    function log(msg) {
+        const time = new Date().toLocaleTimeString();
+        term.innerHTML += `<div>[${time}] ${msg}</div>`;
+        term.scrollTop = term.scrollHeight;
+    }
+
+    log("XCool OS başlatıldı...");
+    log("Kasa hazır. Şifre bekleniyor...");
+
+    // Sürükle Bırak
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
+        document.body.addEventListener(e, (evt) => {
+            evt.preventDefault();
+            if (e === 'drop') {
+                const files = evt.dataTransfer.files;
+                processFiles(files);
+            }
+        });
     });
 
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => dropZone.classList.add('highlight'), false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => dropZone.classList.remove('highlight'), false);
-    });
-
-    dropZone.addEventListener('drop', (e) => {
-        const dt = e.dataTransfer;
-        handleFiles(dt.files);
-    });
-
-    function handleFiles(files) {
-        [...files].forEach(addFileToUI);
-    }
-
-    function addFileToUI(file) {
-        const div = document.createElement('div');
-        div.className = 'card';
-        div.onclick = () => openLock(file.name);
-        
-        // Dosya tipine göre ikon belirle
-        let icon = "📄";
-        if(file.type.includes('image')) icon = "🖼️";
-        if(file.type.includes('video')) icon = "🎬";
-        if(file.name.endsWith('.exe')) icon = "⚙️";
-        if(file.name.endsWith('.html')) icon = "🌐";
-
-        div.innerHTML = `
-            <span class="card-icon">${icon}</span>
-            <div class="card-name">${file.name}</div>
-        `;
-        grid.prepend(div); // En başa ekle
-    }
-
-    // Şifre Sistemi
-    function openLock(name) {
-        selectedFile = name;
-        document.getElementById('file-title').innerText = name;
-        document.getElementById('lock-modal').style.display = 'flex';
-        document.getElementById('pass-field').focus();
-    }
-
-    function closeLock() {
-        document.getElementById('lock-modal').style.display = 'none';
-        document.getElementById('pass-field').value = "";
-    }
-
-    function unlock() {
-        const val = document.getElementById('pass-field').value;
-        if(val === KEY) {
-            alert("✅ '" + selectedFile + "' başarıyla açıldı!");
-            closeLock();
-        } else {
-            alert("❌ ŞİFRE HATALI!");
-            document.getElementById('pass-field').value = "";
+    function processFiles(files) {
+        for (let file of files) {
+            const id = "ID_" + Math.random().toString(36).substr(2, 9);
+            database[id] = {
+                name: file.name,
+                url: URL.createObjectURL(file),
+                size: (file.size / 1024).toFixed(2) + " KB"
+            };
+            
+            const card = document.createElement('div');
+            card.className = 'folder-item';
+            card.onclick = () => openAuth(id);
+            card.innerHTML = `
+                <span class="icon">📦</span>
+                <div class="name">${file.name}</div>
+                <div class="size">${database[id].size}</div>
+            `;
+            grid.appendChild(card);
+            log(`Yeni veri eklendi: ${file.name}`);
         }
     }
 
-    // Enter tuşu ile şifre onaylama
-    document.getElementById('pass-field').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') unlock();
-    });
+    function openAuth(id) {
+        activeKey = id;
+        document.getElementById('file-label').innerText = database[id].name;
+        overlay.style.display = 'flex';
+        passInput.focus();
+        log(`Erişim isteği: ${database[id].name}`);
+    }
+
+    function closeAuth() {
+        overlay.style.display = 'none';
+        passInput.value = '';
+        log("İşlem kullanıcı tarafından iptal edildi.");
+    }
+
+    function validateAndDownload() {
+        if (passInput.value === SECRET) {
+            log("Şifre doğrulandı. Protokol başlatılıyor...");
+            const file = database[activeKey];
+            
+            // Kesin indirme tetikleyici
+            const downloader = document.createElement('a');
+            downloader.href = file.url;
+            downloader.setAttribute('download', file.name);
+            document.body.appendChild(downloader);
+            downloader.click();
+            document.body.removeChild(downloader);
+
+            log(`Başarılı: ${file.name} dışa aktarıldı.`);
+            closeAuth();
+        } else {
+            log("!!! HATALI ŞİFRE DENEMESİ !!!");
+            passInput.style.borderColor = "var(--danger)";
+            setTimeout(() => passInput.style.borderColor = "#333", 500);
+            passInput.value = '';
+        }
+    }
+
+    passInput.onkeydown = (e) => { if (e.key === "Enter") validateAndDownload(); };
 </script>
 
 </body>
