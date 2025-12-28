@@ -1,419 +1,261 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eroğlu Sistem | Digital Solutions</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
-<style>
-  /* GENEL STİL VE FONT */
-  body { 
-    margin: 0; 
-    font-family: 'Montserrat', sans-serif; 
-    background: #121212; /* Derin Koyu Arka Plan */
-    color: #e0e0e0; /* Açık Gri Yazı */
-    transition: background-color 0.5s ease;
-    overflow-x: hidden; /* Yatay kaydırmayı engelle */
-  }
-  
-  /* SPLASH EKRANI - 3 SANİYE LOGO */
-  #splash { 
-    display: flex; 
-    flex-direction: column;
-    justify-content: center; 
-    align-items: center; 
-    height: 100vh; 
-    background: linear-gradient(135deg, #1f1f1f 0%, #000000 100%); 
-    opacity: 1;
-    transition: opacity 0.5s ease-in-out;
-  }
-  .splash-logo {
-    font-size: 6em; 
-    font-weight: 900; 
-    color: #4CAF50; /* Neon Yeşil - Ana Logo Rengi */
-    letter-spacing: 8px;
-    text-shadow: 0 0 15px rgba(76, 175, 80, 0.7); /* Neon Efekti */
-    animation: neon-glow 1.5s infinite alternate; 
-    margin-bottom: 0.2em;
-  }
-  .splash-slogan {
-    font-size: 1.2em;
-    color: #90caf9; /* Mavi alt başlık */
-    letter-spacing: 4px;
-    font-weight: 400;
-  }
-  @keyframes neon-glow {
-    from { transform: scale(1); text-shadow: 0 0 5px #4CAF50, 0 0 10px #4CAF50; }
-    to { transform: scale(1.05); text-shadow: 0 0 10px #4CAF50, 0 0 20px #4CAF50; }
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XCool | Professional Vault</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0a0c;
+            --card-bg: #16161a;
+            --accent-color: #6161ff;
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
+            --danger: #ff4d4d;
+        }
 
-  /* HAMBURGER BUTONU */
-  #hamburger { 
-    position: fixed; 
-    top: 1.5em; 
-    left: 1.5em; 
-    font-size: 2em; 
-    cursor: pointer; 
-    color: #90caf9; /* Açık Mavi */
-    z-index: 1000; 
-    transition: color 0.3s, transform 0.3s;
-    padding: 5px;
-    border-radius: 4px;
-  }
-  #hamburger:hover { 
-    color: #e0e0e0; 
-    transform: rotate(90deg);
-  }
-  
-  /* YAN MENÜ (NAVİGASYON) */
-  #menu { 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 280px; /* Daha geniş menü */
-    height: 100%; 
-    background: #1f1f1f; /* Koyu Menü Arka Planı */
-    box-shadow: 10px 0 20px rgba(0, 0, 0, 0.7);
-    transform: translateX(-280px); 
-    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Yaylanmalı (Spring) Efekt */
-    padding: 5em 1em 1em 1em;
-    z-index: 999;
-  }
-  #menu.open {
-    transform: translateX(0);
-  }
-  #menu ul { 
-    list-style: none; 
-    padding: 0; 
-    margin-top: 2em;
-  }
-  #menu ul li { 
-    margin: 1.2em 0; 
-    cursor: pointer; 
-    padding: 15px 20px;
-    border-radius: 10px;
-    transition: background 0.3s, color 0.3s, transform 0.2s;
-    font-weight: 700;
-    font-size: 1.1em;
-    border-left: 5px solid transparent;
-  }
-  #menu ul li:hover { 
-    background: rgba(76, 175, 80, 0.1); 
-    color: #4CAF50; 
-    border-left: 5px solid #4CAF50;
-    transform: translateX(5px);
-  }
-  
-  /* ANA İÇERİK ALANI */
-  #content { 
-    margin-left: 0; 
-    transition: margin-left 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55), transform 0.5s;
-    padding: 3em;
-    min-height: 100vh;
-  }
-  body.menu-open #content {
-    margin-left: 280px;
-    transform: perspective(1000px) scale(0.95) rotateY(-5deg); /* 3D derinlik hissi */
-    box-shadow: -10px 0 20px rgba(0, 0, 0, 0.5);
-  }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-  /* ORTAK FORM ELEMANLARI */
-  h2 { 
-    color: #4CAF50; 
-    border-bottom: 3px solid #90caf9; 
-    padding-bottom: 0.5em; 
-    margin-bottom: 1.5em; 
-    font-weight: 700;
-  }
-  input, select { 
-    background: #1f1f1f; 
-    border: 1px solid #333; 
-    color: #e0e0e0; 
-    border-radius: 8px; 
-    padding: 1em; 
-    width: calc(100% - 2em); 
-    margin: 0.75em 0;
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
-    transition: border-color 0.3s, box-shadow 0.3s;
-  }
-  input:focus, select:focus { 
-    border-color: #4CAF50; 
-    outline: none; 
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5), inset 0 2px 5px rgba(0, 0, 0, 0.3); 
-  }
-  button { 
-    background: #90caf9; /* Mavi Buton */
-    color: #121212; 
-    border: none; 
-    padding: 1.2em; 
-    width: 100%; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    margin-top: 1.5em;
-    font-weight: 700;
-    letter-spacing: 1px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-    transition: background 0.3s, transform 0.1s;
-  }
-  button:hover { 
-    background: #4CAF50; /* Yeşil Hover */
-    color: #e0e0e0; 
-    transform: translateY(-3px); 
-    box-shadow: 0 6px 15px rgba(76, 175, 80, 0.5);
-  }
-  
-  /* KAYIT VE KAMERA BÖLÜMÜ */
-  #camera { 
-    width: 100%; 
-    max-width: 450px; 
-    height: 300px; 
-    background: #333; 
-    border: 3px solid #4CAF50; 
-    margin: 1em auto;
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    font-size: 1.4em;
-    color: #90caf9;
-    border-radius: 12px;
-    text-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
-  }
+        /* Sidebar Tasarımı */
+        .sidebar {
+            width: 260px;
+            background-color: var(--card-bg);
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
 
-  /* GARANTİ LİSTESİ STİLİ */
-  #garantiList {
-    background: #1f1f1f;
-    padding: 1.5em;
-    border-radius: 10px;
-    min-height: 200px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-  }
-  .kayit-item {
-    padding: 12px;
-    border-bottom: 1px solid #333;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background 0.2s;
-  }
-  .kayit-item:hover { background: #2a2a2a; }
-  .kayit-item:last-child { border-bottom: none; }
-  .garanti-sure {
-    color: #4CAF50;
-    font-weight: 700;
-    background: #121212;
-    padding: 5px 10px;
-    border-radius: 5px;
-  }
-  
-</style>
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--accent-color);
+            margin-bottom: 40px;
+            letter-spacing: -1px;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: 0.3s;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        /* Ana İçerik */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .file-card {
+            background: var(--card-bg);
+            border: 1px solid #333;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .file-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+        }
+
+        .file-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* Şifre Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            width: 300px;
+        }
+
+        input[type="password"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #222;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Dosya Ekleme Alanı */
+        .upload-section {
+            background: #1a1a20;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 2px dashed #444;
+        }
+    </style>
 </head>
 <body>
 
-<div id="splash">
-    <div class="splash-logo">Eroğlu</div>
-    <div class="splash-slogan">Digital Solutions</div>
-</div>
-
-<div id="hamburger">&#9776;</div>
-
-<div id="menu">
-  <ul>
-    <li onclick="showSection('kayit')">📝 Yeni Kayıt</li>
-    <li onclick="showSection('garanti')">🛡️ Garanti Kayıtları</li>
-    <li onclick="showSection('admin')">⚙️ Admin Paneli</li>
-  </ul>
-</div>
-
-<div id="app">
-  <div id="content">
-    
-    <div id="kayit" style="display:none;">
-      <h2>📝 Yeni Kayıt Girişi</h2>
-      <input type="text" id="tvModel" placeholder="TV Marka / Model">
-      <input type="text" id="tvSN" placeholder="TV Seri Numarası">
-      
-      <div id="camera">Barkod / SN Tarama Alanı</div>
-      
-      <select id="islem">
-        <option value="led">💡 LED Değişim</option>
-        <option value="panel">🖥️ Panel Değişim</option>
-        <option value="diger">🔧 Diğer İşlemler</option>
-      </select>
-      
-      <input type="number" id="garanti" placeholder="Garanti Yılı (Manuel Giriş)">
-      <button onclick="kaydet()">💾 Kaydı Tamamla</button>
+    <div class="sidebar">
+        <div class="logo">XCOOL PRO</div>
+        <div class="nav-item active" onclick="showSection('all')">Tüm Dosyalar</div>
+        <div class="nav-item" onclick="showSection('docs')">Belgeler</div>
+        <div class="nav-item" onclick="showSection('media')">Medya</div>
+        <div class="nav-item" onclick="alert('Ayarlar yakında!')">Sistem Ayarları</div>
     </div>
 
-    <div id="admin" style="display:none;">
-      <h2>⚙️ Admin Paneli</h2>
-      <input type="password" id="adminPass" placeholder="Yönetici Şifresi">
-      <button onclick="girisAdmin()">🔑 Giriş Yap</button>
-      
-      <div id="adminContent" style="display:none;">
-        <h3>🎨 Tema Renk Paletleri</h3>
-        <p style="font-size:0.8em; color:#aaa;">Uygulamanın ana renklerini buradan değiştirin.</p>
-        <div style="display:flex; justify-content:space-between;">
-          <input type="color" id="renk1" value="#121212" title="Arka Plan">
-          <input type="color" id="renk2" value="#1f1f1f" title="Menü/Kart">
-          <input type="color" id="renk3" value="#4CAF50" title="Aksan 1 (Yeşil)">
-          <input type="color" id="renk4" value="#90caf9" title="Aksan 2 (Mavi)">
+    <div class="main-content">
+        <div class="header">
+            <h1>Dosya Kasası</h1>
+            <button class="btn" onclick="document.getElementById('fileInput').click()">+ Yeni Dosya At</button>
+            <input type="file" id="fileInput" style="display:none" onchange="manualUpload(event)">
         </div>
-        <button onclick="renkDegistir()">🚀 Renkleri Uygula</button>
-      </div>
-    </div>
 
-    <div id="garanti" style="display:none;">
-      <h2>🛡️ Garanti Kayıtları</h2>
-      <p style="color:#aaa;">Sisteme kayıtlı tüm garanti bilgilerini buradan takip edebilirsiniz.</p>
-      <div id="garantiList">
-        <div class="kayit-item">
-            <div style="flex-grow:1;">
-                <span style="font-weight:700;">Örnek TV Model (SN12345)</span><br>
-                <span style="font-size:0.9em; color:#90caf9;">İşlem: LED - Tarih: 01.01.2025</span>
+        <div class="upload-section">
+            <p style="color: var(--text-dim); font-size: 14px;">Manuel Dosya Ekleme: Aşağıdaki kutuya isim yazıp ekle diyebilirsin.</p>
+            <input type="text" id="manualFileName" placeholder="Dosya adı (Örn: Sırlarım.txt)">
+            <button class="btn" onclick="addManualFile()">Listeye Ekle</button>
+        </div>
+
+        <div class="file-grid" id="fileGrid">
+            <div class="file-card" onclick="checkAccess('Maaş Bordrosu')">
+                <span class="file-icon">📄</span>
+                <span>Maas_Bordrosu.pdf</span>
             </div>
-            <span class="garanti-sure">2 YIL</span>
+            <div class="file-card" onclick="checkAccess('Özel Fotoğraflar')">
+                <span class="file-icon">🖼️</span>
+                <span>Tatil_Resimleri.zip</span>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-</div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <h3>Güvenlik Kontrolü</h3>
+            <p id="targetFileName" style="color: var(--text-dim);"></p>
+            <input type="password" id="passInput" placeholder="Şifreyi Girin">
+            <button class="btn" onclick="verifyPassword()">Erişim Sağla</button>
+            <button class="btn" style="background:#333; margin-top:5px;" onclick="closeModal()">İptal</button>
+        </div>
+    </div>
 
-<script>
-  // Firebase ayarları (Değişmedi)
-  const firebaseConfig = {
-    apiKey: "AIzaSyCkS2QqyYNAWvIGYHmXtg0tFwAUtxYnYhE",
-    authDomain: "ef-8914e.firebaseapp.com",
-    projectId: "ef-8914e",
-    storageBucket: "ef-8914e.appspot.com",
-    messagingSenderId: "131514808744",
-    appId: "1:131514808744:web:7b45d2f5fbedff9abf859d",
-    measurementId: "G-3XWC0SF1PY"
-  };
-  const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+    <script>
+        const MASTER_PASS = "6161";
+        let currentTarget = "";
 
-  // DOM Elemanları
-  const splash = document.getElementById('splash');
-  const application = document.getElementById('app');
-  const menu = document.getElementById('menu');
-  const body = document.body;
+        function checkAccess(fileName) {
+            currentTarget = fileName;
+            document.getElementById('targetFileName').innerText = fileName;
+            document.getElementById('passwordModal').style.display = 'flex';
+        }
 
-  // 1. SPLASH EKRANI GECİKME (3 saniye)
-  setTimeout(() => { 
-    splash.style.opacity = '0'; // Yumuşak geçiş için
-    setTimeout(() => { 
-        splash.style.display = 'none'; 
-        application.style.display = 'block'; 
-        showSection('kayit'); // Başlangıçta Kayıt ekranını göster
-    }, 500); // Opaklık geçişi süresi
-  }, 3000); // Tam 3 saniye sonra başla
+        function verifyPassword() {
+            const input = document.getElementById('passInput').value;
+            if(input === MASTER_PASS) {
+                alert("Erişim Onaylandı: " + currentTarget + " açılıyor...");
+                closeModal();
+            } else {
+                alert("Hatalı Şifre! Erişim Reddedildi.");
+            }
+            document.getElementById('passInput').value = "";
+        }
 
-  // 2. HAMBURGER MENÜ FONKSİYONU
-  document.getElementById('hamburger').onclick = () => {
-    menu.classList.toggle('open');
-    body.classList.toggle('menu-open');
-  };
+        function closeModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+        }
 
-  function showSection(id){
-    ['kayit','admin','garanti'].forEach(s => document.getElementById(s).style.display='none');
-    document.getElementById(id).style.display='block';
-    menu.classList.remove('open');
-    body.classList.remove('menu-open');
-    if(id === 'garanti') {
-        loadGarantiList(); 
-    }
-  }
+        // Manuel Dosya Ekleme Fonksiyonu
+        function addManualFile() {
+            const name = document.getElementById('manualFileName').value;
+            if(!name) return;
+            
+            createFileCard(name);
+            document.getElementById('manualFileName').value = "";
+        }
 
-  // 3. ADMIN GİRİŞ
-  function girisAdmin(){
-    const pass = document.getElementById('adminPass').value;
-    if(pass==='6161'){ 
-        document.getElementById('adminContent').style.display='block'; 
-        alert('✅ Admin Giriş Başarılı'); 
-    }
-    else{ 
-        alert('❌ Hatalı Şifre'); 
-    }
-  }
+        // Uygulama Üzerinden Dosya Seçerek Ekleme
+        function manualUpload(event) {
+            const file = event.target.files[0];
+            if(file) {
+                createFileCard(file.name);
+            }
+        }
 
-  // 4. RENK DEĞİŞTİRME FONKSİYONU
-  function renkDegistir(){
-    const r1 = document.getElementById('renk1').value; // Arka Plan
-    const r2 = document.getElementById('renk2').value; // Menü/Kart
-    const r3 = document.getElementById('renk3').value; // Aksan 1 (Yeşil)
-    const r4 = document.getElementById('renk4').value; // Aksan 2 (Mavi)
-    
-    document.body.style.background = r1;
-    document.getElementById('menu').style.background = r2;
-    document.querySelector('.splash-logo').style.color = r3;
-    document.querySelector('#hamburger').style.color = r4;
-    document.querySelector('h2').style.color = r3;
-    document.querySelector('h2').style.borderBottom = `3px solid ${r4}`;
-    document.querySelector('button').style.background = r4;
-    
-    alert('🎨 Yeni Renkler Başarıyla Uygulandı!');
-  }
+        function createFileCard(name) {
+            const grid = document.getElementById('fileGrid');
+            const card = document.createElement('div');
+            card.className = 'file-card';
+            card.onclick = () => checkAccess(name);
+            card.innerHTML = `
+                <span class="file-icon">📂</span>
+                <span>${name}</span>
+            `;
+            grid.appendChild(card);
+        }
 
-  // 5. KAYIT FONKSİYONU
-  function kaydet(){
-    const tvModel = document.getElementById('tvModel').value.trim();
-    const tvSN = document.getElementById('tvSN').value.trim();
-    const islem = document.getElementById('islem').value;
-    const garanti = document.getElementById('garanti').value.trim();
-
-    if(!tvModel || !tvSN) {
-        alert('Lütfen Model ve Seri Numarası alanlarını doldurunuz.');
-        return;
-    }
-
-    db.ref('kayitlar').push({ 
-        tvModel, 
-        tvSN, 
-        islem, 
-        garanti: garanti || 'Belirtilmedi',
-        tarih: new Date().toLocaleDateString('tr-TR') 
-    });
-    alert('✅ Yeni Kayıt Başarılı!');
-    document.getElementById('tvModel').value='';
-    document.getElementById('tvSN').value='';
-    document.getElementById('garanti').value='';
-  }
-
-  // 6. GARANTİ LİSTESİNİ YÜKLE
-  function loadGarantiList() {
-      const listElement = document.getElementById('garantiList');
-      listElement.innerHTML = '<p style="color:#90caf9;">Kayıtlar yükleniyor...</p>';
-
-      db.ref('kayitlar').once('value', (snapshot) => {
-          listElement.innerHTML = ''; 
-          
-          if (!snapshot.exists()) {
-              listElement.innerHTML = '<p style="color:#4CAF50;">Henüz hiç kayıt bulunmamaktadır.</p>';
-              return;
-          }
-          
-          snapshot.forEach((childSnapshot) => {
-              const kayit = childSnapshot.val();
-              
-              const item = document.createElement('div');
-              item.classList.add('kayit-item');
-              
-              item.innerHTML = `
-                  <div style="flex-grow:1;">
-                      <span style="font-weight:700;">${kayit.tvModel}</span> 
-                      <span style="font-size:0.8em; color:#90caf9;">(${kayit.tvSN})</span><br>
-                      <span style="font-size:0.9em; color:#aaa;">İşlem: ${kayit.islem.toUpperCase()} - Tarih: ${kayit.tarih}</span>
-                  </div>
-                  <span class="garanti-sure">${kayit.garanti} ${kayit.garanti.toLowerCase().includes('yıl') ? '' : 'YIL'}</span>
-              `;
-              listElement.appendChild(item);
-          });
-      });
-  }
-</script>
-
+        function showSection(type) {
+            // Sekme değiştirme simülasyonu
+            console.log(type + " sekmesine geçildi.");
+            const items = document.querySelectorAll('.nav-item');
+            items.forEach(i => i.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+    </div>
 </body>
 </html>
