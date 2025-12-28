@@ -2,194 +2,154 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>XCOOL | ULTIMATE DIRECT VAULT</title>
+    <title>XCOOL | DEFINITIVE EDITION</title>
     <style>
-        :root { --neon: #00ffcc; --bg: #0a0a0a; --panel: #141414; --danger: #ff3e3e; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif;
-            display: flex; height: 100vh; overflow: hidden;
-        }
-
-        /* Yan Panel - Terminal Log Sistemi */
-        .sidebar {
-            width: 300px; background: #000; border-right: 1px solid #333;
-            display: flex; flex-direction: column; padding: 20px;
-        }
-        .logo { color: var(--neon); font-size: 28px; font-weight: 900; margin-bottom: 20px; letter-spacing: 2px; }
-        #terminal {
-            flex: 1; background: #050505; border: 1px solid #222; border-radius: 5px;
-            padding: 10px; font-family: monospace; font-size: 11px; color: #00ff41;
-            overflow-y: auto; line-height: 1.4;
-        }
-
-        /* Ana İçerik */
-        .main { flex: 1; display: flex; flex-direction: column; padding: 30px; position: relative; }
+        :root { --neon: #00ffcc; --bg: #0d0d0d; }
+        body { margin: 0; background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; }
         
-        /* Gelişmiş Drop Zone */
-        #drop-zone {
-            width: 100%; height: 120px; border: 2px dashed #444; border-radius: 15px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            cursor: pointer; transition: 0.3s; margin-bottom: 30px; background: rgba(255,255,255,0.02);
-        }
-        #drop-zone:hover { border-color: var(--neon); background: rgba(0, 255, 204, 0.05); }
+        /* Layout */
+        .app-container { display: flex; flex-direction: column; height: 100vh; padding: 20px; }
+        .header { border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 28px; font-weight: 900; color: var(--neon); text-shadow: 0 0 10px rgba(0,255,204,0.3); }
 
-        /* Dosya ve Klasör Görünümü */
-        #vault-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 25px; overflow-y: auto;
+        /* Drop Zone */
+        #drop-area {
+            border: 3px dashed #222; border-radius: 20px; padding: 50px;
+            text-align: center; background: #111; transition: 0.3s;
         }
-        .folder-item {
-            background: var(--panel); border-radius: 12px; padding: 20px;
-            border: 1px solid #222; text-align: center; cursor: pointer;
-            transition: 0.3s; position: relative;
-        }
-        .folder-item:hover { border-color: var(--neon); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .icon { font-size: 50px; display: block; margin-bottom: 10px; }
-        .name { font-size: 13px; font-weight: 600; color: #eee; word-break: break-all; }
-        .size { font-size: 10px; color: #666; margin-top: 5px; }
+        #drop-area.hover { border-color: var(--neon); background: #161616; }
 
-        /* Şifre Ekranı Overlay */
-        .overlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-            z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(10px);
+        /* File Display */
+        #file-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        .file-item {
+            background: #1a1a1a; padding: 15px; border-radius: 10px; border: 1px solid #333;
+            cursor: pointer; text-align: center; transition: 0.2s;
         }
-        .auth-card {
-            background: #1a1a1a; padding: 40px; border-radius: 20px;
-            border: 1px solid var(--neon); width: 350px; text-align: center;
-            box-shadow: 0 0 30px rgba(0, 255, 204, 0.2);
+        .file-item:hover { border-color: var(--neon); background: #222; }
+
+        /* Modal / Auth */
+        .auth-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            z-index: 1000; justify-content: center; align-items: center;
         }
-        .auth-card h2 { margin-bottom: 20px; font-size: 18px; color: var(--neon); }
+        .auth-box {
+            background: #111; padding: 40px; border-radius: 15px; border: 1px solid var(--neon);
+            width: 360px; text-align: center; box-shadow: 0 0 40px rgba(0,0,0,1);
+        }
         input {
-            width: 100%; padding: 15px; background: #000; border: 1px solid #333;
-            color: var(--neon); font-size: 28px; text-align: center; margin-bottom: 20px;
-            border-radius: 10px; outline: none; letter-spacing: 5px;
+            width: 100%; padding: 15px; margin: 20px 0; background: #000; border: 1px solid #333;
+            color: var(--neon); font-size: 24px; text-align: center; border-radius: 8px;
         }
-        .btn-unlock {
-            background: var(--neon); color: #000; border: none; padding: 15px;
-            width: 100%; font-weight: 800; cursor: pointer; border-radius: 10px;
-            text-transform: uppercase; transition: 0.2s;
+        .action-btn {
+            background: var(--neon); color: #000; border: none; padding: 15px; width: 100%;
+            font-weight: bold; border-radius: 8px; cursor: pointer; text-transform: uppercase;
         }
-        .btn-unlock:active { transform: scale(0.95); }
+        .dl-ready {
+            display: none; background: #fff; color: #000; padding: 15px; border-radius: 8px;
+            text-decoration: none; font-weight: bold; margin-top: 10px; border: 2px solid var(--neon);
+        }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <div class="logo">XCOOL PRO</div>
-    <div style="margin-bottom: 10px; font-size: 12px; color: #888;">SYSTEM LOGS:</div>
-    <div id="terminal"></div>
-</div>
-
-<div class="main">
-    <div id="drop-zone">
-        <span style="font-size: 32px; margin-bottom: 10px;">📂</span>
-        <p>Klasör veya Dosyaları Buraya Sürükle</p>
+<div class="app-container">
+    <div class="header">
+        <div class="logo">XCOOL PRO</div>
+        <div style="font-size: 12px; color: #555;">ENCRYPTED STORAGE | PASS: 6161</div>
     </div>
 
-    <div id="vault-grid">
-        </div>
+    <div id="drop-area">
+        <div style="font-size: 50px;">📥</div>
+        <h3>DOSYALARI VEYA KLASÖRLERİ BURAYA BIRAKIN</h3>
+        <p style="color: #666;">Sürükle-bırak yaptıktan sonra dosyalar aşağıda listelenecektir.</p>
+    </div>
+
+    <div id="file-list"></div>
 </div>
 
-<div id="overlay" class="overlay">
-    <div class="auth-card">
-        <h2 id="file-label">DOSYA KİLİTLİ</h2>
-        <input type="password" id="pass-code" maxlength="4" placeholder="****" autocomplete="off">
-        <button class="btn-unlock" onclick="validateAndDownload()">KİLİDİ AÇ VE İNDİR</button>
-        <p onclick="closeAuth()" style="margin-top: 20px; font-size: 12px; color: #444; cursor: pointer;">İŞLEMİ İPTAL ET</p>
+<div id="auth-modal" class="auth-overlay">
+    <div class="auth-box">
+        <h2 id="filename" style="font-size: 14px; color: #888;">DOSYA KİLİTLİ</h2>
+        <input type="password" id="pass-input" placeholder="ŞİFRE">
+        <button id="unlock-btn" class="action-btn" onclick="check()">KİLİDİ AÇ</button>
+        
+        <a id="download-trigger" class="dl-ready">⬇️ ŞİMDİ İNDİR / AÇ</a>
+        
+        <p onclick="closeAuth()" style="margin-top: 20px; font-size: 12px; color: #444; cursor: pointer;">VAZGEÇ</p>
     </div>
 </div>
 
 <script>
     const SECRET = "6161";
-    let database = {};
-    let activeKey = null;
+    let activeFiles = {};
+    let currentId = null;
 
-    const term = document.getElementById('terminal');
-    const grid = document.getElementById('vault-grid');
-    const overlay = document.getElementById('overlay');
-    const passInput = document.getElementById('pass-code');
+    const dropArea = document.getElementById('drop-area');
+    const fileList = document.getElementById('file-list');
+    const authModal = document.getElementById('auth-modal');
+    const passInput = document.getElementById('pass-input');
 
-    function log(msg) {
-        const time = new Date().toLocaleTimeString();
-        term.innerHTML += `<div>[${time}] ${msg}</div>`;
-        term.scrollTop = term.scrollHeight;
-    }
-
-    log("XCool OS başlatıldı...");
-    log("Kasa hazır. Şifre bekleniyor...");
-
-    // Sürükle Bırak
+    // Sürükle-Bırak Olayları
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
-        document.body.addEventListener(e, (evt) => {
+        dropArea.addEventListener(e, (evt) => {
             evt.preventDefault();
-            if (e === 'drop') {
-                const files = evt.dataTransfer.files;
-                processFiles(files);
-            }
+            if (e === 'dragover') dropArea.classList.add('hover');
+            else dropArea.classList.remove('hover');
         });
     });
 
-    function processFiles(files) {
+    dropArea.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
         for (let file of files) {
-            const id = "ID_" + Math.random().toString(36).substr(2, 9);
-            database[id] = {
+            const id = 'id' + Math.random().toString(36).substr(2, 9);
+            activeFiles[id] = {
                 name: file.name,
-                url: URL.createObjectURL(file),
-                size: (file.size / 1024).toFixed(2) + " KB"
+                url: URL.createObjectURL(file)
             };
-            
-            const card = document.createElement('div');
-            card.className = 'folder-item';
-            card.onclick = () => openAuth(id);
-            card.innerHTML = `
-                <span class="icon">📦</span>
-                <div class="name">${file.name}</div>
-                <div class="size">${database[id].size}</div>
-            `;
-            grid.appendChild(card);
-            log(`Yeni veri eklendi: ${file.name}`);
+            addToFileList(id, file.name);
         }
+    });
+
+    function addToFileList(id, name) {
+        const div = document.createElement('div');
+        div.className = 'file-item';
+        div.onclick = () => showAuth(id);
+        div.innerHTML = `<span style="font-size:30px">📦</span><br><small>${name}</small>`;
+        fileList.appendChild(div);
     }
 
-    function openAuth(id) {
-        activeKey = id;
-        document.getElementById('file-label').innerText = database[id].name;
-        overlay.style.display = 'flex';
+    function showAuth(id) {
+        currentId = id;
+        document.getElementById('filename').innerText = activeFiles[id].name;
+        authModal.style.display = 'flex';
+        document.getElementById('unlock-btn').style.display = 'block';
+        document.getElementById('pass-input').style.display = 'block';
+        document.getElementById('download-trigger').style.display = 'none';
         passInput.focus();
-        log(`Erişim isteği: ${database[id].name}`);
     }
 
-    function closeAuth() {
-        overlay.style.display = 'none';
-        passInput.value = '';
-        log("İşlem kullanıcı tarafından iptal edildi.");
-    }
-
-    function validateAndDownload() {
+    function check() {
         if (passInput.value === SECRET) {
-            log("Şifre doğrulandı. Protokol başlatılıyor...");
-            const file = database[activeKey];
+            const trigger = document.getElementById('download-trigger');
+            trigger.href = activeFiles[currentId].url;
+            trigger.download = activeFiles[currentId].name;
             
-            // Kesin indirme tetikleyici
-            const downloader = document.createElement('a');
-            downloader.href = file.url;
-            downloader.setAttribute('download', file.name);
-            document.body.appendChild(downloader);
-            downloader.click();
-            document.body.removeChild(downloader);
-
-            log(`Başarılı: ${file.name} dışa aktarıldı.`);
-            closeAuth();
+            // Görünümü Değiştir
+            document.getElementById('unlock-btn').style.display = 'none';
+            document.getElementById('pass-input').style.display = 'none';
+            trigger.style.display = 'block';
         } else {
-            log("!!! HATALI ŞİFRE DENEMESİ !!!");
-            passInput.style.borderColor = "var(--danger)";
-            setTimeout(() => passInput.style.borderColor = "#333", 500);
+            alert("HATALI ŞİFRE!");
             passInput.value = '';
         }
     }
 
-    passInput.onkeydown = (e) => { if (e.key === "Enter") validateAndDownload(); };
+    function closeAuth() {
+        authModal.style.display = 'none';
+        passInput.value = '';
+    }
+
+    passInput.onkeydown = (e) => { if (e.key === "Enter") check(); };
 </script>
 
 </body>
