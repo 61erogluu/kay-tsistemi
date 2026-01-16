@@ -2,165 +2,139 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>XCOOL | FOLDER SYSTEM</title>
+    <title>İlaydaya Aşık - Parkur</title>
     <style>
-        :root { --accent: #00ffcc; --bg: #0a0a0a; --card: #151515; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: #fff; display: flex; height: 100vh; }
-
-        /* Sidebar */
-        .sidebar { width: 240px; background: #000; border-right: 1px solid #222; padding: 20px; }
-        .logo { font-size: 22px; font-weight: 900; color: var(--accent); margin-bottom: 30px; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
-        .nav-btn { width: 100%; padding: 12px; background: none; border: none; color: #888; text-align: left; cursor: pointer; border-radius: 5px; margin-bottom: 5px; }
-        .nav-btn.active { background: var(--accent); color: #000; font-weight: bold; }
-
-        /* Ana Alan */
-        .container { flex: 1; display: flex; flex-direction: column; padding: 30px; }
-        
-        /* Drop Alanı */
-        #drop-zone { 
-            border: 2px dashed #333; border-radius: 15px; padding: 40px; 
-            text-align: center; cursor: pointer; transition: 0.3s; 
-            background: rgba(255,255,255,0.02); margin-bottom: 20px;
-        }
-        #drop-zone:hover { border-color: var(--accent); background: rgba(0, 255, 204, 0.05); }
-
-        /* Dosya Listesi */
-        .file-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; overflow-y: auto; }
-        .file-item { 
-            background: var(--card); border: 1px solid #222; padding: 15px; 
-            border-radius: 10px; text-align: center; transition: 0.2s; position: relative;
-        }
-        .file-item:hover { border-color: var(--accent); transform: translateY(-3px); }
-        .file-item b { display: block; font-size: 12px; margin: 10px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
-        .actions { display: flex; gap: 5px; }
-        .btn { flex: 1; padding: 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; text-decoration: none; text-align: center; }
-        .btn-open { background: #333; color: #fff; }
-        .btn-dl { background: var(--accent); color: #000; }
-
-        /* Önizleme Modal */
-        #preview { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; padding: 20px; }
-        #preview-content { flex: 1; background: #fff; border-radius: 10px; overflow: auto; display: flex; justify-content: center; align-items: center; }
+        body { margin: 0; background: #1a1a1a; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        canvas { border: 5px solid #444; box-shadow: 0 0 20px rgba(0,0,0,0.5); background: #222; }
+        #msg { position: absolute; top: 20px; color: white; text-align: center; pointer-events: none; }
     </style>
 </head>
 <body>
-
-<div class="sidebar">
-    <div class="logo">XCOOL PRO</div>
-    <button class="nav-btn active" onclick="setTab('Tümü')">📂 Tümü</button>
-    <button class="nav-btn" onclick="setTab('Klasörler')">📁 Klasör İçeriği</button>
-    <div style="margin-top: 20px; font-size: 10px; color: #444;">KLASÖRÜ SÜRÜKLE BIRAK</div>
-</div>
-
-<div class="container">
-    <div id="drop-zone" onclick="document.getElementById('manual-inp').click()">
-        <h2 style="color: var(--accent);">DOSYA VEYA KLASÖR AT</h2>
-        <p style="color: #666; font-size: 14px;">Klasörü buraya bırakırsan içindeki tüm dosyaları tek tek açarım.</p>
-        <input type="file" id="manual-inp" hidden multiple webkitdirectory directory onchange="handleFiles(this.files)">
+    <div id="msg">
+        <h1 style="color: #ff4757; margin: 0;">İLAYDAYA AŞIK</h1>
+        <p>Mavi: WASD | Kırmızı: Ok Tuşları | Kendi rengindeki sıvıdan geçebilirsin!</p>
     </div>
-
-    <div class="file-list" id="list"></div>
-</div>
-
-<div id="preview">
-    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-        <h3 id="p-title">Önizleme</h3>
-        <button onclick="closePreview()" style="background:red; color:white; border:none; padding:5px 15px; cursor:pointer;">KAPAT</button>
-    </div>
-    <div id="preview-content"></div>
-</div>
+    <canvas id="game"></canvas>
 
 <script>
-    let filesData = [];
-    
-    // Sürükle Bırak Ayarları
-    const zone = document.getElementById('drop-zone');
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
-        zone.addEventListener(e, (evt) => {
-            evt.preventDefault();
-            if(e === 'drop') {
-                // Klasör içindeki dosyaları derinlemesine okuma
-                const items = evt.dataTransfer.items;
-                if (items) {
-                    for (let i = 0; i < items.length; i++) {
-                        const item = items[i].webkitGetAsEntry();
-                        if (item) traverseFileTree(item);
-                    }
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+canvas.width = 800; canvas.height = 500;
+
+const gravity = 0.6;
+const friction = 0.8;
+
+class Player {
+    constructor(x, y, color, controls, type) {
+        this.startX = x; this.startY = y;
+        this.x = x; this.y = y;
+        this.w = 25; this.h = 25;
+        this.color = color;
+        this.controls = controls;
+        this.type = type; // 'su' veya 'ates'
+        this.velX = 0; this.velY = 0;
+        this.grounded = false;
+    }
+
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.w, this.h);
+        // Göz ekleyelim
+        ctx.fillStyle = "white";
+        ctx.fillRect(this.x + 5, this.y + 5, 5, 5);
+        ctx.fillRect(this.x + 15, this.y + 5, 5, 5);
+    }
+
+    update(keys, platforms, hazards) {
+        if (keys[this.controls.up] && this.grounded) { this.velY = -12; this.grounded = false; }
+        if (keys[this.controls.left]) this.velX = -4.5;
+        if (keys[this.controls.right]) this.velX = 4.5;
+
+        this.velY += gravity;
+        this.x += this.velX;
+        this.y += this.velY;
+        this.velX *= friction;
+
+        this.grounded = false;
+        platforms.forEach(p => {
+            if (this.x < p.x + p.w && this.x + this.w > p.x && this.y < p.y + p.h && this.y + this.h > p.y) {
+                if (this.velY > 0 && this.y + this.h - this.velY <= p.y) {
+                    this.y = p.y - this.h; this.velY = 0; this.grounded = true;
                 }
             }
         });
+
+        hazards.forEach(h => {
+            if (this.x < h.x + h.w && this.x + this.w > h.x && this.y < h.y + h.h && this.y + this.h > h.y) {
+                if (this.type !== h.safeType) this.reset();
+            }
+        });
+
+        if (this.y > canvas.height) this.reset();
+    }
+
+    reset() { this.x = this.startX; this.y = this.startY; this.velX = 0; this.velY = 0; }
+}
+
+const platforms = [
+    {x: 0, y: 450, w: 800, h: 50}, // Zemin
+    {x: 150, y: 370, w: 100, h: 20},
+    {x: 300, y: 300, w: 100, h: 20},
+    {x: 50, y: 220, w: 120, h: 20},
+    {x: 250, y: 150, w: 300, h: 20},
+    {x: 650, y: 100, w: 150, h: 20}
+];
+
+const hazards = [
+    {x: 400, y: 440, w: 80, h: 10, color: "#e74c3c", safeType: "ates"}, // Lav
+    {x: 550, y: 440, w: 80, h: 10, color: "#3498db", safeType: "su"},   // Su
+    {x: 350, y: 140, w: 50, h: 10, color: "#2ecc71", safeType: "none"} // Asit
+];
+
+const p1 = new Player(30, 400, "#3498db", {up: 'w', left: 'a', right: 'd'}, "su");
+const p2 = new Player(70, 400, "#e74c3c", {up: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight'}, "ates");
+
+const keys = {};
+window.onkeydown = (e) => keys[e.key] = true;
+window.onkeyup = (e) => keys[e.key] = false;
+
+function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Platformlar
+    ctx.fillStyle = "#7f8c8d";
+    platforms.forEach(p => ctx.fillRect(p.x, p.y, p.w, p.h));
+
+    // Tehlikeler (Lav/Su)
+    hazards.forEach(h => {
+        ctx.fillStyle = h.color;
+        ctx.fillRect(h.x, h.y, h.w, h.h);
     });
 
-    // Klasör yapısını tarayan fonksiyon
-    function traverseFileTree(item, path = "") {
-        if (item.isFile) {
-            item.file((file) => {
-                addFile(file);
-            });
-        } else if (item.isDirectory) {
-            let dirReader = item.createReader();
-            dirReader.readEntries((entries) => {
-                for (let i = 0; i < entries.length; i++) {
-                    traverseFileTree(entries[i], path + item.name + "/");
-                }
-            });
-        }
+    // Bitiş Kapısı
+    ctx.fillStyle = "#f1c40f";
+    ctx.fillRect(750, 40, 40, 60);
+    ctx.fillStyle = "white";
+    ctx.fillText("BİTİŞ", 755, 35);
+
+    p1.update(keys, platforms, hazards);
+    p2.update(keys, platforms, hazards);
+    p1.draw();
+    p2.draw();
+
+    if ((p1.x > 740 && p1.y < 100) || (p2.x > 740 && p2.y < 100)) {
+        ctx.fillStyle = "rgba(0,0,0,0.8)";
+        ctx.fillRect(0,0,canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+        ctx.font = "40px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("TEBRİKLER! İLAYDAYA AŞIK", canvas.width/2, canvas.height/2);
+        return; 
     }
 
-    function handleFiles(files) {
-        for(let f of files) addFile(f);
-    }
-
-    function addFile(file) {
-        const fileObj = {
-            name: file.name,
-            url: URL.createObjectURL(file),
-            type: file.type,
-            raw: file
-        };
-        filesData.push(fileObj);
-        render();
-    }
-
-    function render() {
-        const list = document.getElementById('list');
-        list.innerHTML = '';
-        filesData.forEach((f, i) => {
-            const card = document.createElement('div');
-            card.className = 'file-item';
-            card.innerHTML = `
-                <div style="font-size:30px">${f.type.includes('image') ? '🖼️' : '📄'}</div>
-                <b>${f.name}</b>
-                <div class="actions">
-                    <button class="btn btn-open" onclick="openFile(${i})">AÇ</button>
-                    <a href="${f.url}" download="${f.name}" class="btn btn-dl">İNDİR</a>
-                </div>
-            `;
-            list.appendChild(card);
-        });
-    }
-
-    function openFile(i) {
-        const f = filesData[i];
-        const p = document.getElementById('preview');
-        const c = document.getElementById('preview-content');
-        document.getElementById('p-title').innerText = f.name;
-        c.innerHTML = '';
-        p.style.display = 'flex';
-
-        if(f.type.includes('image')) {
-            c.innerHTML = `<img src="${f.url}" style="max-width:100%; max-height:100%">`;
-        } else if(f.type.includes('video')) {
-            c.innerHTML = `<video src="${f.url}" controls style="max-width:100%"></video>`;
-        } else {
-            c.innerHTML = `<div style="padding:20px">Önizleme desteklenmiyor. İndirip açabilirsiniz.</div>`;
-        }
-    }
-
-    function closePreview() { document.getElementById('preview').style.display = 'none'; }
-    function setTab(t) { console.log(t + " seçildi"); }
+    requestAnimationFrame(loop);
+}
+loop();
 </script>
-
 </body>
 </html>
