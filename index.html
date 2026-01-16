@@ -1,189 +1,195 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Neon Quest: Dual Escape</title>
+    <title>NEON ESCAPE - 2 PLAYER</title>
     <style>
-        body { margin: 0; background: #050505; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        #game-container { position: relative; }
-        canvas { background: #000; border: 2px solid #333; box-shadow: 0 0 20px #111; }
-        #menu, #win-screen { position: absolute; top: 0; left: 0; width: 800px; height: 500px; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; }
-        .btn { background: #00ff88; color: #000; padding: 15px 40px; border: none; font-weight: bold; cursor: pointer; font-size: 20px; transition: 0.3s; }
-        .btn:hover { transform: scale(1.1); box-shadow: 0 0 20px #00ff88; }
-        #ui { position: absolute; top: 10px; left: 0; width: 100%; display: flex; justify-content: space-around; pointer-events: none; font-size: 20px; text-shadow: 0 0 10px #fff; }
+        body { margin: 0; background: #0a0a0a; color: #fff; font-family: 'Orbitron', sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        #game-wrap { position: relative; border: 4px solid #333; box-shadow: 0 0 50px #000; }
+        canvas { background: linear-gradient(to bottom, #111, #000); display: block; }
+        
+        /* MODERN MENÜ */
+        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.85); z-index: 20; text-align: center; }
+        h1 { font-size: 60px; margin: 0; color: #0ff; text-shadow: 0 0 20px #0ff; letter-spacing: 5px; }
+        .start-btn { margin-top: 30px; padding: 15px 50px; font-size: 24px; background: none; border: 2px solid #0ff; color: #0ff; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px #0ff; }
+        .start-btn:hover { background: #0ff; color: #000; transform: scale(1.1); }
+        
+        /* OYUN İÇİ BİLGİ */
+        #stats { position: absolute; top: 15px; width: 100%; display: flex; justify-content: space-around; font-size: 22px; font-weight: bold; pointer-events: none; z-index: 10; }
         .hidden { display: none !important; }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<div id="game-container">
-    <div id="ui">
-        <div>BÖLÜM: <span id="lvl-display">1</span></div>
-        <div style="color: #ff4757;">SÜRE: <span id="timer">40</span></div>
+<div id="game-wrap">
+    <div id="stats">
+        <div style="color: #0ff;">BÖLÜM: <span id="lvl">1</span></div>
+        <div style="color: #f0f;">SÜRE: <span id="time">50</span></div>
     </div>
 
-    <div id="menu">
-        <h1 style="font-size: 50px; color: #00d4ff; text-shadow: 0 0 20px #00d4ff;">NEON RUNNER</h1>
-        <p>İki oyuncu da kapılara AYNI ANDA girmeli!</p>
-        <button class="btn" onclick="startGame()">OYUNA BAŞLA</button>
+    <div id="ui-layer">
+        <h1>NEON ESCAPE</h1>
+        <p style="color: #aaa; margin-top: 10px;">MAVİ: W-A-D | PEMBE: OK TUŞLARI</p>
+        <p style="color: #555;">İki oyuncu da kendi kapısına ulaşmalıdır!</p>
+        <button class="start-btn" onclick="startGame()">BAŞLAT</button>
     </div>
 
-    <div id="win-screen" class="hidden">
-        <h1 style="color: #00ff88;">TEBRİKLER KAZANDINIZ!</h1>
-        <p id="final-stat"></p>
-        <button class="btn" onclick="location.reload()">TEKRAR OYNA</button>
-    </div>
-
-    <canvas id="game"></canvas>
+    <canvas id="c"></canvas>
 </div>
 
 <script>
-const canvas = document.getElementById("game");
+const canvas = document.getElementById("c");
 const ctx = canvas.getContext("2d");
-canvas.width = 800; canvas.height = 500;
+canvas.width = 900; canvas.height = 550;
 
-let level = 1;
-let timeLeft = 40;
-let gameActive = false;
-let timerInterval;
+let currentLevel = 1;
+let timeLeft = 50;
+let active = false;
+let timer;
 
 const keys = {};
 window.onkeydown = (e) => keys[e.code] = true;
 window.onkeyup = (e) => keys[e.code] = false;
 
 class Player {
-    constructor(x, y, color, controls) {
+    constructor(x, y, color, controls, targetX) {
         this.startX = x; this.startY = y;
         this.x = x; this.y = y;
-        this.w = 20; this.h = 20;
+        this.w = 25; this.h = 25;
         this.color = color;
         this.controls = controls;
+        this.targetX = targetX; 
         this.vx = 0; this.vy = 0;
-        this.jump = false;
-        this.inGoal = false;
+        this.onG = false;
+        this.finished = false;
     }
 
     draw() {
-        // Bölüm geçtikçe karakterler "Cool" (Neon parlamalı) olur
-        ctx.shadowBlur = 5 * level;
+        ctx.save();
+        ctx.shadowBlur = 10 + (currentLevel * 5);
         ctx.shadowColor = this.color;
         ctx.fillStyle = this.color;
-        let sizeMod = level * 2; // Bölüm başına büyüme
+        // Seviye geçtikçe karakterler daha cool (büyük ve parlak)
+        let sizeMod = (currentLevel - 1) * 4;
         ctx.fillRect(this.x - sizeMod/2, this.y - sizeMod/2, this.w + sizeMod, this.h + sizeMod);
-        ctx.shadowBlur = 0;
+        ctx.restore();
     }
 
-    update(platforms) {
-        if (keys[this.controls.left]) this.vx = -5;
-        else if (keys[this.controls.right]) this.vx = 5;
+    update(plats) {
+        if (keys[this.controls.l]) this.vx = -6;
+        else if (keys[this.controls.r]) this.vx = 6;
         else this.vx = 0;
 
-        if (keys[this.controls.up] && !this.jump) {
-            this.vy = -12;
-            this.jump = true;
+        if (keys[this.controls.u] && this.onG) {
+            this.vy = -13;
+            this.onG = false;
         }
 
-        this.vy += 0.6;
+        this.vy += 0.7;
         this.x += this.vx;
         this.y += this.vy;
 
-        // Platform Çarpışma
-        platforms.forEach(p => {
+        this.onG = false;
+        plats.forEach(p => {
             if (this.x < p.x + p.w && this.x + this.w > p.x && this.y + this.h > p.y && this.y < p.y + p.h) {
-                if (this.vy > 0) {
+                if (this.vy > 0 && this.y + this.h - this.vy <= p.y) {
                     this.y = p.y - this.h;
                     this.vy = 0;
-                    this.jump = false;
+                    this.onG = true;
                 }
             }
         });
 
+        // Kendi kapısına girdi mi? (Kapılar y: 40 civarında)
+        if (this.y < 100 && Math.abs(this.x - this.targetX) < 40) {
+            this.finished = true;
+        } else {
+            this.finished = false;
+        }
+
         if (this.y > canvas.height) this.reset();
+        if (this.x < 0) this.x = 0;
+        if (this.x > canvas.width - this.w) this.x = canvas.width - this.w;
     }
 
-    reset() {
-        this.x = this.startX; this.y = this.startY; this.vx = 0; this.vy = 0;
-    }
+    reset() { this.x = this.startX; this.y = this.startY; this.vx = 0; this.vy = 0; }
 }
 
-let p1 = new Player(50, 400, "#00d4ff", {up: 'KeyW', left: 'KeyA', right: 'KeyD'});
-let p2 = new Player(100, 400, "#ff0077", {up: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight'});
+let p1 = new Player(50, 480, "#0ff", {u:'KeyW', l:'KeyA', r:'KeyD'}, 820);
+let p2 = new Player(100, 480, "#f0f", {u:'ArrowUp', l:'ArrowLeft', r:'ArrowRight'}, 50);
 
 let platforms = [];
-let goals = { p1: {x: 750, y: 50}, p2: {x: 700, y: 50} };
 
-function setupLevel(lvl) {
+function buildLevel(n) {
     p1.reset(); p2.reset();
-    platforms = [
-        {x: 0, y: 480, w: 800, h: 20}, // Yer
-        {x: 100, y: 400, w: 150, h: 15},
-        {x: 300, y: 320, w: 150, h: 15},
-        {x: 550, y: 240, w: 150, h: 15},
-        {x: 300, y: 160, w: 200, h: 15},
-        {x: 650, y: 100, w: 150, h: 15}
-    ];
-
-    // Seviye arttıkça platformlar küçülür
-    platforms.forEach(p => { if(p.y < 480) p.w -= (lvl * 15); });
+    timeLeft = 50 - (n * 5);
+    document.getElementById("lvl").innerText = n;
     
-    timeLeft = Math.max(10, 45 - (lvl * 5));
-    document.getElementById("lvl-display").innerText = lvl;
+    // Her bölümde zorlaşan platform düzeni
+    platforms = [
+        {x: 0, y: 530, w: 900, h: 20}, // Zemin
+        {x: 150 - (n*10), y: 440, w: 150, h: 10},
+        {x: 400, y: 360, w: 120 - (n*5), h: 10},
+        {x: 100, y: 280, w: 100, h: 10},
+        {x: 350, y: 200, w: 200, h: 10},
+        {x: 700, y: 120, w: 150, h: 10},
+        {x: 30, y: 100, w: 100, h: 10} // Üst sol platform
+    ];
 }
 
 function startGame() {
-    document.getElementById("menu").classList.add("hidden");
-    gameActive = true;
-    setupLevel(1);
-    timerInterval = setInterval(() => {
-        if(gameActive) {
+    document.getElementById("ui-layer").classList.add("hidden");
+    active = true;
+    currentLevel = 1;
+    buildLevel(1);
+    if(timer) clearInterval(timer);
+    timer = setInterval(() => {
+        if(active) {
             timeLeft--;
-            document.getElementById("timer").innerText = timeLeft;
-            if(timeLeft <= 0) gameOver();
+            document.getElementById("time").innerText = timeLeft;
+            if(timeLeft <= 0) { alert("SÜRE BİTTİ!"); location.reload(); }
         }
     }, 1000);
-    loop();
-}
-
-function gameOver() {
-    alert("SÜRE BİTTİ! Bölüm: " + level);
-    location.reload();
+    requestAnimationFrame(loop);
 }
 
 function loop() {
-    if(!gameActive) return;
+    if(!active) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Platform Çizimi (Neon)
-    ctx.strokeStyle = "#444";
-    ctx.lineWidth = 2;
+    // Kapı 1 (P1 - Mavi Kapı Sağda)
+    ctx.strokeStyle = "#0ff"; ctx.lineWidth = 4;
+    ctx.strokeRect(820, 40, 40, 60);
+    ctx.fillStyle = "rgba(0, 255, 255, 0.2)";
+    ctx.fillRect(820, 40, 40, 60);
+
+    // Kapı 2 (P2 - Pembe Kapı Solda)
+    ctx.strokeStyle = "#f0f";
+    ctx.strokeRect(50, 40, 40, 60);
+    ctx.fillStyle = "rgba(255, 0, 255, 0.2)";
+    ctx.fillRect(50, 40, 40, 60);
+
+    // Platformlar
+    ctx.fillStyle = "#333";
     platforms.forEach(p => {
-        ctx.strokeRect(p.x, p.y, p.w, p.h);
-        ctx.fillStyle = "#111";
         ctx.fillRect(p.x, p.y, p.w, p.h);
+        ctx.strokeStyle = "#555";
+        ctx.strokeRect(p.x, p.y, p.w, p.h);
     });
 
-    // Kapılar (Ayrı ayrı)
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = p1.color; ctx.strokeRect(750, 40, 30, 40); // P1 Kapısı
-    ctx.strokeStyle = p2.color; ctx.strokeRect(710, 40, 30, 40); // P2 Kapısı
+    p1.update(platforms); p1.draw();
+    p2.update(platforms); p2.draw();
 
-    p1.update(platforms);
-    p2.update(platforms);
-    p1.draw();
-    p2.draw();
-
-    // Kazanma Kontrolü (İkisi de kapıda mı?)
-    let p1In = (p1.x > 740 && p1.y < 100);
-    let p2In = (p2.x > 700 && p2.x < 740 && p2.y < 100);
-
-    if (p1In && p2In) {
-        if(level < 5) {
-            level++;
-            setupLevel(level);
+    // İkisi de kendi kapısına ulaştı mı?
+    if (p1.finished && p2.finished) {
+        if (currentLevel < 5) {
+            currentLevel++;
+            buildLevel(currentLevel);
         } else {
-            gameActive = false;
-            document.getElementById("win-screen").classList.remove("hidden");
-            document.getElementById("final-stat").innerText = "TÜM BÖLÜMLERİ GEÇTİNİZ!";
+            active = false;
+            alert("TEBRİKLER! TÜM BÖLÜMLERİ GEÇTİNİZ!");
+            location.reload();
         }
     }
 
