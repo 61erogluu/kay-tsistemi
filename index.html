@@ -2,120 +2,193 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>tebriklerrr</title>
+    <title>Neon Quest: Dual Escape</title>
     <style>
-        body { margin: 0; background: #111; color: white; font-family: sans-serif; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
-        canvas { background: #222; border: 3px solid #fff; margin-top: 20px; }
-        h1 { margin-top: 10px; color: #ff4757; }
+        body { margin: 0; background: #050505; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        #game-container { position: relative; }
+        canvas { background: #000; border: 2px solid #333; box-shadow: 0 0 20px #111; }
+        #menu, #win-screen { position: absolute; top: 0; left: 0; width: 800px; height: 500px; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; }
+        .btn { background: #00ff88; color: #000; padding: 15px 40px; border: none; font-weight: bold; cursor: pointer; font-size: 20px; transition: 0.3s; }
+        .btn:hover { transform: scale(1.1); box-shadow: 0 0 20px #00ff88; }
+        #ui { position: absolute; top: 10px; left: 0; width: 100%; display: flex; justify-content: space-around; pointer-events: none; font-size: 20px; text-shadow: 0 0 10px #fff; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <h1>İLAYDAYA AŞIK</h1>
-    <p>Mavi: W,A,S,D | Kırmızı: Ok Tuşları</p>
-    <canvas id="gameCanvas"></canvas>
+<div id="game-container">
+    <div id="ui">
+        <div>BÖLÜM: <span id="lvl-display">1</span></div>
+        <div style="color: #ff4757;">SÜRE: <span id="timer">40</span></div>
+    </div>
+
+    <div id="menu">
+        <h1 style="font-size: 50px; color: #00d4ff; text-shadow: 0 0 20px #00d4ff;">NEON RUNNER</h1>
+        <p>İki oyuncu da kapılara AYNI ANDA girmeli!</p>
+        <button class="btn" onclick="startGame()">OYUNA BAŞLA</button>
+    </div>
+
+    <div id="win-screen" class="hidden">
+        <h1 style="color: #00ff88;">TEBRİKLER KAZANDINIZ!</h1>
+        <p id="final-stat"></p>
+        <button class="btn" onclick="location.reload()">TEKRAR OYNA</button>
+    </div>
+
+    <canvas id="game"></canvas>
+</div>
 
 <script>
-const canvas = document.getElementById("gameCanvas");
+const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
-canvas.width = 800;
-canvas.height = 400;
+canvas.width = 800; canvas.height = 500;
 
-// Tuş kontrol sistemi (Hatasız)
+let level = 1;
+let timeLeft = 40;
+let gameActive = false;
+let timerInterval;
+
 const keys = {};
-window.addEventListener("keydown", (e) => { keys[e.key.toLowerCase()] = true; keys[e.code] = true; });
-window.addEventListener("keyup", (e) => { keys[e.key.toLowerCase()] = false; keys[e.code] = false; });
+window.onkeydown = (e) => keys[e.code] = true;
+window.onkeyup = (e) => keys[e.code] = false;
 
 class Player {
-    constructor(x, y, color, up, left, right) {
+    constructor(x, y, color, controls) {
+        this.startX = x; this.startY = y;
         this.x = x; this.y = y;
-        this.w = 30; this.h = 30;
+        this.w = 20; this.h = 20;
         this.color = color;
-        this.up = up; this.left = left; this.right = right;
-        this.velX = 0; this.velY = 0;
+        this.controls = controls;
+        this.vx = 0; this.vy = 0;
         this.jump = false;
+        this.inGoal = false;
     }
 
     draw() {
+        // Bölüm geçtikçe karakterler "Cool" (Neon parlamalı) olur
+        ctx.shadowBlur = 5 * level;
+        ctx.shadowColor = this.color;
         ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.w, this.h);
+        let sizeMod = level * 2; // Bölüm başına büyüme
+        ctx.fillRect(this.x - sizeMod/2, this.y - sizeMod/2, this.w + sizeMod, this.h + sizeMod);
+        ctx.shadowBlur = 0;
     }
 
-    update() {
-        // Hareketler
-        if (keys[this.left]) this.velX = -4;
-        else if (keys[this.right]) this.velX = 4;
-        else this.velX = 0;
+    update(platforms) {
+        if (keys[this.controls.left]) this.vx = -5;
+        else if (keys[this.controls.right]) this.vx = 5;
+        else this.vx = 0;
 
-        if (keys[this.up] && !this.jump) {
-            this.velY = -12;
+        if (keys[this.controls.up] && !this.jump) {
+            this.vy = -12;
             this.jump = true;
         }
 
-        this.velY += 0.6; // Yerçekimi
-        this.x += this.velX;
-        this.y += this.velY;
+        this.vy += 0.6;
+        this.x += this.vx;
+        this.y += this.vy;
 
-        // Platform Çarpışması (Basit zemin kontrolü)
-        if (this.y > 350) {
-            this.y = 350;
-            this.velY = 0;
-            this.jump = false;
-        }
-
-        // Platformlar
+        // Platform Çarpışma
         platforms.forEach(p => {
             if (this.x < p.x + p.w && this.x + this.w > p.x && this.y + this.h > p.y && this.y < p.y + p.h) {
-                if (this.velY > 0) {
+                if (this.vy > 0) {
                     this.y = p.y - this.h;
-                    this.velY = 0;
+                    this.vy = 0;
                     this.jump = false;
                 }
             }
         });
 
-        // Kazanma kontrolü
-        if (this.x > 740 && this.y < 100) {
-            alert("İLAYDAYA AŞIK KAZANDI!");
-            this.x = 20; this.y = 350;
-        }
+        if (this.y > canvas.height) this.reset();
+    }
+
+    reset() {
+        this.x = this.startX; this.y = this.startY; this.vx = 0; this.vy = 0;
     }
 }
 
-const platforms = [
-    {x: 100, y: 300, w: 100, h: 15},
-    {x: 300, y: 230, w: 100, h: 15},
-    {x: 500, y: 160, w: 100, h: 15},
-    {x: 700, y: 100, w: 100, h: 15}
-];
+let p1 = new Player(50, 400, "#00d4ff", {up: 'KeyW', left: 'KeyA', right: 'KeyD'});
+let p2 = new Player(100, 400, "#ff0077", {up: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight'});
 
-// Mavi karakter (W,A,S,D) | Kırmızı karakter (Ok Tuşları)
-const p1 = new Player(20, 350, "#3498db", "w", "a", "d");
-const p2 = new Player(60, 350, "#e74c3c", "ArrowUp", "ArrowLeft", "ArrowRight");
+let platforms = [];
+let goals = { p1: {x: 750, y: 50}, p2: {x: 700, y: 50} };
+
+function setupLevel(lvl) {
+    p1.reset(); p2.reset();
+    platforms = [
+        {x: 0, y: 480, w: 800, h: 20}, // Yer
+        {x: 100, y: 400, w: 150, h: 15},
+        {x: 300, y: 320, w: 150, h: 15},
+        {x: 550, y: 240, w: 150, h: 15},
+        {x: 300, y: 160, w: 200, h: 15},
+        {x: 650, y: 100, w: 150, h: 15}
+    ];
+
+    // Seviye arttıkça platformlar küçülür
+    platforms.forEach(p => { if(p.y < 480) p.w -= (lvl * 15); });
+    
+    timeLeft = Math.max(10, 45 - (lvl * 5));
+    document.getElementById("lvl-display").innerText = lvl;
+}
+
+function startGame() {
+    document.getElementById("menu").classList.add("hidden");
+    gameActive = true;
+    setupLevel(1);
+    timerInterval = setInterval(() => {
+        if(gameActive) {
+            timeLeft--;
+            document.getElementById("timer").innerText = timeLeft;
+            if(timeLeft <= 0) gameOver();
+        }
+    }, 1000);
+    loop();
+}
+
+function gameOver() {
+    alert("SÜRE BİTTİ! Bölüm: " + level);
+    location.reload();
+}
 
 function loop() {
+    if(!gameActive) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Zemin
-    ctx.fillStyle = "#555";
-    ctx.fillRect(0, 380, 800, 20);
+    // Platform Çizimi (Neon)
+    ctx.strokeStyle = "#444";
+    ctx.lineWidth = 2;
+    platforms.forEach(p => {
+        ctx.strokeRect(p.x, p.y, p.w, p.h);
+        ctx.fillStyle = "#111";
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+    });
 
-    // Platformları çiz
-    ctx.fillStyle = "white";
-    platforms.forEach(p => ctx.fillRect(p.x, p.y, p.w, p.h));
+    // Kapılar (Ayrı ayrı)
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = p1.color; ctx.strokeRect(750, 40, 30, 40); // P1 Kapısı
+    ctx.strokeStyle = p2.color; ctx.strokeRect(710, 40, 30, 40); // P2 Kapısı
 
-    // Bitiş (Altın blok)
-    ctx.fillStyle = "gold";
-    ctx.fillRect(750, 50, 40, 40);
+    p1.update(platforms);
+    p2.update(platforms);
+    p1.draw();
+    p2.draw();
 
-    p1.update(); p1.draw();
-    p2.update(); p2.draw();
+    // Kazanma Kontrolü (İkisi de kapıda mı?)
+    let p1In = (p1.x > 740 && p1.y < 100);
+    let p2In = (p2.x > 700 && p2.x < 740 && p2.y < 100);
+
+    if (p1In && p2In) {
+        if(level < 5) {
+            level++;
+            setupLevel(level);
+        } else {
+            gameActive = false;
+            document.getElementById("win-screen").classList.remove("hidden");
+            document.getElementById("final-stat").innerText = "TÜM BÖLÜMLERİ GEÇTİNİZ!";
+        }
+    }
 
     requestAnimationFrame(loop);
 }
-
-loop();
 </script>
 </body>
 </html>
-
