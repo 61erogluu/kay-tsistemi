@@ -2,14 +2,14 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>NEON EVOLUTION - PARKOUR</title>
+    <title>Neon Quest 43 - PRO</title>
     <style>
         body { margin: 0; background: #000; color: #fff; font-family: 'Orbitron', sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        #wrap { position: relative; border: 5px solid #222; }
-        canvas { background: #050505; display: block; }
-        #ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.9); z-index: 100; }
-        .stats { position: absolute; top: 15px; width: 100%; display: flex; justify-content: space-around; font-size: 20px; z-index: 50; text-shadow: 0 0 10px #fff; }
-        button { padding: 15px 40px; font-size: 20px; background: none; border: 2px solid #0ff; color: #0ff; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+        #wrap { position: relative; border: 4px solid #333; }
+        canvas { background: #020202; display: block; }
+        #ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); z-index: 100; text-align: center; }
+        .stats { position: absolute; top: 10px; width: 100%; display: flex; justify-content: space-around; font-size: 20px; z-index: 50; }
+        button { padding: 15px 50px; font-size: 22px; background: none; border: 2px solid #0ff; color: #0ff; cursor: pointer; transition: 0.3s; margin-top: 20px; }
         button:hover { background: #0ff; color: #000; box-shadow: 0 0 30px #0ff; }
         .hidden { display: none !important; }
     </style>
@@ -18,16 +18,14 @@
 <body>
 
 <div id="wrap">
-    <div class="stats" id="in-game-stats">
-        <div style="color: #0ff;">LEVEL: <span id="lvl">1</span></div>
-        <div style="color: #0f0;">EVRİM: <span id="evo-status">BAŞLANGIÇ</span></div>
-        <div style="color: #f00;">SÜRE: <span id="time">60</span></div>
+    <div class="stats">
+        <div style="color: #0ff;">BÖLÜM: <span id="lvl">1/43</span></div>
+        <div style="color: #0f0;">GEÇEN SÜRE: <span id="timeDisplay">0</span> sn</div>
     </div>
 
     <div id="ui">
-        <h1 style="font-size: 50px; color: #0ff; text-shadow: 0 0 20px #0ff;">NEON EVOLUTION</h1>
-        <p>Ateş (Kırmızı) Maviye Zarar Verir | Su (Mavi) Pembeye Zarar Verir</p>
-        <p style="color: #0f0;">Asit (Yeşil) Herkesi Öldürür!</p>
+        <h1 id="title" style="font-size: 50px; color: #0ff; text-shadow: 0 0 20px #0ff;">NEON QUEST 43</h1>
+        <p id="desc">Mavi: WASD | Pembe: Ok Tuşları<br>Mavi Su Pembe'yi, Kırmızı Lav Mavi'yi yakar!</p>
         <button onclick="start()">MÜCADELEYE BAŞLA</button>
     </div>
 
@@ -40,9 +38,11 @@ const ctx = canvas.getContext("2d");
 canvas.width = 1000; canvas.height = 600;
 
 let level = 1;
-let timeLeft = 60;
+const totalLevels = 43;
+let startTime;
+let currentTime = 0;
 let active = false;
-let timer;
+let timerInterval;
 
 const keys = {};
 window.onkeydown = (e) => keys[e.code] = true;
@@ -56,7 +56,7 @@ class Player {
         this.color = color;
         this.controls = controls;
         this.targetX = targetX;
-        this.type = type; // 'water' or 'fire'
+        this.type = type; 
         this.vx = 0; this.vy = 0;
         this.onG = false;
         this.finished = false;
@@ -64,27 +64,18 @@ class Player {
 
     draw() {
         ctx.save();
-        let s = (level - 1) * 5; // Level arttıkça büyüme
-        
-        // Gelişmiş Görsel Efektler (Level'a göre karakter değişiyor)
-        ctx.shadowBlur = 10 + (level * 8);
+        // Cool Evrim: Seviye arttıkça boyut ve parlama artar
+        let evolutionMod = Math.min(level * 0.8, 20);
+        ctx.shadowBlur = 15 + level;
         ctx.shadowColor = this.color;
         ctx.fillStyle = this.color;
-
-        if(level >= 1) { // 1. Evre: Kare
-            ctx.fillRect(this.x - s/2, this.y - s/2, this.w + s, this.h + s);
-        }
-        if(level >= 2) { // 2. Evre: İç çekirdek
+        
+        ctx.fillRect(this.x - evolutionMod/2, this.y - evolutionMod/2, this.w + evolutionMod, this.h + evolutionMod);
+        
+        // İç çekirdek (Evolution 2. evre gibi)
+        if(level > 10) {
             ctx.fillStyle = "#fff";
-            ctx.fillRect(this.x + 5, this.y + 5, 5 + s/2, 5 + s/2);
-        }
-        if(level >= 3) { // 3. Evre: Kanatlar/Çizgiler
-            ctx.strokeStyle = this.color;
-            ctx.lineWidth = 3;
-            ctx.strokeRect(this.x - 10 - s, this.y - 10 - s, this.w + 20 + s*2, this.h + 20 + s*2);
-        }
-        if(level >= 5) { // 5. Evre: Tanrı Modu Parlama
-             ctx.shadowBlur = 50;
+            ctx.fillRect(this.x + 5, this.y + 5, 5, 5);
         }
         ctx.restore();
     }
@@ -96,79 +87,93 @@ class Player {
 
         if (keys[this.controls.u] && this.onG) { this.vy = -14; this.onG = false; }
 
-        this.vy += 0.8;
-        this.x += this.vx; this.y += this.vy;
+        this.vy += 0.8; // Gravity
+        this.x += this.vx;
+        this.y += this.vy;
 
         this.onG = false;
-        plats.forEach(p => {
+        for (let p of plats) {
             if (this.x < p.x + p.w && this.x + this.w > p.x && this.y + this.h > p.y && this.y < p.y + p.h) {
-                if (this.vy > 0 && this.y + this.h - this.vy <= p.y) {
-                    this.y = p.y - this.h; this.vy = 0; this.onG = true;
+                if (this.vy > 0 && (this.y + this.h - this.vy) <= p.y) {
+                    this.y = p.y - this.h;
+                    this.vy = 0;
+                    this.onG = true;
                 }
             }
-        });
+        }
 
-        hazards.forEach(h => {
+        for (let h of hazards) {
             if (this.x < h.x + h.w && this.x + this.w > h.x && this.y < h.y + h.h && this.y + this.h > h.y) {
-                if (h.type === 'acid') this.reset();
-                if (h.type === 'fire' && this.type === 'water') this.reset();
-                if (h.type === 'water' && this.type === 'fire') this.reset();
+                if (h.type === 'acid' || (h.type === 'fire' && this.type === 'water') || (h.type === 'water' && this.type === 'fire')) {
+                    this.reset();
+                }
             }
-        });
+        }
 
-        if (this.y < 120 && Math.abs(this.x - this.targetX) < 50) this.finished = true;
+        if (this.y < 150 && Math.abs(this.x - this.targetX) < 40) this.finished = true;
         else this.finished = false;
 
         if (this.y > canvas.height) this.reset();
+        if (this.x < 0) this.x = 0;
+        if (this.x > canvas.width - this.w) this.x = canvas.width - this.w;
     }
 
     reset() { this.x = this.startX; this.y = this.startY; this.vx = 0; this.vy = 0; }
 }
 
-let p1 = new Player(50, 520, "#00fbff", {u:'KeyW', l:'KeyA', r:'KeyD'}, 900, 'water');
-let p2 = new Player(120, 520, "#ff00aa", {u:'ArrowUp', l:'ArrowLeft', r:'ArrowRight'}, 50, 'fire');
+let p1 = new Player(50, 520, "#00fbff", {u:'KeyW', l:'KeyA', r:'KeyD'}, 920, 'water');
+let p2 = new Player(110, 520, "#ff00aa", {u:'ArrowUp', l:'ArrowLeft', r:'ArrowRight'}, 30, 'fire');
 
 let platforms = [];
 let hazards = [];
 
 function buildLevel(n) {
     p1.reset(); p2.reset();
-    timeLeft = 65 - (n * 5);
-    document.getElementById("lvl").innerText = n;
-    const evoNames = ["BAŞLANGIÇ", "PARLAYAN", "KANATLI", "USTA", "NEON TANRISI"];
-    document.getElementById("evo-status").innerText = evoNames[n-1];
-
+    document.getElementById("lvl").innerText = n + "/" + totalLevels;
+    
+    // Zemin ve Sabitler
     platforms = [
-        {x: 0, y: 570, w: 1000, h: 30}, // Zemin
-        {x: 200, y: 480, w: 150 - n*10, h: 10},
-        {x: 450, y: 400, w: 150 - n*10, h: 10},
-        {x: 750, y: 320, w: 150 - n*10, h: 10},
-        {x: 400, y: 240, w: 200 - n*10, h: 10},
-        {x: 50, y: 150, w: 150, h: 10}, // P2 Kapı platformu
-        {x: 850, y: 150, w: 150, h: 10}  // P1 Kapı platformu
+        {x: 0, y: 570, w: 1000, h: 30},
+        {x: 20, y: 140, w: 100, h: 10}, // P2 Kapı Plat
+        {x: 880, y: 140, w: 100, h: 10}  // P1 Kapı Plat
     ];
 
+    // Seviye arttıkça platformlar kısalır: Zorluk Denklemi
+    let pWidth = Math.max(80, 180 - (n * 3));
+    
+    // Parkur oluşturma (43 Bölüm Boyunca Değişir)
+    platforms.push({x: 200, y: 460, w: pWidth, h: 10});
+    platforms.push({x: 450, y: 380, w: pWidth, h: 10});
+    platforms.push({x: 750, y: 300, w: pWidth, h: 10});
+    platforms.push({x: 400, y: 220, w: pWidth, h: 10});
+
+    // Tehlikeler (Seviye arttıkça büyürler)
+    let hazardSize = 50 + (n * 5);
     hazards = [
-        {x: 350, y: 560, w: 100, h: 15, type: 'fire', color: '#ff4400'},
-        {x: 600, y: 560, w: 100, h: 15, type: 'water', color: '#0044ff'},
-        {x: 450, y: 230, w: 50, h: 10, type: 'acid', color: '#00ff44'}
+        {x: 300, y: 565, w: hazardSize, h: 10, type: 'fire', color: '#ff4400'},
+        {x: 600, y: 565, w: hazardSize, h: 10, type: 'water', color: '#0044ff'}
     ];
     
-    // Seviye arttıkça daha fazla engel
-    if(n > 2) hazards.push({x: 100, y: 560, w: 150, h: 15, type: 'acid', color: '#0f0'});
+    if(n > 5) hazards.push({x: 450, y: 370, w: 40, h: 10, type: 'acid', color: '#0f0'});
+    if(n > 15) hazards.push({x: 450, y: 210, w: 100, h: 10, type: 'acid', color: '#0f0'});
 }
 
 function start() {
     document.getElementById("ui").classList.add("hidden");
-    active = true; level = 1; buildLevel(1);
-    if(timer) clearInterval(timer);
-    timer = setInterval(() => {
+    active = true;
+    level = 1;
+    startTime = Date.now();
+    buildLevel(1);
+    
+    if(timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
         if(active) {
-            timeLeft--; document.getElementById("time").innerText = timeLeft;
-            if(timeLeft <= 0) { alert("SÜRE DOLDU!"); location.reload(); }
+            currentTime = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById("timeDisplay").innerText = currentTime;
         }
     }, 1000);
-    loop();
+    
+    requestAnimationFrame(loop);
 }
 
 function loop() {
@@ -176,9 +181,9 @@ function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Kapıları Çiz
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = p1.color; ctx.strokeRect(910, 70, 50, 80); // P1 Kapı
-    ctx.strokeStyle = p2.color; ctx.strokeRect(40, 70, 50, 80);  // P2 Kapı
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = p1.color; ctx.strokeRect(910, 60, 40, 80);
+    ctx.strokeStyle = p2.color; ctx.strokeRect(30, 60, 40, 80);
 
     // Platformlar
     ctx.fillStyle = "#222";
@@ -187,7 +192,7 @@ function loop() {
         ctx.strokeStyle = "#444"; ctx.strokeRect(p.x, p.y, p.w, p.h);
     });
 
-    // Tehlikeler
+    // Tehlikeler (Lav/Su/Asit)
     hazards.forEach(h => {
         ctx.shadowBlur = 15; ctx.shadowColor = h.color;
         ctx.fillStyle = h.color;
@@ -198,12 +203,21 @@ function loop() {
     p1.update(platforms, hazards); p1.draw();
     p2.update(platforms, hazards); p2.draw();
 
+    // Bölüm geçme kontrolü
     if (p1.finished && p2.finished) {
-        if (level < 5) { level++; buildLevel(level); }
-        else { active = false; alert("TEBRİKLER! TÜM EVRİMLER TAMAMLANDI VE KAZANDINIZ!"); location.reload(); }
+        if (level < totalLevels) {
+            level++;
+            buildLevel(level);
+        } else {
+            active = false;
+            document.getElementById("ui").classList.remove("hidden");
+            document.getElementById("title").innerText = "OYUN BİTTİ!";
+            document.getElementById("desc").innerText = "43 Bölümü Toplam " + currentTime + " saniyede bitirdiniz!";
+        }
     }
+
     requestAnimationFrame(loop);
 }
 </script>
 </body>
-</html>4
+</html>
