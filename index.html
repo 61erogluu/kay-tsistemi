@@ -2,222 +2,528 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Neon Quest 43 - PRO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>Yazılım Satış Paneli | Bebek Mavisi</title>
     <style>
-        body { margin: 0; background: #000; color: #fff; font-family: 'Orbitron', sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        #wrap { position: relative; border: 4px solid #333; }
-        canvas { background: #020202; display: block; }
-        #ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); z-index: 100; text-align: center; }
-        .stats { position: absolute; top: 10px; width: 100%; display: flex; justify-content: space-around; font-size: 20px; z-index: 50; }
-        button { padding: 15px 50px; font-size: 22px; background: none; border: 2px solid #0ff; color: #0ff; cursor: pointer; transition: 0.3s; margin-top: 20px; }
-        button:hover { background: #0ff; color: #000; box-shadow: 0 0 30px #0ff; }
-        .hidden { display: none !important; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0f9ff 0%, #e6f3fe 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            margin: 0;
+            transition: background 0.3s ease;
+        }
+
+        /* Ana kart */
+        .panel-container {
+            width: 100%;
+            max-width: 1300px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 48px 48px 32px 32px;
+            box-shadow: 0 25px 50px -10px rgba(147, 197, 253, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.7);
+            animation: yumusakGiris 0.7s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+        }
+
+        @keyframes yumusakGiris {
+            0% { opacity: 0; transform: scale(0.96) translateY(15px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Header / Logo */
+        .logo-header {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 22px 32px;
+            border-bottom: 2px solid rgba(137, 207, 240, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            backdrop-filter: blur(4px);
+        }
+
+        .logo-box {
+            background: #c7e5fc;
+            width: 60px;
+            height: 60px;
+            border-radius: 30% 70% 70% 30% / 30% 55% 45% 70%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 25px -8px #a0c8f0;
+            animation: logoNabiz 3s infinite alternate ease-in-out;
+        }
+
+        @keyframes logoNabiz {
+            0% { border-radius: 30% 70% 70% 30% / 30% 55% 45% 70%; transform: rotate(0deg); }
+            100% { border-radius: 50% 50% 50% 50% / 60% 40% 60% 40%; transform: rotate(5deg); background: #b0d9fb; }
+        }
+
+        .logo-box span {
+            font-size: 32px;
+            font-weight: 800;
+            color: #2c5f8a;
+            letter-spacing: 2px;
+            filter: drop-shadow(2px 4px 4px rgba(255,255,255,0.8));
+        }
+
+        .logo-yazi {
+            font-size: 2.2rem;
+            font-weight: 300;
+            color: #1e4c73;
+            line-height: 1.2;
+        }
+        .logo-yazi strong {
+            font-weight: 700;
+            color: #0a3147;
+            background: linear-gradient(135deg, #0e4b6e, #3f9ed6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Giriş butonları */
+        .giris-bar {
+            display: flex;
+            gap: 18px;
+            padding: 24px 32px 16px 32px;
+            background: rgba(255,255,255,0.2);
+            border-bottom: 1px dashed #b3daf5;
+            flex-wrap: wrap;
+        }
+
+        .giris-btn {
+            border: none;
+            background: rgba(255,255,255,0.7);
+            padding: 14px 42px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #135b8d;
+            box-shadow: 0 4px 8px rgba(144, 202, 249, 0.3);
+            cursor: pointer;
+            transition: 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.9);
+            backdrop-filter: blur(2px);
+            flex: 1 1 auto;
+            min-width: 160px;
+        }
+
+        .giris-btn:hover {
+            background: #ddf0ff;
+            transform: scale(1.02) translateY(-3px);
+            box-shadow: 0 18px 25px -10px #9ac2ef;
+            border-color: #aad0f5;
+        }
+
+        .giris-btn.musteri-btn {
+            background: #eef7fe;
+            color: #26648b;
+        }
+
+        .admin-btn {
+            background: #fffbf5;
+            border: 1px solid #ffdcaa;
+        }
+
+        /* Dinamik içerik paneli */
+        .icerik-panel {
+            padding: 28px 32px 36px 32px;
+            transition: all 0.3s;
+            min-height: 450px;
+        }
+
+        /* Tablo stilleri */
+        .tablo-wrapper {
+            background: rgba(255,255,255,0.6);
+            border-radius: 28px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(166, 208, 242, 0.2);
+            backdrop-filter: blur(2px);
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255,255,255,0.4);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #c6e2ff;
+            color: #1b4c6f;
+            font-weight: 600;
+            padding: 14px 10px;
+            font-size: 1rem;
+        }
+
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #cde4f9;
+            color: #1a3b50;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr {
+            transition: background 0.15s;
+        }
+
+        tbody tr:hover {
+            background: rgba(240, 248, 255, 0.7);
+        }
+
+        /* kart elemanları */
+        .fiyat-karti {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 5px 15px #c5def5;
+            margin-bottom: 20px;
+            border: 1px solid white;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .manuel-input {
+            padding: 14px 18px;
+            border-radius: 50px;
+            border: 1px solid #b8d9fc;
+            background: white;
+            font-size: 1rem;
+            flex: 1 1 200px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .manuel-input:focus {
+            border-color: #4797d6;
+            box-shadow: 0 0 0 4px rgba(140, 202, 255, 0.3);
+        }
+
+        .mavisi-btn {
+            background: #b2d9fc;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 30px;
+            font-weight: 700;
+            color: #124263;
+            cursor: pointer;
+            box-shadow: 0 6px 12px #cfe2fc;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+
+        .mavisi-btn:hover {
+            background: #9acafc;
+            transform: scale(1.01);
+            box-shadow: 0 12px 20px -8px #a1caf5;
+        }
+
+        .gizli {
+            display: none;
+        }
+
+        .misafir-form {
+            background: rgba(255, 255, 255, 0.7);
+            max-width: 500px;
+            margin: 30px auto;
+            padding: 40px 30px;
+            border-radius: 56px;
+            box-shadow: 0 15px 25px #b8d4f0;
+        }
+
+        .input-grup {
+            margin-bottom: 24px;
+        }
+
+        .input-grup label {
+            display: block;
+            margin-bottom: 6px;
+            color: #1c577b;
+            font-weight: 500;
+        }
+
+        .input-grup input {
+            width: 100%;
+            padding: 18px 22px;
+            border-radius: 40px;
+            border: 1px solid white;
+            background: #f3faff;
+            font-size: 1rem;
+        }
+
+        .loading-animation {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2efff;
+            border-top: 4px solid #78b9f0;
+            border-radius: 50%;
+            animation: don 1s infinite linear;
+            margin: 10px auto;
+        }
+
+        @keyframes don {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* mobil uyum */
+        @media (max-width: 650px) {
+            .logo-yazi { font-size: 1.6rem; }
+            .giris-btn { padding: 12px 20px; }
+            .icerik-panel { padding: 20px 16px; }
+        }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="panel-container" id="anaPanel">
+        <!-- Logo alanı (Full yazılım logosu) -->
+        <div class="logo-header">
+            <div class="logo-box">
+                <span>F</span>
+            </div>
+            <div class="logo-yazi">
+                <strong>FULL YAZILIM</strong> · LOGO
+            </div>
+            <div style="margin-left: auto; font-size: 0.9rem; color: #3e6d92; background: rgba(255,255,255,0.6); padding: 8px 18px; border-radius: 50px;">
+                v1.0 bebek mavisi
+            </div>
+        </div>
 
-<div id="wrap">
-    <div class="stats">
-        <div style="color: #0ff;">BÖLÜM: <span id="lvl">1/43</span></div>
-        <div style="color: #0f0;">GEÇEN SÜRE: <span id="timeDisplay">0</span> sn</div>
+        <!-- Giriş butonları (Misafir / Yönetici) -->
+        <div class="giris-bar">
+            <button class="giris-btn musteri-btn" id="misafirBtn">👤 Misafir Girişi</button>
+            <button class="giris-btn admin-btn" id="adminBtn">🔐 Yönetici Girişi (6161)</button>
+        </div>
+
+        <!-- Dinamik içerik buraya yazılacak -->
+        <div class="icerik-panel" id="dinamikAlan">
+            <!-- Başlangıçta hoş geldin mesajı (isteğe bağlı) -->
+            <div style="text-align: center; padding: 60px 20px; background: rgba(255,255,255,0.3); border-radius: 60px;">
+                <h2 style="color:#1f577b; font-weight: 400;">👋 Hoş geldiniz</h2>
+                <p style="color:#2b5f83;">Lütfen giriş tipinizi seçin.</p>
+                <div style="width: 80px; height: 80px; background: #b8dcff; margin: 20px auto; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; animation: logoNabiz 2s infinite;">✨</div>
+            </div>
+        </div>
     </div>
 
-    <div id="ui">
-        <h1 id="title" style="font-size: 50px; color: #0ff; text-shadow: 0 0 20px #0ff;">NEON QUEST 43</h1>
-        <p id="desc">Mavi: WASD | Pembe: Ok Tuşları<br>Mavi Su Pembe'yi, Kırmızı Lav Mavi'yi yakar!</p>
-        <button onclick="start()">MÜCADELEYE BAŞLA</button>
-    </div>
+    <script>
+        (function() {
+            // Başlangıç verileri
+            let yazilimlar = [
+                { id: 1, ad: "Premium Muhasebe 2025", fiyat: 12500, stok: "Sınırsız" },
+                { id: 2, ad: "Fast POS Panel", fiyat: 8400, stok: "10 Kullanıcı" },
+                { id: 3, ad: "E-Ticaret Entegrator", fiyat: 19900, stok: "3 Domain" },
+                { id: 4, ad: "Müşteri Takip CRM", fiyat: 6700, stok: "Sınırsız" }
+            ];
 
-    <canvas id="c"></canvas>
-</div>
+            let musteriler = []; // { email, sifre, kayitTarihi }
 
-<script>
-const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");
-canvas.width = 1000; canvas.height = 600;
+            // DOM öğeleri
+            const dinamikAlan = document.getElementById('dinamikAlan');
+            const misafirBtn = document.getElementById('misafirBtn');
+            const adminBtn = document.getElementById('adminBtn');
 
-let level = 1;
-const totalLevels = 43;
-let startTime;
-let currentTime = 0;
-let active = false;
-let timerInterval;
-
-const keys = {};
-window.onkeydown = (e) => keys[e.code] = true;
-window.onkeyup = (e) => keys[e.code] = false;
-
-class Player {
-    constructor(x, y, color, controls, targetX, type) {
-        this.startX = x; this.startY = y;
-        this.x = x; this.y = y;
-        this.w = 25; this.h = 25;
-        this.color = color;
-        this.controls = controls;
-        this.targetX = targetX;
-        this.type = type; 
-        this.vx = 0; this.vy = 0;
-        this.onG = false;
-        this.finished = false;
-    }
-
-    draw() {
-        ctx.save();
-        // Cool Evrim: Seviye arttıkça boyut ve parlama artar
-        let evolutionMod = Math.min(level * 0.8, 20);
-        ctx.shadowBlur = 15 + level;
-        ctx.shadowColor = this.color;
-        ctx.fillStyle = this.color;
-        
-        ctx.fillRect(this.x - evolutionMod/2, this.y - evolutionMod/2, this.w + evolutionMod, this.h + evolutionMod);
-        
-        // İç çekirdek (Evolution 2. evre gibi)
-        if(level > 10) {
-            ctx.fillStyle = "#fff";
-            ctx.fillRect(this.x + 5, this.y + 5, 5, 5);
-        }
-        ctx.restore();
-    }
-
-    update(plats, hazards) {
-        if (keys[this.controls.l]) this.vx = -6;
-        else if (keys[this.controls.r]) this.vx = 6;
-        else this.vx = 0;
-
-        if (keys[this.controls.u] && this.onG) { this.vy = -14; this.onG = false; }
-
-        this.vy += 0.8; // Gravity
-        this.x += this.vx;
-        this.y += this.vy;
-
-        this.onG = false;
-        for (let p of plats) {
-            if (this.x < p.x + p.w && this.x + this.w > p.x && this.y + this.h > p.y && this.y < p.y + p.h) {
-                if (this.vy > 0 && (this.y + this.h - this.vy) <= p.y) {
-                    this.y = p.y - this.h;
-                    this.vy = 0;
-                    this.onG = true;
+            // Yönetici şifre kontrolü
+            function adminGirisKontrol() {
+                let sifre = prompt("🔒 Yönetici şifresini giriniz:", "");
+                if (sifre === "6161") {
+                    adminPaneliGoster();
+                } else {
+                    alert("❌ Hatalı şifre! (İpucu: 6161)");
+                    // Yine de misafir tarafını gösterebiliriz ama geri dön
+                    misafirPaneliGoster();
                 }
             }
-        }
 
-        for (let h of hazards) {
-            if (this.x < h.x + h.w && this.x + this.w > h.x && this.y < h.y + h.h && this.y + this.h > h.y) {
-                if (h.type === 'acid' || (h.type === 'fire' && this.type === 'water') || (h.type === 'water' && this.type === 'fire')) {
-                    this.reset();
-                }
+            // Admin paneli HTML (fiyatlandırma, müşteri listesi, manuel ekleme, tablolar)
+            function adminPaneliGoster() {
+                let mevcutMusteriler = musteriler;
+
+                // Tablo satırlarını oluştur (yazılımlar)
+                const yazilimSatirlari = yazilimlar.map(y => `
+                    <tr>
+                        <td>${y.id}</td>
+                        <td>${y.ad}</td>
+                        <td>${y.fiyat.toLocaleString('tr-TR')} ₺</td>
+                        <td>${y.stok}</td>
+                    </tr>
+                `).join('');
+
+                const musteriSatirlari = mevcutMusteriler.length === 0 ? 
+                    '<tr><td colspan="3" style="text-align:center; padding:30px;">Henüz kayıtlı müşteri yok.</td></tr>' : 
+                    mevcutMusteriler.map(m => `<tr><td>${m.email}</td><td>${m.sifre}</td><td>${m.kayitTarihi || 'bugün'}</td></tr>`).join('');
+
+                dinamikAlan.innerHTML = `
+                    <div style="animation: yumusakGiris 0.4s;">
+                        <div class="flex-row" style="justify-content: space-between; flex-wrap: wrap;">
+                            <h2 style="color:#13537c;">📋 Yönetici Paneli</h2>
+                            <span class="mavisi-btn" style="background:#e3f0ff; padding:10px 25px;">Yetki: Admin</span>
+                        </div>
+
+                        <!-- FİYATLANDIRMA TABLOSU (Mevcut yazılımlar) -->
+                        <div class="tablo-wrapper">
+                            <h3 style="margin-bottom: 16px; color:#1a4d72;">💰 Fiyatlandırma & Yazılımlar</h3>
+                            <table>
+                                <thead><tr><th>ID</th><th>Yazılım Adı</th><th>Fiyat (₺)</th><th>Stok/Lisans</th></tr></thead>
+                                <tbody>${yazilimSatirlari}</tbody>
+                            </table>
+                        </div>
+
+                        <!-- MÜŞTERİ LİSTESİ (Hesap açanlar) -->
+                        <div class="tablo-wrapper">
+                            <h3 style="margin-bottom: 16px; color:#1a4d72;">👥 Hesap Açan Müşteriler (E-posta / Şifre)</h3>
+                            <table>
+                                <thead><tr><th>E-posta</th><th>Şifre</th><th>Kayıt Zamanı</th></tr></thead>
+                                <tbody>${musteriSatirlari}</tbody>
+                            </table>
+                        </div>
+
+                        <!-- MANUEL YAZILIM EKLEME (elle ekle) -->
+                        <div class="fiyat-karti">
+                            <h4 style="color:#165983; margin-bottom: 12px;">➕ Manuel Yeni Yazılım Ekle</h4>
+                            <div class="flex-row">
+                                <input type="text" id="manuelAd" class="manuel-input" placeholder="Yazılım adı (örn: Full Logo)">
+                                <input type="number" id="manuelFiyat" class="manuel-input" placeholder="Fiyat (₺)">
+                                <input type="text" id="manuelStok" class="manuel-input" placeholder="Stok / Bilgi">
+                                <button class="mavisi-btn" id="ekleButon">Ekle</button>
+                            </div>
+                            <p style="font-size:0.85rem; margin-top:8px;">* Eklediğiniz yazılım hemen fiyat tablosunda görünür.</p>
+                        </div>
+
+                        <!-- Manuel müşteri ekle (siz de isteğe bağlı ekleyebilirsiniz) -->
+                        <div style="background: #eaf4fd; border-radius: 28px; padding: 16px; margin-top: 15px;">
+                            <details>
+                                <summary style="color:#1d6592; font-weight:600;">➕ Müşteri manuel ekle (opsiyonel)</summary>
+                                <div class="flex-row" style="margin-top:15px;">
+                                    <input type="email" id="manuelMail" class="manuel-input" placeholder="Müşteri e-posta">
+                                    <input type="text" id="manuelSifre" class="manuel-input" placeholder="şifre">
+                                    <button class="mavisi-btn" id="musteriEkleButon">Müşteri Ekle</button>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                `;
+
+                // Manuel yazılım ekleme olayı
+                document.getElementById('ekleButon')?.addEventListener('click', function() {
+                    const ad = document.getElementById('manuelAd')?.value.trim();
+                    const fiyat = parseFloat(document.getElementById('manuelFiyat')?.value);
+                    const stok = document.getElementById('manuelStok')?.value.trim();
+
+                    if (!ad || isNaN(fiyat) || !stok) {
+                        alert('Lütfen tüm alanları doldurun!');
+                        return;
+                    }
+
+                    const yeniId = yazilimlar.length > 0 ? Math.max(...yazilimlar.map(y => y.id)) + 1 : 1;
+                    yazilimlar.push({ id: yeniId, ad: ad, fiyat: fiyat, stok: stok });
+                    adminPaneliGoster(); // paneli yenile (güncel tablo)
+                });
+
+                // Manuel müşteri ekle butonu
+                document.getElementById('musteriEkleButon')?.addEventListener('click', function() {
+                    const mail = document.getElementById('manuelMail')?.value.trim();
+                    const sifre = document.getElementById('manuelSifre')?.value.trim();
+                    if (mail && sifre) {
+                        musteriler.push({ email: mail, sifre: sifre, kayitTarihi: 'manuel' });
+                        adminPaneliGoster();
+                    } else { alert('E-posta ve şifre girin'); }
+                });
             }
-        }
 
-        if (this.y < 150 && Math.abs(this.x - this.targetX) < 40) this.finished = true;
-        else this.finished = false;
+            // Misafir paneli (Hesap açma formu)
+            function misafirPaneliGoster() {
+                dinamikAlan.innerHTML = `
+                    <div style="animation: yumusakGiris 0.5s;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <span style="background:#d8ebff; padding:12px 30px; border-radius: 60px; font-size:1.3rem;">👋 Misafir Bölgesi</span>
+                        </div>
+                        <div class="misafir-form">
+                            <h3 style="color:#13537c; margin-bottom: 24px;">🔐 Hesap Oluştur / Giriş Yap</h3>
+                            <div class="input-grup">
+                                <label>E-posta adresiniz</label>
+                                <input type="email" id="misafirEmail" placeholder="ornek@email.com">
+                            </div>
+                            <div class="input-grup">
+                                <label>Şifre</label>
+                                <input type="password" id="misafirSifre" placeholder="********">
+                            </div>
+                            <button class="mavisi-btn" id="hesapAcBtn" style="width:100%;">Hesap Aç / Giriş</button>
+                            <div style="margin-top: 24px; font-size:0.9rem; color:#3c6e93;">* Hesap açtığınızda yönetici panelinde görünürsünüz.</div>
+                            <div id="misafirMesaj" style="margin-top:20px;"></div>
+                        </div>
+                        <div style="background: #f2f9ff; border-radius: 30px; padding: 16px; text-align: center;">
+                            📱 Mobil uyumlu & animasyonlu bebek mavisi tasarım.
+                        </div>
+                    </div>
+                `;
 
-        if (this.y > canvas.height) this.reset();
-        if (this.x < 0) this.x = 0;
-        if (this.x > canvas.width - this.w) this.x = canvas.width - this.w;
-    }
+                document.getElementById('hesapAcBtn')?.addEventListener('click', function() {
+                    const email = document.getElementById('misafirEmail')?.value.trim();
+                    const sifre = document.getElementById('misafirSifre')?.value.trim();
+                    const mesajDiv = document.getElementById('misafirMesaj');
 
-    reset() { this.x = this.startX; this.y = this.startY; this.vx = 0; this.vy = 0; }
-}
+                    if (!email || !sifre) {
+                        mesajDiv.innerHTML = '<span style="color:#b65353;">❌ E-posta ve şifre boş olamaz.</span>';
+                        return;
+                    }
 
-let p1 = new Player(50, 520, "#00fbff", {u:'KeyW', l:'KeyA', r:'KeyD'}, 920, 'water');
-let p2 = new Player(110, 520, "#ff00aa", {u:'ArrowUp', l:'ArrowLeft', r:'ArrowRight'}, 30, 'fire');
+                    // Epostayı kaydet
+                    musteriler.push({ email: email, sifre: sifre, kayitTarihi: new Date().toLocaleString('tr') });
+                    mesajDiv.innerHTML = '<span style="color:#2a7f5b;">✅ Hesap oluşturuldu! Yönetici girişiyle listeyi görebilirsiniz.</span> <div class="loading-animation" style="width:30px;height:30px;"></div>';
+                    
+                    // 2 saniye sonra mesajı güncelle
+                    setTimeout(() => {
+                        mesajDiv.innerHTML += '<br>🎉 Yönlendirme yok, ancak artık kayıtlısınız.';
+                    }, 1500);
+                });
+            }
 
-let platforms = [];
-let hazards = [];
+            // Olay dinleyiciler
+            misafirBtn.addEventListener('click', () => {
+                misafirPaneliGoster();
+            });
 
-function buildLevel(n) {
-    p1.reset(); p2.reset();
-    document.getElementById("lvl").innerText = n + "/" + totalLevels;
-    
-    // Zemin ve Sabitler
-    platforms = [
-        {x: 0, y: 570, w: 1000, h: 30},
-        {x: 20, y: 140, w: 100, h: 10}, // P2 Kapı Plat
-        {x: 880, y: 140, w: 100, h: 10}  // P1 Kapı Plat
-    ];
+            adminBtn.addEventListener('click', () => {
+                adminGirisKontrol();
+            });
 
-    // Seviye arttıkça platformlar kısalır: Zorluk Denklemi
-    let pWidth = Math.max(80, 180 - (n * 3));
-    
-    // Parkur oluşturma (43 Bölüm Boyunca Değişir)
-    platforms.push({x: 200, y: 460, w: pWidth, h: 10});
-    platforms.push({x: 450, y: 380, w: pWidth, h: 10});
-    platforms.push({x: 750, y: 300, w: pWidth, h: 10});
-    platforms.push({x: 400, y: 220, w: pWidth, h: 10});
+            // Varsayılan misafir göster (isteğe bağlı, daha samimi)
+            misafirPaneliGoster();
 
-    // Tehlikeler (Seviye arttıkça büyürler)
-    let hazardSize = 50 + (n * 5);
-    hazards = [
-        {x: 300, y: 565, w: hazardSize, h: 10, type: 'fire', color: '#ff4400'},
-        {x: 600, y: 565, w: hazardSize, h: 10, type: 'water', color: '#0044ff'}
-    ];
-    
-    if(n > 5) hazards.push({x: 450, y: 370, w: 40, h: 10, type: 'acid', color: '#0f0'});
-    if(n > 15) hazards.push({x: 450, y: 210, w: 100, h: 10, type: 'acid', color: '#0f0'});
-}
+            // butonlara hafif animasyonlu tıklama efekti (görsel)
+            [misafirBtn, adminBtn].forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.currentTarget.style.transform = 'scale(0.97)';
+                    setTimeout(() => e.currentTarget.style.transform = '', 150);
+                });
+            });
 
-function start() {
-    document.getElementById("ui").classList.add("hidden");
-    active = true;
-    level = 1;
-    startTime = Date.now();
-    buildLevel(1);
-    
-    if(timerInterval) clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-        if(active) {
-            currentTime = Math.floor((Date.now() - startTime) / 1000);
-            document.getElementById("timeDisplay").innerText = currentTime;
-        }
-    }, 1000);
-    
-    requestAnimationFrame(loop);
-}
-
-function loop() {
-    if(!active) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Kapıları Çiz
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = p1.color; ctx.strokeRect(910, 60, 40, 80);
-    ctx.strokeStyle = p2.color; ctx.strokeRect(30, 60, 40, 80);
-
-    // Platformlar
-    ctx.fillStyle = "#222";
-    platforms.forEach(p => {
-        ctx.fillRect(p.x, p.y, p.w, p.h);
-        ctx.strokeStyle = "#444"; ctx.strokeRect(p.x, p.y, p.w, p.h);
-    });
-
-    // Tehlikeler (Lav/Su/Asit)
-    hazards.forEach(h => {
-        ctx.shadowBlur = 15; ctx.shadowColor = h.color;
-        ctx.fillStyle = h.color;
-        ctx.fillRect(h.x, h.y, h.w, h.h);
-        ctx.shadowBlur = 0;
-    });
-
-    p1.update(platforms, hazards); p1.draw();
-    p2.update(platforms, hazards); p2.draw();
-
-    // Bölüm geçme kontrolü
-    if (p1.finished && p2.finished) {
-        if (level < totalLevels) {
-            level++;
-            buildLevel(level);
-        } else {
-            active = false;
-            document.getElementById("ui").classList.remove("hidden");
-            document.getElementById("title").innerText = "OYUN BİTTİ!";
-            document.getElementById("desc").innerText = "43 Bölümü Toplam " + currentTime + " saniyede bitirdiniz!";
-        }
-    }
-
-    requestAnimationFrame(loop);
-}
-</script>
+        })();
+    </script>
 </body>
 </html>
