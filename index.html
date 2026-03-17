@@ -5,80 +5,92 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>PRO-FIX iOS Panel</title>
 <style>
-body{margin:0;font-family:-apple-system, sans-serif;background:#000;color:white;padding:20px;}
-input,textarea{width:100%;padding:12px;margin:6px 0;background:#1c1c1e;border:1px solid #333;border-radius:10px;color:white;}
-button,.opt-btn{width:100%;padding:14px;margin:6px 0;border-radius:10px;text-align:center;font-weight:bold;background:#0a84ff;color:white;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+body{margin:0;font-family:-apple-system,sans-serif;background:#000;color:white;padding:15px;}
+h2{margin-bottom:15px;}
+input,textarea{width:100%;padding:12px;margin:6px 0;background:#1c1c1e;border:1px solid #333;border-radius:10px;color:white;font-size:16px;}
+button,.opt-btn{width:100%;padding:14px;margin:6px 0;border-radius:10px;text-align:center;font-weight:bold;background:#0a84ff;color:white;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:16px;}
 .opt-btn.active{background:#32d74b;}
 #records{margin-top:20px;}
-.record{background:#1c1c1e;padding:10px;border-radius:8px;margin-bottom:8px;}
+.record{background:#1c1c1e;padding:10px;border-radius:8px;margin-bottom:8px;font-size:14px;}
+.section{margin-top:15px;margin-bottom:10px;font-weight:bold;color:#ccc;}
 </style>
 </head>
 <body>
 
-<h2>PRO-FIX iOS</h2>
+<h2>PRO-FIX Servis Paneli (iOS)</h2>
 
-<input id="code" placeholder="Servis Kodu">
-<input id="device" placeholder="Cihaz">
+<div class="section">1. Servis Kodu</div>
+<input id="code" placeholder="Örn: 123456">
 
-<h4>Usta Seç</h4>
-<div class="opt-btn" id="kadir" ontouchstart="ustaSec('Kadir',this)">Kadir</div>
-<div class="opt-btn" id="mehmet" ontouchstart="ustaSec('Mehmet',this)">Mehmet</div>
+<div class="section">2. Cihaz</div>
+<input id="device" placeholder="Örn: LG 42LB">
 
-<h4>İşlem Seç</h4>
-<div class="opt-btn" id="emmc" ontouchstart="islemSec('EMMC',this)">EMMC</div>
-<div class="opt-btn" id="anakart" ontouchstart="islemSec('Anakart',this)">Anakart</div>
-<div class="opt-btn" id="diger" ontouchstart="islemSec('DİĞER',this)">DİĞER</div>
+<div class="section">3. Usta Seçimi (manuel)</div>
+<input id="ustaInput" placeholder="Usta Adı (Kadir / Mehmet vb.)">
 
-<textarea id="manual" placeholder="Manuel işlem (DİĞER seçilmişse)"></textarea>
+<div class="section">4. İşlem Seçimi</div>
+<div class="opt-btn" id="emmc" ontouchstart="selectIslem('EMMC',this)">EMMC Değişimi</div>
+<div class="opt-btn" id="anakart" ontouchstart="selectIslem('Anakart',this)">Anakart Tamiri</div>
+<div class="opt-btn" id="diger" ontouchstart="selectIslem('DİĞER',this)">DİĞER / Manuel Yaz</div>
 
-<button ontouchstart="kaydet()">Kaydet</button>
+<textarea id="manual" placeholder="Manuel işlem (DİĞER seçildiğinde)" rows="2"></textarea>
 
-<h3>Kayıtlar</h3>
+<button ontouchstart="saveData()">Kaydet</button>
+
+<h3>Kayıtlı Servisler</h3>
 <div id="records"></div>
 
 <script>
-let db=JSON.parse(localStorage.getItem('profix_db'))||[];
-let usta='',islem='';
+let db = JSON.parse(localStorage.getItem('profix_db')) || [];
+let selectedIslem = '';
 
-function ustaSec(name,el){
-usta=name;
+function selectIslem(name,el){
+selectedIslem = name;
 document.querySelectorAll('.opt-btn').forEach(x=>x.classList.remove('active'));
 el.classList.add('active');
 }
 
-function islemSec(name,el){
-islem=name;
-document.querySelectorAll('.opt-btn').forEach(x=>x.classList.remove('active'));
-el.classList.add('active');
+function saveData(){
+let code = document.getElementById('code').value.trim();
+let device = document.getElementById('device').value.trim();
+let usta = document.getElementById('ustaInput').value.trim();
+let manual = document.getElementById('manual').value.trim();
+
+let finalIslem = selectedIslem === 'DİĞER' ? manual : selectedIslem;
+
+if(!code || !device || !usta || !finalIslem){
+alert('Lütfen tüm alanları doldurun!');
+return;
 }
 
-function kaydet(){
-let code=document.getElementById('code').value;
-let device=document.getElementById('device').value;
-let manual=document.getElementById('manual').value;
-let final=islem==='DİĞER'?manual:islem;
-
-if(!code||!device||!usta||!final){alert('Eksik bilgi!');return;}
-
-db.unshift({id:Date.now(),code,device,usta,islem:final,date:new Date().toLocaleString()});
+let data = {id:Date.now(), code, device, usta, islem:finalIslem, date: new Date().toLocaleString()};
+db.unshift(data);
 localStorage.setItem('profix_db',JSON.stringify(db));
-render();
+
+renderRecords();
+
+document.getElementById('code').value = '';
+document.getElementById('device').value = '';
+document.getElementById('ustaInput').value = '';
+document.getElementById('manual').value = '';
+selectedIslem = '';
+document.querySelectorAll('.opt-btn').forEach(x=>x.classList.remove('active'));
+
 alert('Kaydedildi!');
-document.getElementById('code').value='';document.getElementById('device').value='';document.getElementById('manual').value='';usta='';islem='';document.querySelectorAll('.opt-btn').forEach(x=>x.classList.remove('active'));
 }
 
-function render(){
-let list=document.getElementById('records');
-list.innerHTML='';
-db.forEach(x=>{
-let div=document.createElement('div');
-div.className='record';
-div.innerHTML=`<b>${x.code}</b> - ${x.device}<br>${x.usta} | ${x.islem}<br>${x.date}`;
-list.appendChild(div);
+function renderRecords(){
+let container = document.getElementById('records');
+container.innerHTML = '';
+db.forEach(item=>{
+let div = document.createElement('div');
+div.className = 'record';
+div.innerHTML = `<b>${item.code}</b> - ${item.device}<br>${item.usta} | ${item.islem}<br>${item.date}`;
+container.appendChild(div);
 });
 }
 
-render();
+renderRecords();
 </script>
 
 </body>
