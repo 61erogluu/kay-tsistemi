@@ -3,135 +3,177 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PRO-FIX Modern iOS</title>
+<title>PRO-FIX iOS Profesyonel Panel</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-body{
-  margin:0;
-  font-family: 'Roboto', sans-serif;
-  background:#0d0d0f;
-  color:white;
-  padding:15px;
-}
-h2{margin-bottom:15px;color:#0a84ff;}
-input,textarea{
-  width:100%;
-  padding:12px;
-  margin:8px 0;
-  background:#1c1c1f;
-  border:1px solid #333;
-  border-radius:12px;
-  color:white;
-  font-size:16px;
-}
-button,.opt-btn{
-  width:100%;
-  padding:14px;
-  margin:6px 0;
-  border-radius:12px;
-  text-align:center;
-  font-weight:bold;
-  background:#0a84ff;
-  color:white;
-  border:none;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-  font-size:16px;
-  transition:0.2s all;
-  box-shadow:0 4px 8px rgba(0,0,0,0.3);
-}
-button:hover,.opt-btn:hover{transform:scale(1.02);box-shadow:0 6px 12px rgba(0,0,0,0.4);}
+body{margin:0;font-family:'Roboto',sans-serif;background:#0d0d0f;color:white;}
+header{display:flex;align-items:center;justify-content:space-between;padding:15px;background:#161616;box-shadow:0 2px 5px rgba(0,0,0,0.5);}
+header h2{margin:0;color:#0a84ff;font-size:18px;}
+header .menu-btn{font-size:24px;cursor:pointer;}
+
+main{padding:15px;}
+input,select,textarea{width:100%;padding:12px;margin:8px 0;background:#1c1c1f;border:1px solid #333;border-radius:10px;color:white;font-size:16px;}
+button,.opt-btn{width:100%;padding:14px;margin:6px 0;border-radius:12px;text-align:center;font-weight:bold;background:#0a84ff;color:white;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:16px;transition:0.2s all;box-shadow:0 3px 6px rgba(0,0,0,0.4);}
+button:hover,.opt-btn:hover{transform:scale(1.02);box-shadow:0 5px 10px rgba(0,0,0,0.5);}
 .opt-btn.active{background:#32d74b;color:#000;}
 .section{margin-top:15px;margin-bottom:10px;font-weight:bold;color:#ccc;}
-#records{margin-top:20px;}
-.record{
-  background:#1c1c1f;
-  padding:12px;
-  border-radius:12px;
-  margin-bottom:10px;
-  box-shadow:0 4px 8px rgba(0,0,0,0.3);
-  transition:0.2s all;
-}
-.record:hover{transform:scale(1.01);box-shadow:0 6px 12px rgba(0,0,0,0.4);}
+
+#sidebar{position:fixed;top:0;right:-100%;width:90%;max-width:400px;height:100%;background:#161616;z-index:1000;transition:0.3s;overflow-y:auto;padding:15px;}
+#sidebar.open{right:0;}
+#sidebar h3{margin-top:0;}
+.record{background:#1c1c1f;padding:10px;border-radius:10px;margin-bottom:10px;box-shadow:0 3px 6px rgba(0,0,0,0.4);}
+.record b{color:#0a84ff;}
+.record .actions{margin-top:5px;text-align:right;}
+.record .actions span{cursor:pointer;margin-left:10px;color:#ff6b6b;font-weight:bold;}
+canvas{background:#0d0d0f;border-radius:12px;margin-top:10px;}
 </style>
 </head>
 <body>
 
-<h2>PRO-FIX Modern iOS Panel</h2>
+<header>
+<h2>PRO-FIX Profesyonel</h2>
+<div class="menu-btn" ontouchstart="toggleSidebar()">☰</div>
+</header>
 
-<div class="section">1. Servis Kodu</div>
-<input id="code" placeholder="Örn: 123456">
-
-<div class="section">2. Cihaz</div>
+<main>
+<div class="section">1. Model / Cihaz</div>
 <input id="device" placeholder="Örn: LG 42LB">
 
-<div class="section">3. Usta (manuel)</div>
-<input id="ustaInput" placeholder="Kadir / Mehmet vb.">
+<div class="section">2. Servis Kodu / Seri No</div>
+<input id="code" placeholder="Örn: 123456">
 
-<div class="section">4. İşlem Seçimi</div>
-<div class="opt-btn" id="emmc" ontouchstart="selectIslem('EMMC',this)">EMMC Değişimi</div>
-<div class="opt-btn" id="anakart" ontouchstart="selectIslem('Anakart',this)">Anakart Tamiri</div>
-<div class="opt-btn" id="diger" ontouchstart="selectIslem('DİĞER',this)">DİĞER / Manuel Yaz</div>
+<div class="section">3. Usta</div>
+<select id="usta">
+  <option value="">Seçiniz</option>
+  <option value="Kadir">Kadir</option>
+  <option value="Mehmet">Mehmet</option>
+</select>
 
-<textarea id="manual" placeholder="Manuel işlem (DİĞER seçildiğinde)" rows="2"></textarea>
+<div class="section">4. İşlem</div>
+<select id="islem">
+  <option value="">Seçiniz</option>
+  <option value="BGA Değişim">BGA Değişim</option>
+  <option value="EMMC">EMMC</option>
+</select>
 
 <button ontouchstart="saveData()">Kaydet</button>
 
-<h3>Kayıtlı Servisler</h3>
-<div id="records"></div>
+<div class="section">Günlük / Aylık Sayaç</div>
+<canvas id="chart" height="200"></canvas>
 
+<div class="section">Yedekleme / Geri Yükleme</div>
+<button ontouchstart="exportData()">Dışa Aktar JSON</button>
+<input type="file" id="importFile" onchange="importData(event)">
+</main>
+
+<div id="sidebar">
+<h3>Kayıtlı Servisler</h3>
+<input type="text" id="search" placeholder="Ara: kod, cihaz, usta..." onkeyup="renderRecords()">
+<div id="records"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 let db = JSON.parse(localStorage.getItem('profix_db')) || [];
-let selectedIslem = '';
+let editingId = null;
 
-function selectIslem(name,el){
-  selectedIslem = name;
-  document.querySelectorAll('.opt-btn').forEach(x=>x.classList.remove('active'));
-  el.classList.add('active');
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
 }
 
 function saveData(){
-  let code = document.getElementById('code').value.trim();
-  let device = document.getElementById('device').value.trim();
-  let usta = document.getElementById('ustaInput').value.trim();
-  let manual = document.getElementById('manual').value.trim();
+  let device=document.getElementById('device').value.trim();
+  let code=document.getElementById('code').value.trim();
+  let usta=document.getElementById('usta').value;
+  let islem=document.getElementById('islem').value;
   
-  let finalIslem = selectedIslem==='DİĞER'?manual:selectedIslem;
+  if(!device||!code||!usta||!islem){alert("Tüm alanları doldurun!");return;}
   
-  if(!code || !device || !usta || !finalIslem){
-    alert('Lütfen tüm alanları doldurun!');
-    return;
+  if(editingId){
+    let rec=db.find(r=>r.id===editingId);
+    rec.device=device; rec.code=code; rec.usta=usta; rec.islem=islem; rec.date=new Date().toLocaleString();
+    editingId=null;
+  } else {
+    db.unshift({id:Date.now(),device,code,usta,islem,date:new Date().toLocaleString()});
   }
-  
-  let data = {id:Date.now(), code, device, usta, islem:finalIslem, date:new Date().toLocaleString()};
-  db.unshift(data);
   localStorage.setItem('profix_db',JSON.stringify(db));
-  
   renderRecords();
-  
-  document.getElementById('code').value='';
-  document.getElementById('device').value='';
-  document.getElementById('ustaInput').value='';
-  document.getElementById('manual').value='';
-  selectedIslem='';
-  document.querySelectorAll('.opt-btn').forEach(x=>x.classList.remove('active'));
-  
-  alert('Kaydedildi!');
+  updateChart();
+  document.getElementById('device').value='';document.getElementById('code').value='';document.getElementById('usta').value='';document.getElementById('islem').value='';
+}
+
+function editRecord(id){
+  let rec=db.find(r=>r.id===id);
+  document.getElementById('device').value=rec.device;
+  document.getElementById('code').value=rec.code;
+  document.getElementById('usta').value=rec.usta;
+  document.getElementById('islem').value=rec.islem;
+  editingId=id;
+  toggleSidebar();
+}
+
+function deleteRecord(id){
+  if(confirm('Silmek istediğinize emin misiniz?')){
+    db=db.filter(r=>r.id!==id);
+    localStorage.setItem('profix_db',JSON.stringify(db));
+    renderRecords();
+    updateChart();
+  }
 }
 
 function renderRecords(){
-  let container = document.getElementById('records');
+  let term=document.getElementById('search').value.toLowerCase();
+  let container=document.getElementById('records');
   container.innerHTML='';
-  db.forEach(item=>{
-    let div = document.createElement('div');
-    div.className='record';
-    div.innerHTML=`<b>${item.code}</b> - ${item.device}<br>${item.usta} | ${item.islem}<br>${item.date}`;
-    container.appendChild(div);
-  });
+  db.filter(r=>r.device.toLowerCase().includes(term)||r.code.includes(term)||r.usta.toLowerCase().includes(term))
+    .forEach(r=>{
+      let div=document.createElement('div'); div.className='record';
+      div.innerHTML=`<b>${r.code}</b> - ${r.device}<br>${r.usta} | ${r.islem}<br>${r.date}
+      <div class="actions"><span onclick="editRecord(${r.id})">Düzenle</span><span onclick="deleteRecord(${r.id})">Sil</span></div>`;
+      container.appendChild(div);
+    });
+}
+
+// Chart.js - Günlük ve usta performans
+let chart=null;
+function updateChart(){
+  let ctx=document.getElementById('chart').getContext('2d');
+  let ustaCounts={};
+  db.forEach(r=>ustaCounts[r.usta]= (ustaCounts[r.usta]||0)+1 );
+  let labels=Object.keys(ustaCounts);
+  let data=Object.values(ustaCounts);
+  
+  if(chart) chart.destroy();
+  chart=new Chart(ctx,{type:'bar',data:{labels, datasets:[{label:'Tamir Sayısı',data,backgroundColor:'#0a84ff'}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+}
+
+updateChart();
+
+// Yedekleme / Geri Yükleme
+function exportData(){
+  let dataStr=JSON.stringify(db,null,2);
+  let blob=new Blob([dataStr],{type:'application/json'});
+  let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='profix_backup.json'; a.click();
+}
+
+function importData(event){
+  let file=event.target.files[0];
+  let reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      let imported=JSON.parse(e.target.result);
+      db=imported.concat(db);
+      localStorage.setItem('profix_db',JSON.stringify(db));
+      renderRecords(); updateChart();
+      alert('Yedek yüklendi!');
+    }catch(err){alert('Geçersiz dosya!');}
+  };
+  reader.readAsText(file);
 }
 
 renderRecords();
+updateChart();
 </script>
 
 </body>
