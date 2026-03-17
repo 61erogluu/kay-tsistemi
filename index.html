@@ -2,115 +2,39 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>PRO-FIX Dashboard</title>
-
+<title>PRO-FIX Servis Paneli</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
-
-body{
-margin:0;
-font-family:Segoe UI;
-background:#0d1117;
-color:white;
-}
-
-.header{
-background:#161b22;
-padding:20px;
-font-size:22px;
-font-weight:bold;
-}
-
-.layout{
-display:flex;
-height:calc(100vh - 60px);
-}
-
-.panel{
-width:320px;
-background:#161b22;
-padding:20px;
-overflow:auto;
-}
-
-.panel input,textarea{
-width:100%;
-padding:10px;
-margin-bottom:10px;
-background:#0d1117;
-border:1px solid #30363d;
-color:white;
-border-radius:6px;
-}
-
-.btn{
-background:#238636;
-padding:10px;
-text-align:center;
-border-radius:6px;
-cursor:pointer;
-margin-bottom:6px;
-}
-
-.btn.gray{
-background:#30363d;
-}
-
-.main{
-flex:1;
-padding:20px;
-overflow:auto;
-}
-
-.stats{
-background:#161b22;
-padding:15px;
-border-radius:6px;
-margin-bottom:15px;
-}
-
-.table{
-width:100%;
-border-collapse:collapse;
-}
-
-.table th,.table td{
-padding:8px;
-border-bottom:1px solid #30363d;
-}
-
-.delete{
-color:#ff6b6b;
-cursor:pointer;
-}
-
-canvas{
-background:#161b22;
-padding:10px;
-border-radius:6px;
-margin-bottom:20px;
-}
-
+body{margin:0;font-family:Segoe UI;background:#0f1115;color:white;}
+.header{background:#161b22;padding:20px;font-size:22px;font-weight:bold;}
+.layout{display:flex;height:calc(100vh - 60px);}
+.panel{width:320px;background:#161b22;padding:20px;overflow:auto;}
+.panel input,textarea{width:100%;padding:10px;margin-bottom:10px;background:#0f1115;border:1px solid #30363d;color:white;border-radius:6px;}
+.btn{background:#238636;padding:10px;text-align:center;border-radius:6px;cursor:pointer;margin-bottom:6px;}
+.btn.gray{background:#30363d;}
+.main{flex:1;padding:20px;overflow:auto;}
+.stats{background:#161b22;padding:15px;border-radius:6px;margin-bottom:15px;}
+.table{width:100%;border-collapse:collapse;}
+.table th,.table td{padding:8px;border-bottom:1px solid #30363d;}
+.delete{color:#ff6b6b;cursor:pointer;}
+canvas{background:#161b22;padding:10px;border-radius:6px;margin-bottom:20px;}
 </style>
 </head>
-
 <body>
 
-<div class="header">PRO-FIX Servis Dashboard</div>
+<div class="header">PRO-FIX Servis Paneli</div>
 
 <div class="layout">
 
 <div class="panel">
-
 <input id="code" placeholder="Servis kodu">
 <input id="device" placeholder="Cihaz">
 
-<div class="btn gray" onclick="usta='Kadir'">Kadir</div>
-<div class="btn gray" onclick="usta='Mehmet'">Mehmet</div>
+<div class="btn gray" onclick="usta='Kadir';highlightUsta(this)">Kadir</div>
+<div class="btn gray" onclick="usta='Mehmet';highlightUsta(this)">Mehmet</div>
 
-<div class="btn gray" onclick="islem='EMMC'">EMMC</div>
-<div class="btn gray" onclick="islem='Anakart'">Anakart</div>
+<div class="btn gray" onclick="islem='EMMC';highlightIslem(this)">EMMC</div>
+<div class="btn gray" onclick="islem='Anakart';highlightIslem(this)">Anakart</div>
 
 <textarea id="manual" placeholder="Diğer işlem"></textarea>
 
@@ -119,9 +43,7 @@ margin-bottom:20px;
 <hr>
 
 <div class="btn gray" onclick="backup()">Yedek indir</div>
-
 <input type="file" onchange="restore(event)">
-
 </div>
 
 <div class="main">
@@ -134,14 +56,7 @@ Bugünkü Tamir: <b id="today">0</b>
 
 <table class="table">
 <thead>
-<tr>
-<th>Kod</th>
-<th>Cihaz</th>
-<th>İşlem</th>
-<th>Usta</th>
-<th>Tarih</th>
-<th></th>
-</tr>
+<tr><th>Kod</th><th>Cihaz</th><th>İşlem</th><th>Usta</th><th>Tarih</th><th></th></tr>
 </thead>
 <tbody id="list"></tbody>
 </table>
@@ -153,173 +68,54 @@ Bugünkü Tamir: <b id="today">0</b>
 <canvas id="monthChart"></canvas>
 
 </div>
-
 </div>
 
 <script>
-
 let db = JSON.parse(localStorage.getItem("profix_db")) || [];
+let usta="", islem="";
 
-let usta="";
-let islem="";
-
+function highlightUsta(el){
+document.querySelectorAll('.panel .btn.gray').forEach(b=>b.style.border='1px solid #30363d');
+el.style.border='2px solid #0a84ff';
+}
+function highlightIslem(el){
+document.querySelectorAll('.panel .btn.gray').forEach(b=>b.style.border='1px solid #30363d');
+el.style.border='2px solid #0a84ff';
+}
 function kaydet(){
-
 let code=document.getElementById("code").value;
 let device=document.getElementById("device").value;
 let manual=document.getElementById("manual").value;
-
 let final=islem || manual;
-
-if(!code||!device||!usta||!final){
-alert("Eksik bilgi");
-return;
-}
-
-db.unshift({
-id:Date.now(),
-code,
-device,
-islem:final,
-usta,
-date:new Date().toLocaleString()
-});
-
+if(!code||!device||!usta||!final){alert("Eksik bilgi");return;}
+db.unshift({id:Date.now(),code,device,islem:final,usta,date:new Date().toLocaleString()});
 localStorage.setItem("profix_db",JSON.stringify(db));
-
-render();
-charts();
-
+render();charts();
 }
-
 function render(){
-
 let term=document.getElementById("search").value?.toLowerCase()||"";
-
 let list=document.getElementById("list");
-
 list.innerHTML="";
-
 let today=0;
-
 let todayStr=new Date().toLocaleDateString();
-
-db.filter(x=>
-
-x.code.includes(term) ||
-x.device.toLowerCase().includes(term) ||
-x.usta.toLowerCase().includes(term)
-
-).forEach(x=>{
-
+db.filter(x=>x.code.includes(term)||x.device.toLowerCase().includes(term)||x.usta.toLowerCase().includes(term)).forEach(x=>{
 if(x.date.includes(todayStr)) today++;
-
 let tr=document.createElement("tr");
-
-tr.innerHTML=`
-<td>${x.code}</td>
-<td>${x.device}</td>
-<td>${x.islem}</td>
-<td>${x.usta}</td>
-<td>${x.date}</td>
-<td class="delete" onclick="sil(${x.id})">Sil</td>
-`;
-
+tr.innerHTML=<td>${x.code}</td><td>${x.device}</td><td>${x.islem}</td><td>${x.usta}</td><td>${x.date}</td><td class="delete" onclick="sil(${x.id})">Sil</td>;
 list.appendChild(tr);
-
 });
-
 document.getElementById("today").innerText=today;
-
 }
-
-function sil(id){
-
-db=db.filter(x=>x.id!=id);
-
-localStorage.setItem("profix_db",JSON.stringify(db));
-
-render();
-charts();
-
-}
-
+function sil(id){db=db.filter(x=>x.id!=id);localStorage.setItem("profix_db",JSON.stringify(db));render();charts();}
 function charts(){
-
-let kadir=0;
-let mehmet=0;
-
-let months={};
-
-db.forEach(x=>{
-
-if(x.usta=="Kadir") kadir++;
-if(x.usta=="Mehmet") mehmet++;
-
-let m=x.date.split(".")[1];
-
-months[m]=(months[m]||0)+1;
-
-});
-
-new Chart(document.getElementById("ustaChart"),{
-type:"bar",
-data:{
-labels:["Kadir","Mehmet"],
-datasets:[{data:[kadir,mehmet]}]
+let kadir=0;let mehmet=0;let months={};
+db.forEach(x=>{if(x.usta=="Kadir") kadir++; if(x.usta=="Mehmet") mehmet++; let m=x.date.split(".")[1]; months[m]=(months[m]||0)+1;});
+new Chart(document.getElementById("ustaChart"),{type:"bar",data:{labels:["Kadir","Mehmet"],datasets:[{label:"Tamir",data:[kadir,mehmet],backgroundColor:["#238636","#1f6feb"]}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+new Chart(document.getElementById("monthChart"),{type:"line",data:{labels:Object.keys(months),datasets:[{label:"Tamir",data:Object.values(months),borderColor:"#0a84ff",backgroundColor:"#238636"}]}});
 }
-});
-
-new Chart(document.getElementById("monthChart"),{
-type:"line",
-data:{
-labels:Object.keys(months),
-datasets:[{data:Object.values(months)}]
-}
-});
-
-}
-
-function backup(){
-
-let data=JSON.stringify(db);
-
-let blob=new Blob([data]);
-
-let a=document.createElement("a");
-
-a.href=URL.createObjectURL(blob);
-
-a.download="profix_backup.json";
-
-a.click();
-
-}
-
-function restore(e){
-
-let file=e.target.files[0];
-
-let reader=new FileReader();
-
-reader.onload=function(){
-
-db=JSON.parse(reader.result);
-
-localStorage.setItem("profix_db",JSON.stringify(db));
-
-render();
-charts();
-
-};
-
-reader.readAsText(file);
-
-}
-
-render();
-charts();
-
+function backup(){let data=JSON.stringify(db);let blob=new Blob([data]);let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="profix_backup.json";a.click();}
+function restore(e){let file=e.target.files[0];let reader=new FileReader();reader.onload=function(){db=JSON.parse(reader.result);localStorage.setItem("profix_db",JSON.stringify(db));render();charts();};reader.readAsText(file);}
+render();charts();
 </script>
 
 </body>
