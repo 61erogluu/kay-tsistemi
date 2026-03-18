@@ -6,48 +6,95 @@
 <title>PRO-FIX</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#0d0d0f;color:white;}
-header{display:flex;justify-content:space-between;padding:15px;background:#161616;}
-.menu{font-size:22px;cursor:pointer;}
+:root{
+--bg:#0d0d0f;
+--card:#1c1c1f;
+--blue:#0a84ff;
+--border:#333;
+}
+
+body{margin:0;font-family:-apple-system;background:var(--bg);color:white;}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px;
+background:var(--card);
+}
+
+.icons{display:flex;gap:12px;font-size:22px;cursor:pointer;}
+
 .container{padding:15px;}
-input,select{width:100%;padding:10px;margin:6px 0;background:#1c1c1f;border:1px solid #333;color:white;border-radius:8px;}
-button{width:100%;padding:12px;margin-top:10px;background:#0a84ff;border:none;color:white;border-radius:8px;}
 
-#overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;}
+input,select{
+width:100%;
+padding:14px;
+margin-top:10px;
+background:var(--card);
+border:1px solid var(--border);
+border-radius:10px;
+color:white;
+font-size:16px;
+}
 
-#panel,#admin{
+button{
+width:100%;
+padding:16px;
+margin-top:20px;
+background:var(--blue);
+border:none;
+border-radius:12px;
+color:white;
+font-weight:bold;
+}
+
+.sidebar{
 position:fixed;
 top:0;
 right:-100%;
-width:85%;
-max-width:350px;
+width:100%;
 height:100%;
-background:#161616;
-padding:15px;
+background:var(--bg);
+padding:20px;
 transition:0.3s;
 overflow:auto;
-z-index:2;
+z-index:10;
 }
 
-#panel.open,#admin.open{right:0;}
-#overlay.show{display:block;}
+.sidebar.open{right:0;}
 
-.record{background:#1c1c1f;margin-top:10px;padding:10px;border-radius:8px;}
+.record{
+background:var(--card);
+padding:12px;
+border-radius:10px;
+margin-top:10px;
+}
+
+.close{
+font-size:18px;
+margin-bottom:10px;
+cursor:pointer;
+color:red;
+}
 </style>
 </head>
 
 <body>
 
-<header>
-<div class="menu" onclick="togglePanel()" ontouchstart="togglePanel()">☰</div>
-<div>PRO-FIX</div>
-<div class="menu" onclick="openAdmin()" ontouchstart="openAdmin()">⋮</div>
-</header>
+<div class="header">
+<h2>PRO-FIX</h2>
+
+<div class="icons">
+<div onclick="openUsta()">👤</div>
+<div onclick="toggleMenu(true)">☰</div>
+</div>
+</div>
 
 <div class="container">
 
-<input id="device" placeholder="Cihaz">
-<input id="code" placeholder="Kod">
+<input id="device" placeholder="Cihaz Model">
+<input id="code" placeholder="Servis Kodu">
 
 <select id="usta">
 <option value="">Usta seç</option>
@@ -56,35 +103,36 @@ z-index:2;
 </select>
 
 <select id="islem">
-<option value="">İşlem</option>
+<option value="">İşlem seç</option>
 <option>BGA</option>
 <option>EMMC</option>
 </select>
 
-<button onclick="save()" ontouchstart="save()">Kaydet</button>
+<button onclick="save()">Kaydet</button>
 
 </div>
 
-<div id="overlay" onclick="closeAll()"></div>
-
 <!-- KAYIT PANEL -->
-<div id="panel">
-<h3>Kayıtlar</h3>
+<div class="sidebar" id="menu">
+<div class="close" onclick="toggleMenu(false)">Kapat</div>
+
 <input id="search" placeholder="Ara..." onkeyup="render()">
 <div id="list"></div>
 </div>
 
-<!-- ADMIN PANEL -->
-<div id="admin">
-<h3>Usta Analiz</h3>
+<!-- USTA PANEL -->
+<div class="sidebar" id="ustaPanel">
+<div class="close" onclick="toggleUsta(false)">Kapat</div>
 
-<select id="filterUsta">
-<option value="">Usta seç</option>
+<h3>Usta Performans</h3>
+
+<select id="ustaSec">
+<option value="">Usta</option>
 <option>Kadir</option>
 <option>Mehmet</option>
 </select>
 
-<select id="filterType">
+<select id="zaman">
 <option value="today">Bugün</option>
 <option value="month">Bu Ay</option>
 <option value="custom">Özel</option>
@@ -93,9 +141,9 @@ z-index:2;
 <input type="date" id="start">
 <input type="date" id="end">
 
-<button onclick="analyze()" ontouchstart="analyze()">Hesapla</button>
+<button onclick="hesapla()">Hesapla</button>
 
-<h2 id="result"></h2>
+<h2 id="sonuc"></h2>
 
 </div>
 
@@ -103,25 +151,53 @@ z-index:2;
 
 let db=JSON.parse(localStorage.getItem("db"))||[];
 
+// KAYDET
 function save(){
 let d=device.value;
 let c=code.value;
 let u=usta.value;
 let i=islem.value;
 
-if(!d||!c||!u||!i){alert("Eksik");return;}
+if(!d||!c||!u||!i){alert("Eksik alan");return;}
 
 db.unshift({device:d,code:c,usta:u,islem:i,date:new Date().toISOString()});
 localStorage.setItem("db",JSON.stringify(db));
 
+device.value="";
+code.value="";
+usta.value="";
+islem.value="";
+
+render();
+alert("Kaydedildi");
+}
+
+// MENÜ
+function toggleMenu(x){
+menu.className=x?"sidebar open":"sidebar";
 render();
 }
 
+// USTA PANELİ (ŞİFRELİ)
+function openUsta(){
+let s=prompt("Şifre");
+if(btoa(s)==="MTYxNg=="){
+toggleUsta(true);
+}else{
+alert("Yanlış şifre");
+}
+}
+
+function toggleUsta(x){
+ustaPanel.className=x?"sidebar open":"sidebar";
+}
+
+// LİSTE
 function render(){
-let term=search.value||"";
+let t=search.value||"";
 list.innerHTML="";
 
-db.filter(x=>x.device.includes(term)||x.code.includes(term)||x.usta.includes(term))
+db.filter(x=>x.device.includes(t)||x.code.includes(t)||x.usta.includes(t))
 .forEach(x=>{
 let div=document.createElement("div");
 div.className="record";
@@ -130,56 +206,36 @@ list.appendChild(div);
 });
 }
 
-function togglePanel(){
-panel.classList.add("open");
-overlay.classList.add("show");
-}
+// ANALİZ
+function hesapla(){
 
-function openAdmin(){
-let pass=prompt("Şifre: 1616");
-if(pass==="1616"){
-admin.classList.add("open");
-overlay.classList.add("show");
-}else{
-alert("Yanlış");
-}
-}
-
-function closeAll(){
-panel.classList.remove("open");
-admin.classList.remove("open");
-overlay.classList.remove("show");
-}
-
-function analyze(){
-
-let u=filterUsta.value;
-let type=filterType.value;
-let startVal=start.value;
-let endVal=end.value;
+let u=ustaSec.value;
+let z=zaman.value;
+let s=start.value;
+let e=end.value;
 
 let now=new Date();
-let count=0;
+let say=0;
 
 db.forEach(x=>{
 let d=new Date(x.date);
 
 if(u && x.usta!==u) return;
 
-if(type==="today"){
-if(d.toDateString()===now.toDateString()) count++;
+if(z==="today"){
+if(d.toDateString()===now.toDateString()) say++;
 }
-else if(type==="month"){
-if(d.getMonth()===now.getMonth()) count++;
+else if(z==="month"){
+if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()) say++;
 }
-else if(type==="custom"){
-if(startVal && endVal){
-if(d>=new Date(startVal) && d<=new Date(endVal)) count++;
+else if(z==="custom"){
+if(s && e){
+if(d>=new Date(s) && d<=new Date(e)) say++;
 }
 }
 });
 
-result.innerText="Toplam İş: "+count;
+sonuc.innerText="Toplam İş: "+say;
 }
 
 render();
