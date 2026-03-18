@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>PRO-FIX | Gelişmiş Servis Takip</title>
+    <title>PRO-FIX | Profesyonel Servis Takip</title>
     
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -150,6 +150,11 @@
             border-color: #0a84ff;
             background: #23232a;
             box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #3a3a40;
+            font-size: 14px;
         }
 
         /* Modern Butonlar */
@@ -387,6 +392,10 @@
             padding-left: 48px;
         }
 
+        .search-box input::placeholder {
+            color: #3a3a40;
+        }
+
         /* Overlay */
         .overlay {
             position: fixed;
@@ -446,6 +455,24 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Boş durum için stil */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: #8e8e93;
+            margin-bottom: 16px;
+        }
+
+        .empty-state p {
+            color: #8e8e93;
+        }
     </style>
 </head>
 <body>
@@ -454,7 +481,7 @@
 <div class="header">
     <div class="logo">
         <i class="fas fa-tools"></i>
-        <h1>PRO-FIX Gelişmiş</h1>
+        <h1>PRO-FIX PROFESYONEL</h1>
     </div>
     <div class="menu-btn" onclick="toggleSidebar()">
         <i class="fas fa-bars"></i>
@@ -484,39 +511,39 @@
 
         <div class="input-group">
             <label><i class="fas fa-mobile-alt" style="margin-right: 6px;"></i> Model / Cihaz</label>
-            <input type="text" id="device" placeholder="Örn: iPhone 14 Pro Max" autocomplete="off">
+            <input type="text" id="device" placeholder="Cihaz modeli giriniz" autocomplete="off">
         </div>
 
         <div class="input-group">
             <label><i class="fas fa-qrcode"></i> Servis Kodu / Seri No</label>
-            <input type="text" id="code" placeholder="Örn: SER-2024-001" autocomplete="off">
+            <input type="text" id="code" placeholder="Servis kodu giriniz" autocomplete="off">
         </div>
 
         <div class="input-group">
             <label><i class="fas fa-user-cog"></i> Usta</label>
             <select id="usta">
-                <option value="" disabled selected>Usta seçin</option>
-                <option value="Kadir">👨‍🔧 Kadir Usta</option>
-                <option value="Mehmet">👨‍🔧 Mehmet Usta</option>
-                <option value="Ahmet">👨‍🔧 Ahmet Usta</option>
+                <option value="" disabled selected>Usta seçiniz</option>
+                <option value="Kadir">Kadir Usta</option>
+                <option value="Mehmet">Mehmet Usta</option>
+                <option value="Ahmet">Ahmet Usta</option>
             </select>
         </div>
 
         <div class="input-group">
             <label><i class="fas fa-wrench"></i> İşlem</label>
             <select id="islem">
-                <option value="" disabled selected>İşlem seçin</option>
-                <option value="BGA Değişim">🔧 BGA Değişim</option>
-                <option value="EMMC">💾 EMMC Tamiri</option>
-                <option value="Şarj Soketi">🔌 Şarj Soketi</option>
-                <option value="Batarya">🔋 Batarya Değişim</option>
-                <option value="Ekran">📱 Ekran Değişim</option>
+                <option value="" disabled selected>İşlem seçiniz</option>
+                <option value="BGA Değişim">BGA Değişim</option>
+                <option value="EMMC">EMMC Tamiri</option>
+                <option value="Şarj Soketi">Şarj Soketi</option>
+                <option value="Batarya">Batarya Değişim</option>
+                <option value="Ekran">Ekran Değişim</option>
             </select>
         </div>
 
         <div class="input-group">
             <label><i class="fas fa-sticky-note"></i> Notlar</label>
-            <textarea id="notes" rows="2" placeholder="Ek notlar (opsiyonel)"></textarea>
+            <textarea id="notes" rows="2" placeholder="Not ekleyin (opsiyonel)"></textarea>
         </div>
 
         <button class="btn" onclick="saveData()">
@@ -565,7 +592,7 @@
 <!-- Sidebar (Kayıt Listesi) -->
 <div id="sidebar" class="sidebar">
     <div class="sidebar-header">
-        <h3 style="font-size: 20px;">📋 Kayıtlı Servisler</h3>
+        <h3 style="font-size: 20px;">Kayıtlı Servisler</h3>
         <div class="close-btn" onclick="toggleSidebar()">
             <i class="fas fa-times"></i>
         </div>
@@ -772,9 +799,9 @@ function renderRecords() {
     
     if (filteredDb.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 40px 20px; background: rgba(255,255,255,0.02); border-radius: 20px;">
-                <i class="fas fa-inbox" style="font-size: 48px; color: #8e8e93; margin-bottom: 16px;"></i>
-                <p style="color: #8e8e93;">Kayıt bulunamadı</p>
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>Kayıt bulunamadı</p>
             </div>
         `;
         return;
