@@ -188,11 +188,6 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .btn-danger {
-            background: #ff453a;
-            box-shadow: 0 10px 20px rgba(255, 69, 58, 0.2);
-        }
-
         /* İstatistik Kartları */
         .stats-grid {
             display: grid;
@@ -525,7 +520,6 @@
                 <option value="" disabled selected>Usta seçiniz</option>
                 <option value="Kadir">Kadir Usta</option>
                 <option value="Mehmet">Mehmet Usta</option>
-                <option value="Ahmet">Ahmet Usta</option>
             </select>
         </div>
 
@@ -534,10 +528,7 @@
             <select id="islem">
                 <option value="" disabled selected>İşlem seçiniz</option>
                 <option value="BGA Değişim">BGA Değişim</option>
-                <option value="EMMC">EMMC Tamiri</option>
-                <option value="Şarj Soketi">Şarj Soketi</option>
-                <option value="Batarya">Batarya Değişim</option>
-                <option value="Ekran">Ekran Değişim</option>
+                <option value="EMMC Değişim">EMMC Değişim</option>
             </select>
         </div>
 
@@ -609,7 +600,6 @@
         <button class="btn-secondary" style="padding: 8px 16px; font-size: 13px;" onclick="filterRecords('all')">Tümü</button>
         <button class="btn-secondary" style="padding: 8px 16px; font-size: 13px;" onclick="filterRecords('Kadir')">Kadir</button>
         <button class="btn-secondary" style="padding: 8px 16px; font-size: 13px;" onclick="filterRecords('Mehmet')">Mehmet</button>
-        <button class="btn-secondary" style="padding: 8px 16px; font-size: 13px;" onclick="filterRecords('Ahmet')">Ahmet</button>
     </div>
 
     <!-- Kayıt Listesi -->
@@ -854,8 +844,7 @@ function updateChart() {
     
     let ustaCounts = {
         'Kadir': 0,
-        'Mehmet': 0,
-        'Ahmet': 0
+        'Mehmet': 0
     };
     
     db.forEach(r => {
@@ -878,8 +867,7 @@ function updateChart() {
                 data,
                 backgroundColor: [
                     'rgba(10, 132, 255, 0.8)',
-                    'rgba(50, 215, 75, 0.8)',
-                    'rgba(255, 149, 0, 0.8)'
+                    'rgba(50, 215, 75, 0.8)'
                 ],
                 borderRadius: 8,
                 barPercentage: 0.6
