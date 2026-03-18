@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PROFIX Cloud - iOS</title>
+<title>PROFIX Cloud - iOS Modern</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
@@ -16,20 +16,21 @@
 --blue:#0a84ff;
 --green:#30d158;
 --red:#ff3b30;
+--hover:#111;
+--active-bg:rgba(10,132,255,0.2);
 }
 body{
 margin:0;
 font-family:-apple-system, sans-serif;
 background:var(--bg);
 color:white;
--webkit-touch-callout: none;
--webkit-user-select: none;
--ms-user-select: none;
-user-select: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+user-select:none;
 overflow-x:hidden;
 }
 .header{
-padding:50px 20px 20px;
+padding:40px 16px 16px;
 background:var(--card);
 display:flex;
 justify-content:space-between;
@@ -37,13 +38,23 @@ align-items:center;
 position:sticky;
 top:0;
 z-index:10;
+box-shadow:0 2px 4px rgba(0,0,0,0.5);
 }
 .header h2{font-size:20px;}
-.header div{font-size:28px;cursor:pointer;}
-.container{padding:20px;}
+.header div{font-size:28px;cursor:pointer;transition:0.2s;}
+.header div:hover{opacity:0.7;}
+.container{padding:16px;}
+.stats{
+background:var(--card);
+padding:12px;
+border-radius:12px;
+margin-bottom:12px;
+font-size:16px;
+box-shadow:0 2px 4px rgba(0,0,0,0.5);
+}
 .input{
 width:100%;
-padding:16px;
+padding:14px;
 border-radius:12px;
 border:2px solid var(--border);
 background:var(--card);
@@ -51,11 +62,13 @@ color:white;
 margin-bottom:12px;
 font-size:16px;
 -webkit-appearance:none;
+transition:0.2s;
 }
+.input:focus{border-color:var(--blue);}
 textarea.input{resize:none;}
 .btn{
 width:100%;
-padding:16px;
+padding:14px;
 border-radius:12px;
 border:2px solid var(--border);
 background:var(--card);
@@ -64,49 +77,53 @@ font-weight:700;
 margin-bottom:10px;
 font-size:16px;
 touch-action: manipulation;
+transition:0.2s, transform 0.1s;
 }
-.btn.active{border-color:var(--blue);background:rgba(10,132,255,0.2);}
+.btn:hover{background:var(--hover);}
+.btn:active{transform:scale(0.97);}
+.btn.active{border-color:var(--blue);background:var(--active-bg);}
 .save{
 background:var(--blue);
 border:none;
 width:100%;
-padding:20px;
+padding:18px;
 border-radius:14px;
 font-weight:800;
 font-size:18px;
 touch-action: manipulation;
+transition:0.2s, transform 0.1s;
 }
-.stats{
-background:var(--card);
-padding:15px;
-border-radius:12px;
-margin-bottom:15px;
-}
+.save:hover{opacity:0.9;}
+.save:active{transform:scale(0.97);}
 .sidebar{
 position:fixed;
 right:-100%;
 top:0;
 width:100%;
 height:100%;
-background:#000;
-padding:60px 20px;
+background:rgba(0,0,0,0.95);
+padding:60px 16px;
 transition:.3s;
 overflow-y:auto;
 -webkit-overflow-scrolling: touch;
 z-index:1000;
 }
-.sidebar.open{
-right:0;
-}
+.sidebar.open{right:0;}
 .record{
 background:var(--card);
-padding:15px;
+padding:12px;
 border-radius:12px;
 margin-bottom:10px;
 word-break:break-word;
+font-size:14px;
+box-shadow:0 2px 4px rgba(0,0,0,0.4);
+transition:0.2s, transform 0.1s;
 }
+.record:hover{background:var(--hover);}
+.record:active{transform:scale(0.98);}
 </style>
 </head>
+
 <body>
 
 <div class="header">
@@ -116,9 +133,7 @@ word-break:break-word;
 
 <div class="container">
 
-<div class="stats">
-<b>Bugünkü Tamir:</b> <span id="today">0</span>
-</div>
+<div class="stats"><b>Bugünkü Tamir:</b> <span id="today">0</span></div>
 
 <input id="code" class="input" placeholder="Servis kodu">
 <input id="device" class="input" placeholder="Cihaz">
@@ -159,68 +174,68 @@ let selectedUsta="";
 let selectedProc="";
 
 function toggleMenu(){
-document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("sidebar").classList.toggle("open");
 }
 
 function selectUsta(u,el){
-selectedUsta=u;
-document.querySelectorAll(".btn").forEach(b=>b.classList.remove("active"));
-el.classList.add("active");
+  selectedUsta=u;
+  document.querySelectorAll(".btn").forEach(b=>b.classList.remove("active"));
+  el.classList.add("active");
 }
 
 function selectProc(p,el){
-selectedProc=p;
-document.querySelectorAll(".btn").forEach(b=>{
-if(b.innerText===p || b.innerText==="EMMC" || b.innerText==="Anakart") b.classList.remove("active");
-});
-el.classList.add("active");
+  selectedProc=p;
+  document.querySelectorAll(".btn").forEach(b=>{
+    if(b.innerText===p || b.innerText==="EMMC" || b.innerText==="Anakart") b.classList.remove("active");
+  });
+  el.classList.add("active");
 }
 
 // Kaydet
 function save(){
-let code=document.getElementById("code").value.trim();
-let device=document.getElementById("device").value.trim();
-let manual=document.getElementById("manual").value.trim();
-let proc=selectedProc || manual;
-if(!code || !device || !proc || !selectedUsta){alert("Tüm alanlar dolu olmalı!"); return;}
-let data={
-code:code,
-device:device,
-proc:proc,
-usta:selectedUsta,
-date:new Date().toLocaleString("tr-TR")
-};
-db.ref("records").push(data);
-alert("Buluta kaydedildi");
-document.getElementById("code").value="";
-document.getElementById("device").value="";
-document.getElementById("manual").value="";
-selectedProc="";
-selectedUsta="";
-document.querySelectorAll(".btn").forEach(b=>b.classList.remove("active"));
+  let code=document.getElementById("code").value.trim();
+  let device=document.getElementById("device").value.trim();
+  let manual=document.getElementById("manual").value.trim();
+  let proc=selectedProc || manual;
+  if(!code || !device || !proc || !selectedUsta){alert("Tüm alanlar dolu olmalı!"); return;}
+  let data={
+    code:code,
+    device:device,
+    proc:proc,
+    usta:selectedUsta,
+    date:new Date().toLocaleString("tr-TR")
+  };
+  db.ref("records").push(data);
+  alert("Buluta kaydedildi");
+  document.getElementById("code").value="";
+  document.getElementById("device").value="";
+  document.getElementById("manual").value="";
+  selectedProc="";
+  selectedUsta="";
+  document.querySelectorAll(".btn").forEach(b=>b.classList.remove("active"));
 }
 
 // Listeleme
 db.ref("records").on("value",snap=>{
-let list=document.getElementById("list");
-list.innerHTML="";
-let today=0;
-let todayDate=new Date().toLocaleDateString("tr-TR");
-snap.forEach(child=>{
-let item=child.val();
-if(item.date.includes(todayDate)) today++;
-let div=document.createElement("div");
-div.className="record";
-div.innerHTML=`
-<b>${item.code}</b><br>
-${item.device}<br>
-${item.proc}<br>
-${item.usta}<br>
-${item.date}
-`;
-list.appendChild(div);
-});
-document.getElementById("today").innerText=today;
+  let list=document.getElementById("list");
+  list.innerHTML="";
+  let today=0;
+  let todayDate=new Date().toLocaleDateString("tr-TR");
+  snap.forEach(child=>{
+    let item=child.val();
+    if(item.date.includes(todayDate)) today++;
+    let div=document.createElement("div");
+    div.className="record";
+    div.innerHTML=`
+      <b>${item.code}</b><br>
+      ${item.device}<br>
+      ${item.proc}<br>
+      ${item.usta}<br>
+      ${item.date}
+    `;
+    list.appendChild(div);
+  });
+  document.getElementById("today").innerText=today;
 });
 </script>
 
