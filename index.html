@@ -3,279 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PRO-FIX | Servis Takip</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js"></script>
+    <title>PRO-FIX | Profesyonel Panel</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        
         body {
-            background: #0a0a0c;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background: #0d0d0f;
             color: white;
-            padding: 16px;
-            max-width: 500px;
-            margin: 0 auto;
         }
-        .header {
+        
+        header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            background: #16161a;
+            justify-content: space-between;
             padding: 15px;
-            border-radius: 20px;
+            background: #161616;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
-        .header h1 {
-            font-size: 22px;
+        
+        header h2 {
+            margin: 0;
             color: #0a84ff;
+            font-size: 18px;
         }
+        
         .menu-btn {
             font-size: 24px;
-            background: #1c1c1f;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
             cursor: pointer;
         }
-        .status {
-            background: #1c1c1f;
-            padding: 10px 15px;
-            border-radius: 30px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
+        
+        main {
+            padding: 15px;
         }
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 10px;
-            background: #ff453a;
-        }
-        .status-dot.online {
-            background: #32d74b;
-        }
-        .card {
-            background: #16161a;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
+        
         input, select, textarea {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             margin: 8px 0;
             background: #1c1c1f;
             border: 1px solid #333;
-            border-radius: 12px;
+            border-radius: 10px;
             color: white;
             font-size: 16px;
         }
+        
         button {
             width: 100%;
-            padding: 16px;
-            background: #0a84ff;
-            border: none;
+            padding: 14px;
+            margin: 6px 0;
             border-radius: 12px;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            margin: 5px 0;
-            cursor: pointer;
-        }
-        .stats {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .stat-box {
-            background: #1c1c1f;
-            flex: 1;
-            padding: 15px;
-            border-radius: 15px;
             text-align: center;
-        }
-        .stat-number {
-            font-size: 28px;
             font-weight: bold;
-            color: #0a84ff;
+            background: #0a84ff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
         }
-        .sidebar {
+        
+        .section {
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #ccc;
+        }
+        
+        #sidebar {
             position: fixed;
             top: 0;
             right: -100%;
             width: 90%;
-            max-width: 350px;
-            height: 100vh;
-            background: #16161a;
+            max-width: 400px;
+            height: 100%;
+            background: #161616;
             z-index: 1000;
             transition: 0.3s;
-            padding: 20px;
             overflow-y: auto;
+            padding: 15px;
         }
-        .sidebar.open {
+        
+        #sidebar.open {
             right: 0;
         }
-        .sidebar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .close-btn {
-            font-size: 24px;
-            cursor: pointer;
-        }
+        
         .record {
+            background: #1c1c1f;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .record b {
+            color: #0a84ff;
+        }
+        
+        .record .actions {
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .record .actions span {
+            cursor: pointer;
+            margin-left: 10px;
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .stat-box {
+            flex: 1;
             background: #1c1c1f;
             padding: 15px;
             border-radius: 12px;
-            margin-bottom: 10px;
+            text-align: center;
         }
-        .record-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-        .record-code {
-            color: #0a84ff;
+        
+        .stat-value {
+            font-size: 24px;
             font-weight: bold;
-            font-size: 16px;
-        }
-        .record-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .edit-btn, .delete-btn {
-            flex: 1;
-            padding: 8px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .edit-btn {
-            background: rgba(10, 132, 255, 0.2);
             color: #0a84ff;
         }
-        .delete-btn {
-            background: rgba(255, 69, 58, 0.2);
-            color: #ff453a;
-        }
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 999;
-            display: none;
-        }
-        .overlay.active {
-            display: block;
-        }
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: #2c2c2e;
-            padding: 15px 20px;
+        
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #1c1c1f;
             border-radius: 30px;
-            text-align: center;
-            transform: translateY(100px);
-            transition: 0.3s;
-            z-index: 2000;
+            margin: 10px 0;
         }
-        .toast.show {
-            transform: translateY(0);
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 12px;
+            background: #ff3b30;
+        }
+        
+        .status-dot.online {
+            background: #32d74b;
         }
     </style>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js"></script>
 </head>
 <body>
 
-<div class="header">
-    <h1>PRO-FIX</h1>
+<header>
+    <h2>PRO-FIX</h2>
     <div class="menu-btn" onclick="toggleSidebar()">☰</div>
-</div>
+</header>
 
-<!-- Durum Göstergesi -->
-<div class="status" id="status">
-    <span class="status-dot" id="statusDot"></span>
-    <span id="statusText">Bağlantı kontrol ediliyor...</span>
-</div>
-
-<!-- İstatistikler -->
-<div class="stats">
-    <div class="stat-box">
-        <div class="stat-number" id="totalCount">0</div>
-        <div>Toplam</div>
+<main>
+    <!-- Durum -->
+    <div class="status" id="status">
+        <div class="status-dot" id="statusDot"></div>
+        <div id="statusText">Buluta bağlanıyor...</div>
     </div>
-    <div class="stat-box">
-        <div class="stat-number" id="todayCount">0</div>
-        <div>Bugün</div>
+    
+    <!-- İstatistikler -->
+    <div class="stats">
+        <div class="stat-box">
+            <div class="stat-value" id="totalCount">0</div>
+            <div>Toplam</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value" id="todayCount">0</div>
+            <div>Bugün</div>
+        </div>
     </div>
-</div>
-
-<!-- Kayıt Formu -->
-<div class="card">
-    <h3 style="margin-bottom: 15px;">Yeni Kayıt</h3>
     
-    <input type="text" id="device" placeholder="Cihaz Modeli">
-    <input type="text" id="code" placeholder="Servis Kodu">
+    <div class="section">Model / Cihaz</div>
+    <input id="device" placeholder="Örn: Samsung S23">
     
+    <div class="section">Servis Kodu</div>
+    <input id="code" placeholder="Örn: SRV-001">
+    
+    <div class="section">Usta</div>
     <select id="usta">
-        <option value="">Usta Seç</option>
-        <option value="Kadir">Kadir Usta</option>
-        <option value="Mehmet">Mehmet Usta</option>
+        <option value="">Seçiniz</option>
+        <option value="Kadir">Kadir</option>
+        <option value="Mehmet">Mehmet</option>
     </select>
     
+    <div class="section">İşlem</div>
     <select id="islem">
-        <option value="">İşlem Seç</option>
+        <option value="">Seçiniz</option>
         <option value="BGA Değişim">BGA Değişim</option>
         <option value="EMMC Değişim">EMMC Değişim</option>
     </select>
     
-    <textarea id="notes" rows="2" placeholder="Not (opsiyonel)"></textarea>
+    <div class="section">Notlar</div>
+    <textarea id="notes" rows="2" placeholder="Not ekleyin..."></textarea>
     
-    <button onclick="saveData()">💾 Buluta Kaydet</button>
-    <button onclick="clearForm()" style="background: #333;">Temizle</button>
-</div>
+    <button onclick="saveData()">Buluta Kaydet</button>
+</main>
 
-<!-- Sidebar -->
-<div id="sidebar" class="sidebar">
-    <div class="sidebar-header">
-        <h3>Kayıtlar</h3>
-        <div class="close-btn" onclick="toggleSidebar()">✕</div>
+<div id="sidebar">
+    <h3>Kayıtlı Servisler</h3>
+    <input type="text" id="search" placeholder="Ara..." onkeyup="renderRecords()">
+    <div style="display: flex; gap: 5px; margin: 10px 0;">
+        <button onclick="filterRecords('all')" style="padding: 8px;">Tümü</button>
+        <button onclick="filterRecords('Kadir')" style="padding: 8px;">Kadir</button>
+        <button onclick="filterRecords('Mehmet')" style="padding: 8px;">Mehmet</button>
     </div>
-    
-    <input type="text" id="search" placeholder="Ara..." onkeyup="renderRecords()" style="margin-bottom: 15px;">
-    
-    <div style="display: flex; gap: 5px; margin-bottom: 15px;">
-        <button onclick="filterRecords('all')" style="flex:1; padding:8px;">Tümü</button>
-        <button onclick="filterRecords('Kadir')" style="flex:1; padding:8px;">Kadir</button>
-        <button onclick="filterRecords('Mehmet')" style="flex:1; padding:8px;">Mehmet</button>
-    </div>
-    
     <div id="records"></div>
 </div>
 
-<div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
-<div id="toast" class="toast">İşlem başarılı</div>
-
 <script>
 // ===========================================
-// FIREBASE - SENİN AYARLARIN
+// FIREBASE - SENİN GERÇEK ANAHTARLARIN
 // ===========================================
 const firebaseConfig = {
     apiKey: "AIzaSyBQSINTtuBwuzZrvrtGQSHSB7BYGDHglz8",
@@ -287,7 +233,7 @@ const firebaseConfig = {
     appId: "1:876650784012:web:1bfd1e383f2ef4523fd529"
 };
 
-// Firebase Başlat
+// Firebase başlat
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
@@ -299,31 +245,31 @@ let editingId = null;
 let currentFilter = 'all';
 
 // ===========================================
-// BAĞLANTI KONTROLÜ
+// BAĞLANTI KONTROLÜ - YEŞİL YANACAK!
 // ===========================================
-function checkConnection() {
-    const connectedRef = database.ref('.info/connected');
-    connectedRef.on('value', (snap) => {
-        if (snap.val() === true) {
-            document.getElementById('statusDot').className = 'status-dot online';
-            document.getElementById('statusText').innerText = 'Buluta Bağlandı ✓';
-            loadData();
-        } else {
-            document.getElementById('statusDot').className = 'status-dot';
-            document.getElementById('statusText').innerText = 'Bağlantı yok ✗';
-        }
-    });
-}
+database.ref('.info/connected').on('value', (snap) => {
+    if (snap.val() === true) {
+        // Yeşil yap
+        document.getElementById('statusDot').className = 'status-dot online';
+        document.getElementById('statusText').innerHTML = '✅ Buluta bağlandı!';
+        
+        // Verileri yükle
+        loadData();
+    } else {
+        // Kırmızı yap
+        document.getElementById('statusDot').className = 'status-dot';
+        document.getElementById('statusText').innerHTML = '❌ Bağlantı yok';
+    }
+});
 
 // ===========================================
-// VERİ YÜKLE
+// VERİLERİ YÜKLE
 // ===========================================
 function loadData() {
     database.ref('kayitlar').on('value', (snapshot) => {
         const data = snapshot.val();
         if (data) {
             db = Object.values(data);
-            showToast('📥 Yeni kayıtlar geldi!');
         } else {
             db = [];
         }
@@ -333,41 +279,46 @@ function loadData() {
 }
 
 // ===========================================
-// KAYDET
+// KAYDET - KESİN ÇALIŞACAK!
 // ===========================================
 function saveData() {
-    const device = document.getElementById('device').value.trim();
-    const code = document.getElementById('code').value.trim();
-    const usta = document.getElementById('usta').value;
-    const islem = document.getElementById('islem').value;
-    const notes = document.getElementById('notes').value.trim();
+    let device = document.getElementById('device').value.trim();
+    let code = document.getElementById('code').value.trim();
+    let usta = document.getElementById('usta').value;
+    let islem = document.getElementById('islem').value;
+    let notes = document.getElementById('notes').value.trim();
     
     if (!device || !code || !usta || !islem) {
-        showToast('Tüm alanları doldur!');
+        alert('Tüm alanları doldurun!');
         return;
     }
     
-    const now = new Date();
-    const date = now.toLocaleDateString('tr-TR') + ' ' + now.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+    let now = new Date();
+    let date = now.toLocaleDateString('tr-TR') + ' ' + 
+               now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
     
-    const newRecord = {
+    let record = {
         id: Date.now(),
-        device,
-        code,
-        usta,
-        islem,
-        notes,
-        date
+        device: device,
+        code: code,
+        usta: usta,
+        islem: islem,
+        notes: notes,
+        date: date
     };
     
     // Firebase'e kaydet
-    database.ref('kayitlar/' + newRecord.id).set(newRecord)
+    database.ref('kayitlar/' + record.id).set(record)
         .then(() => {
-            showToast('☁️ Buluta kaydedildi!');
-            clearForm();
+            alert('☁️ Buluta kaydedildi!');
+            document.getElementById('device').value = '';
+            document.getElementById('code').value = '';
+            document.getElementById('usta').value = '';
+            document.getElementById('islem').value = '';
+            document.getElementById('notes').value = '';
         })
         .catch((error) => {
-            showToast('Hata: ' + error.message);
+            alert('Hata: ' + error.message);
         });
 }
 
@@ -376,23 +327,6 @@ function saveData() {
 // ===========================================
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('active');
-}
-
-function clearForm() {
-    document.getElementById('device').value = '';
-    document.getElementById('code').value = '';
-    document.getElementById('usta').value = '';
-    document.getElementById('islem').value = '';
-    document.getElementById('notes').value = '';
-    editingId = null;
-}
-
-function showToast(msg) {
-    const toast = document.getElementById('toast');
-    toast.innerText = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2000);
 }
 
 function filterRecords(usta) {
@@ -402,25 +336,26 @@ function filterRecords(usta) {
 
 function updateStats() {
     document.getElementById('totalCount').innerText = db.length;
-    const today = new Date().toLocaleDateString();
-    const todayCount = db.filter(r => r.date && r.date.includes(today)).length;
+    
+    let today = new Date().toLocaleDateString();
+    let todayCount = db.filter(r => r.date && r.date.includes(today)).length;
     document.getElementById('todayCount').innerText = todayCount;
 }
 
 function renderRecords() {
-    const term = document.getElementById('search').value.toLowerCase();
-    const container = document.getElementById('records');
+    let term = document.getElementById('search').value.toLowerCase();
+    let container = document.getElementById('records');
     
     let filtered = db.filter(r => {
-        const matchSearch = r.device.toLowerCase().includes(term) || 
+        let matchesSearch = r.device.toLowerCase().includes(term) || 
                            r.code.toLowerCase().includes(term) || 
                            r.usta.toLowerCase().includes(term);
-        const matchFilter = currentFilter === 'all' || r.usta === currentFilter;
-        return matchSearch && matchFilter;
+        let matchesFilter = currentFilter === 'all' || r.usta === currentFilter;
+        return matchesSearch && matchesFilter;
     });
     
     if (filtered.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:#666;">Kayıt yok</div>';
+        container.innerHTML = '<div style="text-align:center; padding:20px;">Kayıt yok</div>';
         return;
     }
     
@@ -428,16 +363,13 @@ function renderRecords() {
     filtered.sort((a,b) => b.id - a.id).forEach(r => {
         container.innerHTML += `
             <div class="record">
-                <div class="record-header">
-                    <span class="record-code">${r.code}</span>
-                    <span>${r.islem}</span>
-                </div>
-                <div style="font-weight:bold; margin-bottom:5px;">${r.device}</div>
-                <div style="color:#888; font-size:12px; margin-bottom:5px;">${r.usta} - ${r.date}</div>
-                ${r.notes ? '<div style="color:#888; font-size:12px;">📝 ' + r.notes + '</div>' : ''}
-                <div class="record-actions">
-                    <div class="edit-btn" onclick="editRecord(${r.id})">Düzenle</div>
-                    <div class="delete-btn" onclick="deleteRecord(${r.id})">Sil</div>
+                <b>${r.code}</b> - ${r.device}<br>
+                ${r.usta} | ${r.islem}<br>
+                ${r.date}<br>
+                ${r.notes ? '📝 ' + r.notes + '<br>' : ''}
+                <div class="actions">
+                    <span onclick="editRecord(${r.id})">Düzenle</span>
+                    <span onclick="deleteRecord(${r.id})">Sil</span>
                 </div>
             </div>
         `;
@@ -445,7 +377,7 @@ function renderRecords() {
 }
 
 function editRecord(id) {
-    const rec = db.find(r => r.id === id);
+    let rec = db.find(r => r.id === id);
     if (rec) {
         document.getElementById('device').value = rec.device;
         document.getElementById('code').value = rec.code;
@@ -458,15 +390,14 @@ function editRecord(id) {
 }
 
 function deleteRecord(id) {
-    if (confirm('Silmek istediğine emin misin?')) {
+    if (confirm('Silmek istediğinize emin misiniz?')) {
         database.ref('kayitlar/' + id).remove()
-            .then(() => showToast('Kayıt silindi'));
+            .then(() => alert('Kayıt silindi'));
     }
 }
 
-// Başlat
-checkConnection();
+// Sayfa yüklendiğinde
+loadData();
 </script>
-
 </body>
 </html>
