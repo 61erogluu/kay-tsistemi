@@ -2,178 +2,169 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PRO-FIX iOS Profesyonel Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRO-FIX PRO</title>
+
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
-body{margin:0;font-family:'Roboto',sans-serif;background:#0d0d0f;color:white;}
-header{display:flex;align-items:center;justify-content:space-between;padding:15px;background:#161616;box-shadow:0 2px 5px rgba(0,0,0,0.5);}
-header h2{margin:0;color:#0a84ff;font-size:18px;}
-header .menu-btn{font-size:24px;cursor:pointer;}
-
-main{padding:15px;}
-input,select,textarea{width:100%;padding:12px;margin:8px 0;background:#1c1c1f;border:1px solid #333;border-radius:10px;color:white;font-size:16px;}
-button,.opt-btn{width:100%;padding:14px;margin:6px 0;border-radius:12px;text-align:center;font-weight:bold;background:#0a84ff;color:white;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:16px;transition:0.2s all;box-shadow:0 3px 6px rgba(0,0,0,0.4);}
-button:hover,.opt-btn:hover{transform:scale(1.02);box-shadow:0 5px 10px rgba(0,0,0,0.5);}
-.opt-btn.active{background:#32d74b;color:#000;}
-.section{margin-top:15px;margin-bottom:10px;font-weight:bold;color:#ccc;}
-
-#sidebar{position:fixed;top:0;right:-100%;width:90%;max-width:400px;height:100%;background:#161616;z-index:1000;transition:0.3s;overflow-y:auto;padding:15px;}
-#sidebar.open{right:0;}
-#sidebar h3{margin-top:0;}
-.record{background:#1c1c1f;padding:10px;border-radius:10px;margin-bottom:10px;box-shadow:0 3px 6px rgba(0,0,0,0.4);}
-.record b{color:#0a84ff;}
-.record .actions{margin-top:5px;text-align:right;}
-.record .actions span{cursor:pointer;margin-left:10px;color:#ff6b6b;font-weight:bold;}
-canvas{background:#0d0d0f;border-radius:12px;margin-top:10px;}
+body{margin:0;font-family:Arial;background:#0d0d0f;color:white;}
+header{display:flex;justify-content:space-between;padding:15px;background:#161616;}
+.menu{font-size:22px;cursor:pointer;}
+.container{padding:15px;}
+input,select{width:100%;padding:10px;margin:6px 0;background:#1c1c1f;border:1px solid #333;color:white;border-radius:8px;}
+button{width:100%;padding:12px;margin-top:10px;background:#0a84ff;border:none;color:white;border-radius:8px;}
+#panel,#admin{position:fixed;top:0;right:-100%;width:90%;max-width:350px;height:100%;background:#161616;padding:15px;transition:0.3s;overflow:auto;}
+#panel.open,#admin.open{right:0;}
+.record{background:#1c1c1f;margin-top:10px;padding:10px;border-radius:8px;}
 </style>
 </head>
+
 <body>
 
 <header>
-<h2>PRO-FIX Profesyonel</h2>
-<div class="menu-btn" ontouchstart="toggleSidebar()">☰</div>
+<div class="menu" onclick="togglePanel()">☰</div>
+<div>PRO-FIX</div>
+<div>
+<span class="menu" onclick="openAdmin()">⋮</span>
+</div>
 </header>
 
-<main>
-<div class="section">1. Model / Cihaz</div>
-<input id="device" placeholder="Örn: LG 42LB">
+<div class="container">
 
-<div class="section">2. Servis Kodu / Seri No</div>
-<input id="code" placeholder="Örn: 123456">
+<input id="device" placeholder="Cihaz">
+<input id="code" placeholder="Kod">
 
-<div class="section">3. Usta</div>
 <select id="usta">
-  <option value="">Seçiniz</option>
-  <option value="Kadir">Kadir</option>
-  <option value="Mehmet">Mehmet</option>
+<option value="">Usta seç</option>
+<option>Kadir</option>
+<option>Mehmet</option>
 </select>
 
-<div class="section">4. İşlem</div>
 <select id="islem">
-  <option value="">Seçiniz</option>
-  <option value="BGA Değişim">BGA Değişim</option>
-  <option value="EMMC">EMMC</option>
+<option value="">İşlem</option>
+<option>BGA</option>
+<option>EMMC</option>
 </select>
 
-<button ontouchstart="saveData()">Kaydet</button>
+<button onclick="save()">Kaydet</button>
 
-<div class="section">Günlük / Aylık Sayaç</div>
-<canvas id="chart" height="200"></canvas>
-
-<div class="section">Yedekleme / Geri Yükleme</div>
-<button ontouchstart="exportData()">Dışa Aktar JSON</button>
-<input type="file" id="importFile" onchange="importData(event)">
-</main>
-
-<div id="sidebar">
-<h3>Kayıtlı Servisler</h3>
-<input type="text" id="search" placeholder="Ara: kod, cihaz, usta..." onkeyup="renderRecords()">
-<div id="records"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- KAYIT PANEL -->
+<div id="panel">
+<h3>Kayıtlar</h3>
+<input id="search" placeholder="Ara..." onkeyup="render()">
+<div id="list"></div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin">
+<h3>Usta Analiz</h3>
+
+<select id="filterUsta">
+<option value="">Usta seç</option>
+<option>Kadir</option>
+<option>Mehmet</option>
+</select>
+
+<select id="filterType">
+<option value="today">Bugün</option>
+<option value="month">Bu Ay</option>
+<option value="custom">Özel</option>
+</select>
+
+<input type="date" id="start">
+<input type="date" id="end">
+
+<button onclick="analyze()">Hesapla</button>
+
+<h3 id="result"></h3>
+
+</div>
+
 <script>
-let db = JSON.parse(localStorage.getItem('profix_db')) || [];
-let editingId = null;
 
-function toggleSidebar(){
-  document.getElementById('sidebar').classList.toggle('open');
+let db=JSON.parse(localStorage.getItem("db"))||[];
+
+function save(){
+let d=document.getElementById("device").value;
+let c=document.getElementById("code").value;
+let u=document.getElementById("usta").value;
+let i=document.getElementById("islem").value;
+
+if(!d||!c||!u||!i){alert("Eksik");return;}
+
+db.unshift({
+device:d,code:c,usta:u,islem:i,
+date:new Date().toISOString()
+});
+
+localStorage.setItem("db",JSON.stringify(db));
+render();
 }
 
-function saveData(){
-  let device=document.getElementById('device').value.trim();
-  let code=document.getElementById('code').value.trim();
-  let usta=document.getElementById('usta').value;
-  let islem=document.getElementById('islem').value;
-  
-  if(!device||!code||!usta||!islem){alert("Tüm alanları doldurun!");return;}
-  
-  if(editingId){
-    let rec=db.find(r=>r.id===editingId);
-    rec.device=device; rec.code=code; rec.usta=usta; rec.islem=islem; rec.date=new Date().toLocaleString();
-    editingId=null;
-  } else {
-    db.unshift({id:Date.now(),device,code,usta,islem,date:new Date().toLocaleString()});
-  }
-  localStorage.setItem('profix_db',JSON.stringify(db));
-  renderRecords();
-  updateChart();
-  document.getElementById('device').value='';document.getElementById('code').value='';document.getElementById('usta').value='';document.getElementById('islem').value='';
+function render(){
+let term=document.getElementById("search").value||"";
+let list=document.getElementById("list");
+list.innerHTML="";
+
+db.filter(x=>x.device.includes(term)||x.code.includes(term)||x.usta.includes(term))
+.forEach(x=>{
+let div=document.createElement("div");
+div.className="record";
+div.innerHTML=`${x.code} - ${x.device}<br>${x.usta} | ${x.islem}`;
+list.appendChild(div);
+});
 }
 
-function editRecord(id){
-  let rec=db.find(r=>r.id===id);
-  document.getElementById('device').value=rec.device;
-  document.getElementById('code').value=rec.code;
-  document.getElementById('usta').value=rec.usta;
-  document.getElementById('islem').value=rec.islem;
-  editingId=id;
-  toggleSidebar();
+function togglePanel(){
+document.getElementById("panel").classList.toggle("open");
 }
 
-function deleteRecord(id){
-  if(confirm('Silmek istediğinize emin misiniz?')){
-    db=db.filter(r=>r.id!==id);
-    localStorage.setItem('profix_db',JSON.stringify(db));
-    renderRecords();
-    updateChart();
-  }
+function openAdmin(){
+let pass=prompt("Şifre gir");
+if(pass==="1616"){
+document.getElementById("admin").classList.add("open");
+}else{
+alert("Yanlış şifre");
+}
 }
 
-function renderRecords(){
-  let term=document.getElementById('search').value.toLowerCase();
-  let container=document.getElementById('records');
-  container.innerHTML='';
-  db.filter(r=>r.device.toLowerCase().includes(term)||r.code.includes(term)||r.usta.toLowerCase().includes(term))
-    .forEach(r=>{
-      let div=document.createElement('div'); div.className='record';
-      div.innerHTML=`<b>${r.code}</b> - ${r.device}<br>${r.usta} | ${r.islem}<br>${r.date}
-      <div class="actions"><span onclick="editRecord(${r.id})">Düzenle</span><span onclick="deleteRecord(${r.id})">Sil</span></div>`;
-      container.appendChild(div);
-    });
+function analyze(){
+
+let u=document.getElementById("filterUsta").value;
+let type=document.getElementById("filterType").value;
+let start=document.getElementById("start").value;
+let end=document.getElementById("end").value;
+
+let now=new Date();
+
+let count=0;
+
+db.forEach(x=>{
+let d=new Date(x.date);
+
+if(u && x.usta!==u) return;
+
+if(type==="today"){
+if(d.toDateString()===now.toDateString()) count++;
+}
+else if(type==="month"){
+if(d.getMonth()===now.getMonth()) count++;
+}
+else if(type==="custom"){
+if(start && end){
+if(d>=new Date(start) && d<=new Date(end)) count++;
+}
 }
 
-// Chart.js - Günlük ve usta performans
-let chart=null;
-function updateChart(){
-  let ctx=document.getElementById('chart').getContext('2d');
-  let ustaCounts={};
-  db.forEach(r=>ustaCounts[r.usta]= (ustaCounts[r.usta]||0)+1 );
-  let labels=Object.keys(ustaCounts);
-  let data=Object.values(ustaCounts);
-  
-  if(chart) chart.destroy();
-  chart=new Chart(ctx,{type:'bar',data:{labels, datasets:[{label:'Tamir Sayısı',data,backgroundColor:'#0a84ff'}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+});
+
+document.getElementById("result").innerText="Toplam İş: "+count;
+
 }
 
-updateChart();
+render();
 
-// Yedekleme / Geri Yükleme
-function exportData(){
-  let dataStr=JSON.stringify(db,null,2);
-  let blob=new Blob([dataStr],{type:'application/json'});
-  let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='profix_backup.json'; a.click();
-}
-
-function importData(event){
-  let file=event.target.files[0];
-  let reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      let imported=JSON.parse(e.target.result);
-      db=imported.concat(db);
-      localStorage.setItem('profix_db',JSON.stringify(db));
-      renderRecords(); updateChart();
-      alert('Yedek yüklendi!');
-    }catch(err){alert('Geçersiz dosya!');}
-  };
-  reader.readAsText(file);
-}
-
-renderRecords();
-updateChart();
 </script>
 
 </body>
