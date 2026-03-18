@@ -2,228 +2,121 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ProFix TV Pro - Modern Grafik</title>
+<title>PRO-FIX Servis Paneli</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-:root{
---bg:#000;
---card:#1c1c1e;
---blue:#0a84ff;
---red:#ff453a;
---green:#32d74b;
---border:#38383a;
---yellow:#FFD700;
-}
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system, sans-serif;}
-body{background:var(--bg);color:#fff;overflow-x:hidden;}
-.header{display:flex;justify-content:space-between;align-items:center;padding:20px;background:var(--card);border-bottom:1px solid var(--border);}
-.header h2{letter-spacing:-1px;}
-.icons{display:flex;gap:12px;font-size:22px;cursor:pointer;align-items:center;}
-.container{padding:20px;}
-.section-label{font-size:12px;color:#8e8e93;font-weight:700;margin:10px 0 5px 0;text-transform:uppercase;}
-.input-box{width:100%;padding:12px;margin-bottom:8px;border-radius:10px;background:var(--card);border:1px solid var(--border);color:#fff;font-weight:600;}
-.input-box:focus{outline:none;border-color:var(--blue);}
-.btn{width:100%;padding:14px;background:var(--blue);border:none;color:#fff;border-radius:12px;font-weight:700;margin-top:10px;cursor:pointer;}
-.btn:hover{opacity:0.9;}
-.btn-group{display:flex;gap:10px;}
-.sidebar{position:fixed;top:0;right:-100%;width:90%;max-width:400px;height:100%;background:var(--bg);padding:20px;transition:0.3s;overflow:auto;z-index:1000;}
-.sidebar.open{right:0;}
-.close-sidebar{cursor:pointer;color:var(--red);margin-bottom:10px;font-weight:700;}
-.record-card{background:var(--card);padding:12px;border-radius:10px;margin-top:10px;position:relative;transition:0.2s;}
-.record-card:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,0.4);}
-.record-card h4{color:var(--blue);}
-.record-card p{font-size:14px;color:#ccc;margin:2px 0;}
-.record-card .actions{position:absolute;top:10px;right:10px;display:flex;gap:5px;}
-.action-btn{cursor:pointer;font-size:14px;padding:4px 6px;border-radius:5px;background:#333;color:#fff;}
-.action-btn:hover{background:#555;}
-.chart-container{margin-top:20px;background:var(--card);padding:12px;border-radius:10px;}
+body{margin:0;font-family:Segoe UI;background:#0f1115;color:white;}
+.header{background:#161b22;padding:20px;font-size:22px;font-weight:bold;}
+.layout{display:flex;height:calc(100vh - 60px);}
+.panel{width:320px;background:#161b22;padding:20px;overflow:auto;}
+.panel input,textarea{width:100%;padding:10px;margin-bottom:10px;background:#0f1115;border:1px solid #30363d;color:white;border-radius:6px;}
+.btn{background:#238636;padding:10px;text-align:center;border-radius:6px;cursor:pointer;margin-bottom:6px;}
+.btn.gray{background:#30363d;}
+.main{flex:1;padding:20px;overflow:auto;}
+.stats{background:#161b22;padding:15px;border-radius:6px;margin-bottom:15px;}
+.table{width:100%;border-collapse:collapse;}
+.table th,.table td{padding:8px;border-bottom:1px solid #30363d;}
+.delete{color:#ff6b6b;cursor:pointer;}
+canvas{background:#161b22;padding:10px;border-radius:6px;margin-bottom:20px;}
 </style>
 </head>
 <body>
 
-<div class="header">
-<h2>PRO-FIX <span style="color:var(--blue)">TV</span></h2>
-<div class="icons">
-<div onclick="openUstaPanel()">👤</div>
-<div onclick="toggleSidebar(true)">☰</div>
+<div class="header">PRO-FIX Servis Paneli</div>
+
+<div class="layout">
+
+<div class="panel">
+<input id="code" placeholder="Servis kodu">
+<input id="device" placeholder="Cihaz">
+
+<div class="btn gray" onclick="usta='Kadir';highlightUsta(this)">Kadir</div>
+<div class="btn gray" onclick="usta='Mehmet';highlightUsta(this)">Mehmet</div>
+
+<div class="btn gray" onclick="islem='EMMC';highlightIslem(this)">EMMC</div>
+<div class="btn gray" onclick="islem='Anakart';highlightIslem(this)">Anakart</div>
+
+<textarea id="manual" placeholder="Diğer işlem"></textarea>
+
+<div class="btn" onclick="kaydet()">Kaydet</div>
+
+<hr>
+
+<div class="btn gray" onclick="backup()">Yedek indir</div>
+<input type="file" onchange="restore(event)">
+</div>
+
+<div class="main">
+
+<div class="stats">
+Bugünkü Tamir: <b id="today">0</b>
+</div>
+
+<input id="search" placeholder="Ara..." onkeyup="render()">
+
+<table class="table">
+<thead>
+<tr><th>Kod</th><th>Cihaz</th><th>İşlem</th><th>Usta</th><th>Tarih</th><th></th></tr>
+</thead>
+<tbody id="list"></tbody>
+</table>
+
+<h3>Usta Performansı</h3>
+<canvas id="ustaChart"></canvas>
+
+<h3>Aylık Tamir</h3>
+<canvas id="monthChart"></canvas>
+
 </div>
 </div>
 
-<div class="container">
-
-<p class="section-label">Cihaz Model</p>
-<input type="text" id="device" class="input-box" placeholder="Örn: LG 42LB">
-
-<p class="section-label">Servis Kodu</p>
-<input type="text" id="code" class="input-box" placeholder="000000">
-
-<p class="section-label">Usta Seç</p>
-<select id="usta" class="input-box">
-<option value="">Seçiniz</option>
-<option>Kadir</option>
-<option>Mehmet</option>
-</select>
-
-<p class="section-label">Yapılan İşlem</p>
-<select id="islem" class="input-box">
-<option value="">Seçiniz</option>
-<option>BGA</option>
-<option>EMMC</option>
-</select>
-
-<button class="btn" onclick="saveData()">Kaydet</button>
-
-</div>
-
-<!-- Kayıtlar -->
-<div class="sidebar" id="sidebar">
-<div class="close-sidebar" onclick="toggleSidebar(false)">✕ Kapat</div>
-<h3>Kayıtlı Cihazlar</h3>
-<input type="text" id="search" class="input-box" placeholder="Ara..." onkeyup="renderRecords()">
-<div id="record-list"></div>
-</div>
-
-<!-- Usta Paneli -->
-<div class="sidebar" id="ustaPanel">
-<div class="close-sidebar" onclick="toggleUsta(false)">✕ Kapat</div>
-<h3>Usta Performans</h3>
-
-<select id="filterUsta" class="input-box">
-<option value="">Usta Seç</option>
-<option>Kadir</option>
-<option>Mehmet</option>
-</select>
-
-<select id="filterType" class="input-box">
-<option value="today">Bugün</option>
-<option value="month">Bu Ay</option>
-<option value="custom">Özel Tarih</option>
-</select>
-
-<input type="date" id="start" class="input-box">
-<input type="date" id="end" class="input-box">
-<button class="btn" onclick="analyzeUsta()">Hesapla</button>
-
-<h3 id="resultUsta"></h3>
-
-<div class="chart-container">
-<canvas id="chart"></canvas>
-</div>
-</div>
-
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-let db = JSON.parse(localStorage.getItem('profix_db')) || [];
+let db = JSON.parse(localStorage.getItem("profix_db")) || [];
+let usta="", islem="";
 
-function saveData(){
-const d = document.getElementById('device').value.trim();
-const c = document.getElementById('code').value.trim();
-const u = document.getElementById('usta').value;
-const i = document.getElementById('islem').value;
-if(!d || !c || !u || !i){alert("Eksik alan!"); return;}
-const id = Date.now();
-db.unshift({id, device:d, code:c, usta:u, islem:i, date:new Date().toISOString()});
-localStorage.setItem('profix_db', JSON.stringify(db));
-document.getElementById('device').value='';
-document.getElementById('code').value='';
-document.getElementById('usta').value='';
-document.getElementById('islem').value='';
-renderRecords();
-alert("✅ Kayıt Başarılı!");
+function highlightUsta(el){
+document.querySelectorAll('.panel .btn.gray').forEach(b=>b.style.border='1px solid #30363d');
+el.style.border='2px solid #0a84ff';
 }
-
-function renderRecords(){
-const list = document.getElementById('record-list');
-const term = document.getElementById('search').value.toLowerCase();
-list.innerHTML = '';
-db.filter(x => x.device.toLowerCase().includes(term) || x.code.includes(term) || x.usta.toLowerCase().includes(term))
-.forEach(x=>{
-const card = document.createElement('div');
-card.className = 'record-card';
-card.innerHTML = `<h4>${x.code} - ${x.device}</h4>
-<p>Usta: ${x.usta}</p>
-<p>İşlem: ${x.islem}</p>
-<p>Tarih: ${new Date(x.date).toLocaleString('tr-TR')}</p>
-<div class="actions">
-<span class="action-btn" onclick="editRecord(${x.id})">Düzenle</span>
-<span class="action-btn" onclick="deleteRecord(${x.id})">Sil</span>
-</div>`;
-list.appendChild(card);
+function highlightIslem(el){
+document.querySelectorAll('.panel .btn.gray').forEach(b=>b.style.border='1px solid #30363d');
+el.style.border='2px solid #0a84ff';
+}
+function kaydet(){
+let code=document.getElementById("code").value;
+let device=document.getElementById("device").value;
+let manual=document.getElementById("manual").value;
+let final=islem || manual;
+if(!code||!device||!usta||!final){alert("Eksik bilgi");return;}
+db.unshift({id:Date.now(),code,device,islem:final,usta,date:new Date().toLocaleString()});
+localStorage.setItem("profix_db",JSON.stringify(db));
+render();charts();
+}
+function render(){
+let term=document.getElementById("search").value?.toLowerCase()||"";
+let list=document.getElementById("list");
+list.innerHTML="";
+let today=0;
+let todayStr=new Date().toLocaleDateString();
+db.filter(x=>x.code.includes(term)||x.device.toLowerCase().includes(term)||x.usta.toLowerCase().includes(term)).forEach(x=>{
+if(x.date.includes(todayStr)) today++;
+let tr=document.createElement("tr");
+tr.innerHTML=`<td>${x.code}</td><td>${x.device}</td><td>${x.islem}</td><td>${x.usta}</td><td>${x.date}</td><td class="delete" onclick="sil(${x.id})">Sil</td>`;
+list.appendChild(tr);
 });
+document.getElementById("today").innerText=today;
 }
-
-function toggleSidebar(show){document.getElementById('sidebar').className = show ? 'sidebar open' : 'sidebar';}
-function toggleUsta(show){document.getElementById('ustaPanel').className = show ? 'sidebar open' : 'sidebar';}
-
-function editRecord(id){
-const rec = db.find(x=>x.id===id);
-if(!rec) return;
-document.getElementById('device').value = rec.device;
-document.getElementById('code').value = rec.code;
-document.getElementById('usta').value = rec.usta;
-document.getElementById('islem').value = rec.islem;
-db = db.filter(x=>x.id!==id);
-localStorage.setItem('profix_db', JSON.stringify(db));
-renderRecords();
+function sil(id){db=db.filter(x=>x.id!=id);localStorage.setItem("profix_db",JSON.stringify(db));render();charts();}
+function charts(){
+let kadir=0;let mehmet=0;let months={};
+db.forEach(x=>{if(x.usta=="Kadir") kadir++; if(x.usta=="Mehmet") mehmet++; let m=x.date.split(".")[1]; months[m]=(months[m]||0)+1;});
+new Chart(document.getElementById("ustaChart"),{type:"bar",data:{labels:["Kadir","Mehmet"],datasets:[{label:"Tamir",data:[kadir,mehmet],backgroundColor:["#238636","#1f6feb"]}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+new Chart(document.getElementById("monthChart"),{type:"line",data:{labels:Object.keys(months),datasets:[{label:"Tamir",data:Object.values(months),borderColor:"#0a84ff",backgroundColor:"#238636"}]}});
 }
-
-function deleteRecord(id){
-if(confirm("Silmek istediğine emin misin?")){
-db = db.filter(x=>x.id!==id);
-localStorage.setItem('profix_db', JSON.stringify(db));
-renderRecords();
-}
-}
-
-function openUstaPanel(){
-const s = prompt("Şifreyi gir");
-if(btoa(s)==="MTYxNg=="){toggleUsta(true);}else{alert("Yanlış şifre!");}
-}
-
-let chart;
-
-function analyzeUsta(){
-const usta = document.getElementById('filterUsta').value;
-const type = document.getElementById('filterType').value;
-const start = document.getElementById('start').value;
-const end = document.getElementById('end').value;
-const now = new Date();
-let labels = [], counts = [];
-
-const ustalar = ["Kadir","Mehmet"];
-ustalar.forEach(u=>{
-let c = 0;
-db.forEach(x=>{
-const d = new Date(x.date);
-if(u && x.usta!==u) return;
-if(type==="today"){if(d.toDateString()===now.toDateString()) c++;}
-else if(type==="month"){if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()) c++;}
-else if(type==="custom"){if(start && end){if(d>=new Date(start) && d<=new Date(end)) c++;}}
-});
-labels.push(u);
-counts.push(c);
-});
-
-document.getElementById('resultUsta').innerText="Toplam İş: "+counts.reduce((a,b)=>a+b,0);
-
-if(chart) chart.destroy();
-const ctx = document.getElementById('chart').getContext('2d');
-chart = new Chart(ctx,{
-type:'bar',
-data:{
-labels:labels,
-datasets:[{
-label:'İş Sayısı',
-data:counts,
-backgroundColor:[ 'var(--blue)','var(--green)']
-}]
-},
-options:{responsive:true,plugins:{legend:{display:false}}}
-});
-}
-
-renderRecords();
+function backup(){let data=JSON.stringify(db);let blob=new Blob([data]);let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="profix_backup.json";a.click();}
+function restore(e){let file=e.target.files[0];let reader=new FileReader();reader.onload=function(){db=JSON.parse(reader.result);localStorage.setItem("profix_db",JSON.stringify(db));render();charts();};reader.readAsText(file);}
+render();charts();
 </script>
+
 </body>
 </html>
