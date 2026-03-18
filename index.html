@@ -1,44 +1,46 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>PROFIX Cloud</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PROFIX Cloud - iOS</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
 
 <style>
-
 :root{
 --bg:#000;
 --card:#1c1c1e;
 --border:#3a3a3c;
 --blue:#0a84ff;
 --green:#30d158;
+--red:#ff3b30;
 }
-
 body{
 margin:0;
-font-family:-apple-system;
+font-family:-apple-system, sans-serif;
 background:var(--bg);
 color:white;
+-webkit-touch-callout: none;
+-webkit-user-select: none;
+-ms-user-select: none;
+user-select: none;
+overflow-x:hidden;
 }
-
 .header{
 padding:50px 20px 20px;
 background:var(--card);
 display:flex;
 justify-content:space-between;
 align-items:center;
+position:sticky;
+top:0;
+z-index:10;
 }
-
-.container{
-padding:20px;
-}
-
+.header h2{font-size:20px;}
+.header div{font-size:28px;cursor:pointer;}
+.container{padding:20px;}
 .input{
 width:100%;
 padding:16px;
@@ -48,23 +50,22 @@ background:var(--card);
 color:white;
 margin-bottom:12px;
 font-size:16px;
+-webkit-appearance:none;
 }
-
+textarea.input{resize:none;}
 .btn{
-padding:18px;
+width:100%;
+padding:16px;
 border-radius:12px;
 border:2px solid var(--border);
 background:var(--card);
 text-align:center;
 font-weight:700;
 margin-bottom:10px;
+font-size:16px;
+touch-action: manipulation;
 }
-
-.active{
-border-color:var(--blue);
-background:rgba(10,132,255,.2);
-}
-
+.btn.active{border-color:var(--blue);background:rgba(10,132,255,0.2);}
 .save{
 background:var(--blue);
 border:none;
@@ -72,15 +73,15 @@ width:100%;
 padding:20px;
 border-radius:14px;
 font-weight:800;
+font-size:18px;
+touch-action: manipulation;
 }
-
 .stats{
 background:var(--card);
 padding:15px;
 border-radius:12px;
 margin-bottom:15px;
 }
-
 .sidebar{
 position:fixed;
 right:-100%;
@@ -90,40 +91,36 @@ height:100%;
 background:#000;
 padding:60px 20px;
 transition:.3s;
-overflow:auto;
+overflow-y:auto;
+-webkit-overflow-scrolling: touch;
+z-index:1000;
 }
-
 .sidebar.open{
 right:0;
 }
-
 .record{
 background:var(--card);
 padding:15px;
 border-radius:12px;
 margin-bottom:10px;
+word-break:break-word;
 }
-
 </style>
-
 </head>
-
 <body>
 
 <div class="header">
-<h2>PRO-FIX CLOUD</h2>
+<h2>PROFIX CLOUD</h2>
 <div onclick="toggleMenu()">☰</div>
 </div>
 
 <div class="container">
 
 <div class="stats">
-<b>Bugünkü Tamir:</b>
-<span id="today">0</span>
+<b>Bugünkü Tamir:</b> <span id="today">0</span>
 </div>
 
 <input id="code" class="input" placeholder="Servis kodu">
-
 <input id="device" class="input" placeholder="Cihaz">
 
 <div class="btn" onclick="selectUsta('Kadir',this)">KADİR</div>
@@ -139,144 +136,92 @@ margin-bottom:10px;
 </div>
 
 <div class="sidebar" id="sidebar">
-
 <h2>Kayıtlar</h2>
-
 <div id="list"></div>
-
 </div>
 
 <script>
-
-/* FIREBASE AYARI */
-
+// Firebase config
 const firebaseConfig = {
-
 apiKey: "BURAYA_API_KEY",
-
 authDomain: "app.firebaseapp.com",
-
 databaseURL: "BURAYA_DATABASE_URL",
-
 projectId: "app",
-
 storageBucket: "app.appspot.com",
-
 messagingSenderId: "123",
-
 appId: "123"
-
 };
-
 const app = firebase.initializeApp(firebaseConfig);
-
 const db = firebase.database();
 
+// Seçimler
 let selectedUsta="";
 let selectedProc="";
 
 function toggleMenu(){
-
 document.getElementById("sidebar").classList.toggle("open");
-
 }
 
-/* SEÇİM */
-
 function selectUsta(u,el){
-
 selectedUsta=u;
-
 document.querySelectorAll(".btn").forEach(b=>b.classList.remove("active"));
-
 el.classList.add("active");
-
 }
 
 function selectProc(p,el){
-
 selectedProc=p;
-
+document.querySelectorAll(".btn").forEach(b=>{
+if(b.innerText===p || b.innerText==="EMMC" || b.innerText==="Anakart") b.classList.remove("active");
+});
 el.classList.add("active");
-
 }
 
-/* SAVE */
-
+// Kaydet
 function save(){
-
-let code=document.getElementById("code").value;
-
-let device=document.getElementById("device").value;
-
-let manual=document.getElementById("manual").value;
-
+let code=document.getElementById("code").value.trim();
+let device=document.getElementById("device").value.trim();
+let manual=document.getElementById("manual").value.trim();
 let proc=selectedProc || manual;
-
+if(!code || !device || !proc || !selectedUsta){alert("Tüm alanlar dolu olmalı!"); return;}
 let data={
-
 code:code,
-
 device:device,
-
 proc:proc,
-
 usta:selectedUsta,
-
 date:new Date().toLocaleString("tr-TR")
-
 };
-
-firebase.database().ref("records").push(data);
-
+db.ref("records").push(data);
 alert("Buluta kaydedildi");
-
+document.getElementById("code").value="";
+document.getElementById("device").value="";
+document.getElementById("manual").value="";
+selectedProc="";
+selectedUsta="";
+document.querySelectorAll(".btn").forEach(b=>b.classList.remove("active"));
 }
 
-/* LOAD */
-
-firebase.database().ref("records").on("value",snap=>{
-
+// Listeleme
+db.ref("records").on("value",snap=>{
 let list=document.getElementById("list");
-
 list.innerHTML="";
-
 let today=0;
-
 let todayDate=new Date().toLocaleDateString("tr-TR");
-
 snap.forEach(child=>{
-
 let item=child.val();
-
 if(item.date.includes(todayDate)) today++;
-
 let div=document.createElement("div");
-
 div.className="record";
-
 div.innerHTML=`
-
 <b>${item.code}</b><br>
-
 ${item.device}<br>
-
 ${item.proc}<br>
-
 ${item.usta}<br>
-
 ${item.date}
-
 `;
-
 list.appendChild(div);
-
 });
-
 document.getElementById("today").innerText=today;
-
 });
-
 </script>
 
 </body>
