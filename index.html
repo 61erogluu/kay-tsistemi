@@ -1,232 +1,385 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PROFIX Cloud - Mobil</title>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRO-FIX TV</title>
 
 <style>
+
 :root{
-  --bg:#000;
-  --card:#1c1c1e;
-  --border:#3a3a3c;
-  --blue:#0a84ff;
-  --green:#30d158;
-  --red:#ff3b30;
-  --hover:#111;
-  --active-bg:rgba(10,132,255,0.2);
+--bg:#000;
+--card:#1c1c1e;
+--border:#38383a;
+--blue:#0a84ff;
+--green:#30d158;
+--red:#ff453a;
 }
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+}
+
 body{
-  margin:0;
-  font-family:-apple-system, sans-serif;
-  background:var(--bg);
-  color:white;
-  overflow-x:hidden;
+background:var(--bg);
+color:white;
 }
+
+/* HEADER */
+
 .header{
-  padding:40px 16px 16px;
-  background:var(--card);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  position:sticky;
-  top:0;
-  z-index:10;
-  box-shadow:0 2px 4px rgba(0,0,0,0.5);
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:50px 20px 20px;
+background:var(--card);
+border-bottom:1px solid var(--border);
 }
-.header h2{font-size:20px;}
-.header div{font-size:28px;cursor:pointer;transition:0.2s;}
-.header div:hover{opacity:0.7;}
-.container{padding:16px; display:flex; flex-direction:column; gap:12px;}
+
+.menu-btn{
+font-size:26px;
+color:var(--blue);
+cursor:pointer;
+}
+
+/* FORM */
+
+.container{
+padding:20px;
+}
+
 .section{
-  display:flex; flex-direction:column; gap:6px;
+font-size:12px;
+color:#8e8e93;
+margin:20px 0 10px;
+font-weight:700;
 }
+
 .input{
-  width:100%;
-  padding:14px;
-  border-radius:12px;
-  border:2px solid var(--border);
-  background:var(--card);
-  color:white;
-  font-size:16px;
-  transition:0.2s;
+width:100%;
+padding:16px;
+background:var(--card);
+border:2px solid var(--border);
+border-radius:12px;
+color:white;
+font-size:17px;
 }
-.input:focus{border-color:var(--blue);}
-textarea.input{resize:none;}
-.btn-group{display:flex;gap:10px; flex-wrap:wrap;}
-.btn{
-  flex:1;
-  padding:14px;
-  border-radius:12px;
-  border:2px solid var(--border);
-  background:var(--card);
-  text-align:center;
-  font-weight:700;
-  font-size:16px;
-  transition:0.2s, transform 0.1s;
+
+.input:focus{
+border-color:var(--blue);
+outline:none;
 }
-.btn:hover{background:var(--hover);}
-.btn:active{transform:scale(0.97);}
-.btn.active{border-color:var(--blue);background:var(--active-bg);}
+
+/* BUTTONS */
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+.opt{
+background:var(--card);
+border:2px solid var(--border);
+padding:18px;
+border-radius:12px;
+text-align:center;
+font-weight:700;
+cursor:pointer;
+}
+
+.opt.active{
+border-color:var(--blue);
+background:rgba(10,132,255,.2);
+}
+
 .save{
-  background:var(--blue);
-  border:none;
-  width:100%;
-  padding:18px;
-  border-radius:14px;
-  font-weight:800;
-  font-size:18px;
-  transition:0.2s, transform 0.1s;
+margin-top:30px;
+width:100%;
+padding:20px;
+border:none;
+border-radius:14px;
+background:var(--blue);
+color:white;
+font-size:18px;
+font-weight:800;
 }
-.save:hover{opacity:0.9;}
-.save:active{transform:scale(0.97);}
+
+/* SIDEBAR */
+
 .sidebar{
-  position:fixed;
-  right:-100%;
-  top:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.95);
-  padding:60px 16px;
-  transition:.3s;
-  overflow-y:auto;
-  -webkit-overflow-scrolling: touch;
-  z-index:1000;
+position:fixed;
+top:0;
+right:-100%;
+width:100%;
+height:100%;
+background:#000;
+padding:60px 20px;
+transition:.3s;
+overflow:auto;
 }
-.sidebar.open{right:0;}
+
+.sidebar.open{
+right:0;
+}
+
 .record{
-  background:var(--card);
-  padding:12px;
-  border-radius:12px;
-  margin-bottom:10px;
-  font-size:14px;
+background:var(--card);
+padding:15px;
+border-radius:12px;
+margin-bottom:10px;
+border-left:4px solid var(--blue);
 }
-.record:hover{background:var(--hover);}
+
+.actions{
+margin-top:10px;
+display:flex;
+gap:10px;
+}
+
+.del{
+background:var(--red);
+color:white;
+border:none;
+padding:6px 10px;
+border-radius:6px;
+}
+
 </style>
+
 </head>
+
 <body>
 
 <div class="header">
-<h2>PROFIX CLOUD</h2>
-<div onclick="toggleMenu()">☰</div>
+<h2>PRO-FIX <span style="color:var(--blue)">TV</span></h2>
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
 </div>
 
 <div class="container">
 
-<div class="section">
-<label>Servis Kodu</label>
-<input id="code" class="input" placeholder="Örn: 123456">
-</div>
+<div class="section">SERVİS KODU</div>
+<input id="code" class="input" placeholder="6 haneli kod">
 
-<div class="section">
-<label>Cihaz</label>
+<div class="section">CİHAZ</div>
 <input id="device" class="input" placeholder="Örn: LG 42LB">
+
+<div class="section">TEKNİSYEN</div>
+
+<div class="grid">
+<div class="opt" id="kadir" onclick="selectUsta('Kadir',this)">KADİR</div>
+<div class="opt" id="mehmet" onclick="selectUsta('Mehmet',this)">MEHMET</div>
 </div>
 
-<div class="section">
-<label>Usta Seçimi</label>
-<div class="btn-group">
-<div class="btn" onclick="selectUsta('Kadir',this)">KADİR</div>
-<div class="btn" onclick="selectUsta('Mehmet',this)">MEHMET</div>
-</div>
-</div>
+<div class="section">İŞLEM</div>
 
-<div class="section">
-<label>Yapılan İşlem</label>
-<div class="btn-group">
-<div class="btn" onclick="selectProc('EMMC',this)">EMMC</div>
-<div class="btn" onclick="selectProc('Anakart',this)">ANAKART</div>
-</div>
-<textarea id="manual" class="input" placeholder="Diğer işlem"></textarea>
-</div>
+<div class="opt" onclick="selectIslem('EMMC Değişimi',this)">EMMC</div>
+<div class="opt" onclick="selectIslem('Anakart Tamiri',this)">ANAKART</div>
+<div class="opt" onclick="showManual(this)">DİĞER</div>
 
-<button class="save" onclick="save()">KAYDET</button>
+<textarea id="manual" class="input" style="display:none;margin-top:10px" placeholder="Arıza yaz"></textarea>
 
-<div class="stats"><b>Bugünkü Tamir:</b> <span id="today">0</span></div>
+<button class="save" onclick="save()">SİSTEME KAYDET</button>
 
 </div>
 
 <div class="sidebar" id="sidebar">
+
 <h2>Kayıtlar</h2>
+
+<input id="search" class="input" placeholder="Ara..." onkeyup="render()">
+
 <div id="list"></div>
+
 </div>
 
 <script>
-// Firebase config
-const firebaseConfig = {
-apiKey: "BURAYA_API_KEY",
-authDomain: "app.firebaseapp.com",
-databaseURL: "BURAYA_DATABASE_URL",
-projectId: "app",
-storageBucket: "app.appspot.com",
-messagingSenderId: "123",
-appId: "123"
-};
-const app = firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+
+let db = JSON.parse(localStorage.getItem("profix_db")) || [];
 
 let selectedUsta="";
-let selectedProc="";
+let selectedIslem="";
+
+/* MENU */
 
 function toggleMenu(){
-  document.getElementById("sidebar").classList.toggle("open");
+
+document.getElementById("sidebar").classList.toggle("open");
+
+render();
+
 }
 
-function selectUsta(u,el){
-  selectedUsta=u;
-  document.querySelectorAll(".btn").forEach(b=>b.classList.remove("active"));
-  el.classList.add("active");
+/* USTA */
+
+function selectUsta(name,el){
+
+selectedUsta=name;
+
+document.querySelectorAll("#kadir,#mehmet").forEach(b=>b.classList.remove("active"));
+
+el.classList.add("active");
+
 }
 
-function selectProc(p,el){
-  selectedProc=p;
-  document.querySelectorAll(".btn").forEach(b=>{
-    if(b.innerText===p || b.innerText==="EMMC" || b.innerText==="Anakart") b.classList.remove("active");
-  });
-  el.classList.add("active");
+/* ISLEM */
+
+function selectIslem(name,el){
+
+selectedIslem=name;
+
+document.getElementById("manual").style.display="none";
+
 }
+
+/* DIGER */
+
+function showManual(el){
+
+selectedIslem="";
+
+document.getElementById("manual").style.display="block";
+
+}
+
+/* SAVE */
 
 function save(){
-  let code=document.getElementById("code").value.trim();
-  let device=document.getElementById("device").value.trim();
-  let manual=document.getElementById("manual").value.trim();
-  let proc=selectedProc || manual;
-  if(!code || !device || !proc || !selectedUsta){alert("Tüm alanlar dolu olmalı!"); return;}
-  let data={code, device, proc, usta:selectedUsta, date:new Date().toLocaleString("tr-TR")};
-  db.ref("records").push(data);
-  alert("Kaydedildi!");
-  document.getElementById("code").value="";
-  document.getElementById("device").value="";
-  document.getElementById("manual").value="";
-  selectedProc="";
-  selectedUsta="";
-  document.querySelectorAll(".btn").forEach(b=>b.classList.remove("active"));
+
+let code=document.getElementById("code").value;
+
+let device=document.getElementById("device").value;
+
+let manual=document.getElementById("manual").value;
+
+let finalIslem = selectedIslem || manual;
+
+if(code.length!=6){
+
+alert("Kod 6 haneli olmalı");
+
+return;
+
 }
 
-db.ref("records").on("value",snap=>{
-  let list=document.getElementById("list");
-  list.innerHTML="";
-  let today=0;
-  let todayDate=new Date().toLocaleDateString("tr-TR");
-  snap.forEach(child=>{
-    let item=child.val();
-    if(item.date.includes(todayDate)) today++;
-    let div=document.createElement("div");
-    div.className="record";
-    div.innerHTML=`
-      <b>${item.code}</b><br>
-      ${item.device}<br>
-      ${item.proc}<br>
-      ${item.usta}<br>
-      ${item.date}
-    `;
-    list.appendChild(div);
-  });
-  document.getElementById("today").innerText=today;
+if(!device){
+
+alert("Cihaz gir");
+
+return;
+
+}
+
+if(!selectedUsta){
+
+alert("Usta seç");
+
+return;
+
+}
+
+if(!finalIslem){
+
+alert("İşlem gir");
+
+return;
+
+}
+
+let data={
+
+id:Date.now(),
+
+code:code,
+
+device:device,
+
+proc:finalIslem,
+
+usta:selectedUsta,
+
+date:new Date().toLocaleString("tr-TR")
+
+};
+
+db.unshift(data);
+
+localStorage.setItem("profix_db",JSON.stringify(db));
+
+alert("Kayıt başarılı");
+
+document.getElementById("code").value="";
+document.getElementById("device").value="";
+document.getElementById("manual").value="";
+
+}
+
+/* RENDER */
+
+function render(){
+
+let term=document.getElementById("search").value?.toLowerCase() || "";
+
+let list=document.getElementById("list");
+
+list.innerHTML="";
+
+db.filter(x=>
+
+x.code.includes(term) ||
+
+x.device.toLowerCase().includes(term) ||
+
+x.usta.toLowerCase().includes(term)
+
+).forEach(item=>{
+
+let div=document.createElement("div");
+
+div.className="record";
+
+div.innerHTML=`
+
+<b>#${item.code}</b><br>
+
+${item.device}<br>
+
+${item.proc}<br>
+
+${item.usta}<br>
+
+${item.date}
+
+<div class="actions">
+
+<button class="del" onclick="del(${item.id})">Sil</button>
+
+</div>
+
+`;
+
+list.appendChild(div);
+
 });
+
+}
+
+/* DELETE */
+
+function del(id){
+
+db=db.filter(x=>x.id!==id);
+
+localStorage.setItem("profix_db",JSON.stringify(db));
+
+render();
+
+}
+
 </script>
 
 </body>
