@@ -3,121 +3,121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PROFIX Cloud - iOS Modern</title>
+<title>PROFIX Cloud - iOS Mobil</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
 
 <style>
 :root{
---bg:#000;
---card:#1c1c1e;
---border:#3a3a3c;
---blue:#0a84ff;
---green:#30d158;
---red:#ff3b30;
---hover:#111;
---active-bg:rgba(10,132,255,0.2);
+  --bg:#000;
+  --card:#1c1c1e;
+  --border:#3a3a3c;
+  --blue:#0a84ff;
+  --green:#30d158;
+  --red:#ff3b30;
+  --hover:#111;
+  --active-bg:rgba(10,132,255,0.2);
 }
 body{
-margin:0;
-font-family:-apple-system, sans-serif;
-background:var(--bg);
-color:white;
--webkit-touch-callout:none;
--webkit-user-select:none;
-user-select:none;
-overflow-x:hidden;
+  margin:0;
+  font-family:-apple-system, sans-serif;
+  background:var(--bg);
+  color:white;
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  user-select:none;
+  overflow-x:hidden;
 }
 .header{
-padding:40px 16px 16px;
-background:var(--card);
-display:flex;
-justify-content:space-between;
-align-items:center;
-position:sticky;
-top:0;
-z-index:10;
-box-shadow:0 2px 4px rgba(0,0,0,0.5);
+  padding:40px 16px 16px;
+  background:var(--card);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;
+  top:0;
+  z-index:10;
+  box-shadow:0 2px 4px rgba(0,0,0,0.5);
 }
 .header h2{font-size:20px;}
 .header div{font-size:28px;cursor:pointer;transition:0.2s;}
 .header div:hover{opacity:0.7;}
 .container{padding:16px;}
 .stats{
-background:var(--card);
-padding:12px;
-border-radius:12px;
-margin-bottom:12px;
-font-size:16px;
-box-shadow:0 2px 4px rgba(0,0,0,0.5);
+  background:var(--card);
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:12px;
+  font-size:16px;
+  box-shadow:0 2px 4px rgba(0,0,0,0.5);
 }
 .input{
-width:100%;
-padding:14px;
-border-radius:12px;
-border:2px solid var(--border);
-background:var(--card);
-color:white;
-margin-bottom:12px;
-font-size:16px;
--webkit-appearance:none;
-transition:0.2s;
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:2px solid var(--border);
+  background:var(--card);
+  color:white;
+  margin-bottom:12px;
+  font-size:16px;
+  -webkit-appearance:none;
+  transition:0.2s;
 }
 .input:focus{border-color:var(--blue);}
 textarea.input{resize:none;}
 .btn{
-width:100%;
-padding:14px;
-border-radius:12px;
-border:2px solid var(--border);
-background:var(--card);
-text-align:center;
-font-weight:700;
-margin-bottom:10px;
-font-size:16px;
-touch-action: manipulation;
-transition:0.2s, transform 0.1s;
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:2px solid var(--border);
+  background:var(--card);
+  text-align:center;
+  font-weight:700;
+  margin-bottom:10px;
+  font-size:16px;
+  touch-action: manipulation;
+  transition:0.2s, transform 0.1s;
 }
 .btn:hover{background:var(--hover);}
 .btn:active{transform:scale(0.97);}
 .btn.active{border-color:var(--blue);background:var(--active-bg);}
 .save{
-background:var(--blue);
-border:none;
-width:100%;
-padding:18px;
-border-radius:14px;
-font-weight:800;
-font-size:18px;
-touch-action: manipulation;
-transition:0.2s, transform 0.1s;
+  background:var(--blue);
+  border:none;
+  width:100%;
+  padding:18px;
+  border-radius:14px;
+  font-weight:800;
+  font-size:18px;
+  touch-action: manipulation;
+  transition:0.2s, transform 0.1s;
 }
 .save:hover{opacity:0.9;}
 .save:active{transform:scale(0.97);}
 .sidebar{
-position:fixed;
-right:-100%;
-top:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.95);
-padding:60px 16px;
-transition:.3s;
-overflow-y:auto;
--webkit-overflow-scrolling: touch;
-z-index:1000;
+  position:fixed;
+  right:-100%;
+  top:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.95);
+  padding:60px 16px;
+  transition:.3s;
+  overflow-y:auto;
+  -webkit-overflow-scrolling: touch;
+  z-index:1000;
 }
 .sidebar.open{right:0;}
 .record{
-background:var(--card);
-padding:12px;
-border-radius:12px;
-margin-bottom:10px;
-word-break:break-word;
-font-size:14px;
-box-shadow:0 2px 4px rgba(0,0,0,0.4);
-transition:0.2s, transform 0.1s;
+  background:var(--card);
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:10px;
+  word-break:break-word;
+  font-size:14px;
+  box-shadow:0 2px 4px rgba(0,0,0,0.4);
+  transition:0.2s, transform 0.1s;
 }
 .record:hover{background:var(--hover);}
 .record:active{transform:scale(0.98);}
