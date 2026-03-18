@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PRO-FIX PRO</title>
+<title>PRO-FIX</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0d0d0f;color:white;}
@@ -12,8 +12,26 @@ header{display:flex;justify-content:space-between;padding:15px;background:#16161
 .container{padding:15px;}
 input,select{width:100%;padding:10px;margin:6px 0;background:#1c1c1f;border:1px solid #333;color:white;border-radius:8px;}
 button{width:100%;padding:12px;margin-top:10px;background:#0a84ff;border:none;color:white;border-radius:8px;}
-#panel,#admin{position:fixed;top:0;right:-100%;width:90%;max-width:350px;height:100%;background:#161616;padding:15px;transition:0.3s;overflow:auto;}
+
+#overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;}
+
+#panel,#admin{
+position:fixed;
+top:0;
+right:-100%;
+width:85%;
+max-width:350px;
+height:100%;
+background:#161616;
+padding:15px;
+transition:0.3s;
+overflow:auto;
+z-index:2;
+}
+
 #panel.open,#admin.open{right:0;}
+#overlay.show{display:block;}
+
 .record{background:#1c1c1f;margin-top:10px;padding:10px;border-radius:8px;}
 </style>
 </head>
@@ -21,11 +39,9 @@ button{width:100%;padding:12px;margin-top:10px;background:#0a84ff;border:none;co
 <body>
 
 <header>
-<div class="menu" onclick="togglePanel()">☰</div>
+<div class="menu" onclick="togglePanel()" ontouchstart="togglePanel()">☰</div>
 <div>PRO-FIX</div>
-<div>
-<span class="menu" onclick="openAdmin()">⋮</span>
-</div>
+<div class="menu" onclick="openAdmin()" ontouchstart="openAdmin()">⋮</div>
 </header>
 
 <div class="container">
@@ -45,9 +61,11 @@ button{width:100%;padding:12px;margin-top:10px;background:#0a84ff;border:none;co
 <option>EMMC</option>
 </select>
 
-<button onclick="save()">Kaydet</button>
+<button onclick="save()" ontouchstart="save()">Kaydet</button>
 
 </div>
+
+<div id="overlay" onclick="closeAll()"></div>
 
 <!-- KAYIT PANEL -->
 <div id="panel">
@@ -75,9 +93,9 @@ button{width:100%;padding:12px;margin-top:10px;background:#0a84ff;border:none;co
 <input type="date" id="start">
 <input type="date" id="end">
 
-<button onclick="analyze()">Hesapla</button>
+<button onclick="analyze()" ontouchstart="analyze()">Hesapla</button>
 
-<h3 id="result"></h3>
+<h2 id="result"></h2>
 
 </div>
 
@@ -86,25 +104,21 @@ button{width:100%;padding:12px;margin-top:10px;background:#0a84ff;border:none;co
 let db=JSON.parse(localStorage.getItem("db"))||[];
 
 function save(){
-let d=document.getElementById("device").value;
-let c=document.getElementById("code").value;
-let u=document.getElementById("usta").value;
-let i=document.getElementById("islem").value;
+let d=device.value;
+let c=code.value;
+let u=usta.value;
+let i=islem.value;
 
 if(!d||!c||!u||!i){alert("Eksik");return;}
 
-db.unshift({
-device:d,code:c,usta:u,islem:i,
-date:new Date().toISOString()
-});
-
+db.unshift({device:d,code:c,usta:u,islem:i,date:new Date().toISOString()});
 localStorage.setItem("db",JSON.stringify(db));
+
 render();
 }
 
 function render(){
-let term=document.getElementById("search").value||"";
-let list=document.getElementById("list");
+let term=search.value||"";
 list.innerHTML="";
 
 db.filter(x=>x.device.includes(term)||x.code.includes(term)||x.usta.includes(term))
@@ -117,27 +131,34 @@ list.appendChild(div);
 }
 
 function togglePanel(){
-document.getElementById("panel").classList.toggle("open");
+panel.classList.add("open");
+overlay.classList.add("show");
 }
 
 function openAdmin(){
-let pass=prompt("Şifre gir");
+let pass=prompt("Şifre: 1616");
 if(pass==="1616"){
-document.getElementById("admin").classList.add("open");
+admin.classList.add("open");
+overlay.classList.add("show");
 }else{
-alert("Yanlış şifre");
+alert("Yanlış");
 }
+}
+
+function closeAll(){
+panel.classList.remove("open");
+admin.classList.remove("open");
+overlay.classList.remove("show");
 }
 
 function analyze(){
 
-let u=document.getElementById("filterUsta").value;
-let type=document.getElementById("filterType").value;
-let start=document.getElementById("start").value;
-let end=document.getElementById("end").value;
+let u=filterUsta.value;
+let type=filterType.value;
+let startVal=start.value;
+let endVal=end.value;
 
 let now=new Date();
-
 let count=0;
 
 db.forEach(x=>{
@@ -152,15 +173,13 @@ else if(type==="month"){
 if(d.getMonth()===now.getMonth()) count++;
 }
 else if(type==="custom"){
-if(start && end){
-if(d>=new Date(start) && d<=new Date(end)) count++;
+if(startVal && endVal){
+if(d>=new Date(startVal) && d<=new Date(endVal)) count++;
 }
 }
-
 });
 
-document.getElementById("result").innerText="Toplam İş: "+count;
-
+result.innerText="Toplam İş: "+count;
 }
 
 render();
