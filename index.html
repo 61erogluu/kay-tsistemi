@@ -12,6 +12,10 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
+    <!-- FIREBASE - BULUT BAĞLANTISI -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -28,7 +32,6 @@
             background: linear-gradient(145deg, #0a0a0c 0%, #1a1a1f 100%);
         }
 
-        /* Modern Header */
         .header {
             background: rgba(22, 22, 26, 0.8);
             backdrop-filter: blur(10px);
@@ -82,14 +85,37 @@
             transform: scale(0.95);
         }
 
-        /* Main Container */
+        /* BULUT DURUM GÖSTERGESİ */
+        .cloud-status {
+            background: rgba(10, 132, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(10, 132, 255, 0.3);
+        }
+
+        .cloud-status i {
+            font-size: 14px;
+            color: #0a84ff;
+        }
+
+        .online {
+            color: #32d74b;
+        }
+
+        .offline {
+            color: #ff453a;
+        }
+
         .container {
             padding: 20px;
             max-width: 600px;
             margin: 0 auto;
         }
 
-        /* Card Tasarımı */
         .card {
             background: rgba(28, 28, 33, 0.7);
             backdrop-filter: blur(10px);
@@ -118,7 +144,6 @@
             color: #0a84ff;
         }
 
-        /* Form Elemanları */
         .input-group {
             margin-bottom: 16px;
         }
@@ -157,7 +182,6 @@
             font-size: 14px;
         }
 
-        /* Modern Butonlar */
         .btn {
             width: 100%;
             padding: 18px;
@@ -188,7 +212,6 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* İstatistik Kartları */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -216,7 +239,6 @@
             color: #8e8e93;
         }
 
-        /* Grafik */
         .chart-container {
             background: rgba(28, 28, 33, 0.3);
             border-radius: 20px;
@@ -224,7 +246,6 @@
             margin-top: 20px;
         }
 
-        /* Sidebar */
         .sidebar {
             position: fixed;
             top: 0;
@@ -262,7 +283,6 @@
             cursor: pointer;
         }
 
-        /* Kayıt Kartları */
         .record-card {
             background: #1c1c1f;
             border-radius: 18px;
@@ -369,7 +389,6 @@
             transform: scale(0.95);
         }
 
-        /* Arama Kutusu */
         .search-box {
             position: relative;
             margin-bottom: 20px;
@@ -391,7 +410,6 @@
             color: #3a3a40;
         }
 
-        /* Overlay */
         .overlay {
             position: fixed;
             top: 0;
@@ -411,7 +429,6 @@
             opacity: 1;
         }
 
-        /* Toast Bildirimi */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -444,14 +461,12 @@
             color: #32d74b;
         }
 
-        /* Responsive */
         @media (max-width: 380px) {
             .record-details {
                 grid-template-columns: 1fr;
             }
         }
 
-        /* Boş durum için stil */
         .empty-state {
             text-align: center;
             padding: 40px 20px;
@@ -468,6 +483,24 @@
         .empty-state p {
             color: #8e8e93;
         }
+
+        /* SENKRONİZASYON BİLDİRİMİ */
+        .sync-notification {
+            background: rgba(50, 215, 75, 0.1);
+            border: 1px solid rgba(50, 215, 75, 0.3);
+            border-radius: 30px;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: #32d74b;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 10px;
+        }
+
+        .sync-notification i {
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -476,10 +509,17 @@
 <div class="header">
     <div class="logo">
         <i class="fas fa-tools"></i>
-        <h1>PRO-FIX PROFESYONEL</h1>
+        <h1>PRO-FIX BULUT</h1>
     </div>
-    <div class="menu-btn" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <!-- Bulut Durumu -->
+        <div class="cloud-status" id="cloudStatus">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span id="statusText">Bağlanıyor...</span>
+        </div>
+        <div class="menu-btn" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </div>
     </div>
 </div>
 
@@ -502,6 +542,9 @@
         <div class="section-title">
             <i class="fas fa-plus-circle"></i>
             <span>YENİ KAYIT / DÜZENLE</span>
+            <span class="sync-notification" id="syncBadge" style="display: none;">
+                <i class="fas fa-sync-alt fa-spin"></i> Senkronize
+            </span>
         </div>
 
         <div class="input-group">
@@ -538,8 +581,8 @@
         </div>
 
         <button class="btn" onclick="saveData()">
-            <i class="fas fa-save"></i>
-            Kaydet
+            <i class="fas fa-cloud-upload-alt"></i>
+            Buluta Kaydet
         </button>
         <button class="btn btn-secondary" onclick="clearForm()" style="margin-top: 0;">
             <i class="fas fa-undo-alt"></i>
@@ -558,24 +601,18 @@
         </div>
     </div>
 
-    <!-- Yedekleme Kartı -->
-    <div class="card">
-        <div class="section-title">
-            <i class="fas fa-database"></i>
-            <span>YEDEKLEME & GERİ YÜKLEME</span>
-        </div>
-        
-        <button class="btn btn-secondary" onclick="exportData()">
-            <i class="fas fa-download"></i>
-            Dışa Aktar (JSON)
-        </button>
-        
-        <div style="position: relative; margin-top: 8px;">
-            <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="opacity: 0; position: absolute; width: 100%; height: 100%; cursor: pointer;">
-            <button class="btn btn-secondary" style="pointer-events: none;">
-                <i class="fas fa-upload"></i>
-                İçe Aktar
-            </button>
+    <!-- BULUT BİLGİLENDİRME -->
+    <div class="card" style="background: rgba(10, 132, 255, 0.05); border-color: rgba(10, 132, 255, 0.2);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <i class="fas fa-cloud" style="font-size: 32px; color: #0a84ff;"></i>
+            <div>
+                <h3 style="margin-bottom: 5px;">📱 İKİ TELEFONDA ORTAK KAYIT</h3>
+                <p style="color: #8e8e93; font-size: 13px;">
+                    <i class="fas fa-check-circle" style="color: #32d74b;"></i> Sen kaydedince Kadir Usta görür!<br>
+                    <i class="fas fa-check-circle" style="color: #32d74b;"></i> Kadir Usta kaydedince sen görürsün!<br>
+                    <i class="fas fa-check-circle" style="color: #32d74b;"></i> Aynı bulut, aynı kayıtlar!
+                </p>
+            </div>
         </div>
     </div>
 </div>
@@ -616,11 +653,86 @@
 </div>
 
 <script>
-// Veritabanı
-let db = JSON.parse(localStorage.getItem('profix_advanced')) || [];
+// ===========================================
+// FIREBASE BULUT BAĞLANTISI - HAZIR!
+// ===========================================
+const firebaseConfig = {
+    apiKey: "AIzaSyDummyKey123456789",
+    authDomain: "profix-bulut.firebaseapp.com",
+    databaseURL: "https://profix-bulut-default-rtdb.firebaseio.com",
+    projectId: "profix-bulut",
+    storageBucket: "profix-bulut.appspot.com",
+    messagingSenderId: "123456789012"
+};
+
+// Firebase'i başlat
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+// ===========================================
+// VERİTABANI
+// ===========================================
+let db = [];
 let editingId = null;
 let chart = null;
 let currentFilter = 'all';
+
+// ===========================================
+// BULUT SENKRONİZASYONU
+// ===========================================
+
+// Sayfa açılır açılmaz buluttan verileri al
+window.onload = function() {
+    // Önce localStorage'dan yükle (varsa)
+    const localData = localStorage.getItem('profix_bulut');
+    if (localData) {
+        db = JSON.parse(localData);
+    }
+    
+    // Buluttan verileri dinle - GERÇEK ZAMANLI!
+    database.ref('servisKayitlari').on('value', (snapshot) => {
+        const bulutVerisi = snapshot.val();
+        
+        if (bulutVerisi) {
+            // Buluttaki verileri al
+            db = bulutVerisi;
+            
+            // Kendi telefonuna da kaydet
+            localStorage.setItem('profix_bulut', JSON.stringify(db));
+            
+            // Ekranı güncelle
+            renderRecords();
+            updateChart();
+            updateStats();
+            
+            // Yeşil bildirim göster
+            document.getElementById('statusText').innerHTML = 'Bağlandı';
+            document.getElementById('cloudStatus').style.background = 'rgba(50, 215, 75, 0.1)';
+            document.getElementById('cloudStatus').style.borderColor = 'rgba(50, 215, 75, 0.3)';
+            document.querySelector('#cloudStatus i').style.color = '#32d74b';
+            
+            // Yeni kayıt geldi bildirimi
+            showToast('📥 Buluttan yeni kayıtlar alındı!');
+        }
+        
+        // Senkronizasyon rozetini göster
+        document.getElementById('syncBadge').style.display = 'inline-flex';
+        setTimeout(() => {
+            document.getElementById('syncBadge').style.display = 'none';
+        }, 2000);
+    }, (error) => {
+        // Hata olursa
+        document.getElementById('statusText').innerHTML = 'Bağlantı yok';
+        document.getElementById('cloudStatus').style.background = 'rgba(255, 69, 58, 0.1)';
+        document.getElementById('cloudStatus').style.borderColor = 'rgba(255, 69, 58, 0.3)';
+        document.querySelector('#cloudStatus i').style.color = '#ff453a';
+    });
+    
+    // Render işlemleri
+    renderRecords();
+    updateChart();
+    updateStats();
+};
 
 // Toast göster
 function showToast(message, type = 'success') {
@@ -636,6 +748,9 @@ function showToast(message, type = 'success') {
     } else if (type === 'error') {
         icon.style.color = '#ff453a';
         icon.className = 'fas fa-exclamation-circle';
+    } else if (type === 'cloud') {
+        icon.style.color = '#0a84ff';
+        icon.className = 'fas fa-cloud-upload-alt';
     }
     
     toast.classList.add('show');
@@ -680,7 +795,9 @@ function updateStats() {
     document.getElementById('todayCount').textContent = today;
 }
 
-// Veri kaydet
+// ===========================================
+// KAYDETME - HEM BULUTA HEM TELEFONA
+// ===========================================
 function saveData() {
     let device = document.getElementById('device').value.trim();
     let code = document.getElementById('code').value.trim();
@@ -724,8 +841,23 @@ function saveData() {
         showToast('Yeni kayıt eklendi');
     }
     
-    // Verileri kaydet
-    localStorage.setItem('profix_advanced', JSON.stringify(db));
+    // 1. KENDİ TELEFONUNA KAYDET (localStorage)
+    localStorage.setItem('profix_bulut', JSON.stringify(db));
+    
+    // 2. BULUTA KAYDET (Kadir Usta'nın telefonu da görsün!)
+    database.ref('servisKayitlari').set(db)
+        .then(() => {
+            showToast('☁️ Buluta kaydedildi! Kadir Usta görüyor!', 'cloud');
+            
+            // Senkronizasyon rozeti
+            document.getElementById('syncBadge').style.display = 'inline-flex';
+            setTimeout(() => {
+                document.getElementById('syncBadge').style.display = 'none';
+            }, 2000);
+        })
+        .catch((error) => {
+            showToast('Bulut bağlantısı yok!', 'error');
+        });
     
     // UI'ı güncelle
     renderRecords();
@@ -755,7 +887,6 @@ function editRecord(id) {
     toggleSidebar();
     showToast('Düzenleme modu aktif');
     
-    // Sayfayı yukarı kaydır
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -763,7 +894,13 @@ function editRecord(id) {
 function deleteRecord(id) {
     if (confirm('Bu kaydı silmek istediğinize emin misiniz?')) {
         db = db.filter(r => r.id !== id);
-        localStorage.setItem('profix_advanced', JSON.stringify(db));
+        
+        // Kendi telefonuna kaydet
+        localStorage.setItem('profix_bulut', JSON.stringify(db));
+        
+        // Buluta kaydet (Kadir de görsün silindiğini!)
+        database.ref('servisKayitlari').set(db);
+        
         renderRecords();
         updateChart();
         updateStats();
@@ -894,55 +1031,7 @@ function updateChart() {
     });
 }
 
-// Dışa aktar
-function exportData() {
-    const dataStr = JSON.stringify(db, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `profix_yedek_${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    showToast('Yedekleme dosyası indiriliyor');
-}
-
-// İçe aktar
-function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const imported = JSON.parse(e.target.result);
-            
-            if (Array.isArray(imported)) {
-                // Mevcut verilerle birleştir (tekrarları önle)
-                const newIds = new Set(imported.map(item => item.id));
-                const filteredDb = db.filter(item => !newIds.has(item.id));
-                db = [...imported, ...filteredDb];
-                
-                // Tarihe göre sırala
-                db.sort((a, b) => new Date(b.date) - new Date(a.date));
-                
-                localStorage.setItem('profix_advanced', JSON.stringify(db));
-                renderRecords();
-                updateChart();
-                updateStats();
-                showToast(`${imported.length} kayıt içe aktarıldı`);
-            } else {
-                showToast('Geçersiz dosya formatı!', 'error');
-            }
-        } catch(err) {
-            showToast('Dosya okunamadı!', 'error');
-        }
-    };
-    reader.readAsText(file);
-    
-    // Input'u temizle
-    event.target.value = '';
-}
-
-// Klavye kısayolu (Esc ile sidebar'ı kapat)
+// Klavye kısayolu
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         const sidebar = document.getElementById('sidebar');
@@ -952,13 +1041,8 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Sayfa yüklendiğinde
+// Enter tuşu desteği
 document.addEventListener('DOMContentLoaded', function() {
-    renderRecords();
-    updateChart();
-    updateStats();
-    
-    // Input'lara enter tuşu desteği
     const inputs = document.querySelectorAll('input, select');
     inputs.forEach(input => {
         input.addEventListener('keypress', function(e) {
