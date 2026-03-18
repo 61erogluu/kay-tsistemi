@@ -3,244 +3,227 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PRO-FIX</title>
-
+<title>ProFix TV Pro - Modern Grafik</title>
 <style>
 :root{
---bg:#0d0d0f;
---card:#1c1c1f;
+--bg:#000;
+--card:#1c1c1e;
 --blue:#0a84ff;
---border:#333;
+--red:#ff453a;
+--green:#32d74b;
+--border:#38383a;
+--yellow:#FFD700;
 }
-
-body{margin:0;font-family:-apple-system;background:var(--bg);color:white;}
-
-.header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:15px;
-background:var(--card);
-}
-
-.icons{display:flex;gap:12px;font-size:22px;cursor:pointer;}
-
-.container{padding:15px;}
-
-input,select{
-width:100%;
-padding:14px;
-margin-top:10px;
-background:var(--card);
-border:1px solid var(--border);
-border-radius:10px;
-color:white;
-font-size:16px;
-}
-
-button{
-width:100%;
-padding:16px;
-margin-top:20px;
-background:var(--blue);
-border:none;
-border-radius:12px;
-color:white;
-font-weight:bold;
-}
-
-.sidebar{
-position:fixed;
-top:0;
-right:-100%;
-width:100%;
-height:100%;
-background:var(--bg);
-padding:20px;
-transition:0.3s;
-overflow:auto;
-z-index:10;
-}
-
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system, sans-serif;}
+body{background:var(--bg);color:#fff;overflow-x:hidden;}
+.header{display:flex;justify-content:space-between;align-items:center;padding:20px;background:var(--card);border-bottom:1px solid var(--border);}
+.header h2{letter-spacing:-1px;}
+.icons{display:flex;gap:12px;font-size:22px;cursor:pointer;align-items:center;}
+.container{padding:20px;}
+.section-label{font-size:12px;color:#8e8e93;font-weight:700;margin:10px 0 5px 0;text-transform:uppercase;}
+.input-box{width:100%;padding:12px;margin-bottom:8px;border-radius:10px;background:var(--card);border:1px solid var(--border);color:#fff;font-weight:600;}
+.input-box:focus{outline:none;border-color:var(--blue);}
+.btn{width:100%;padding:14px;background:var(--blue);border:none;color:#fff;border-radius:12px;font-weight:700;margin-top:10px;cursor:pointer;}
+.btn:hover{opacity:0.9;}
+.btn-group{display:flex;gap:10px;}
+.sidebar{position:fixed;top:0;right:-100%;width:90%;max-width:400px;height:100%;background:var(--bg);padding:20px;transition:0.3s;overflow:auto;z-index:1000;}
 .sidebar.open{right:0;}
-
-.record{
-background:var(--card);
-padding:12px;
-border-radius:10px;
-margin-top:10px;
-}
-
-.close{
-font-size:18px;
-margin-bottom:10px;
-cursor:pointer;
-color:red;
-}
+.close-sidebar{cursor:pointer;color:var(--red);margin-bottom:10px;font-weight:700;}
+.record-card{background:var(--card);padding:12px;border-radius:10px;margin-top:10px;position:relative;transition:0.2s;}
+.record-card:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,0.4);}
+.record-card h4{color:var(--blue);}
+.record-card p{font-size:14px;color:#ccc;margin:2px 0;}
+.record-card .actions{position:absolute;top:10px;right:10px;display:flex;gap:5px;}
+.action-btn{cursor:pointer;font-size:14px;padding:4px 6px;border-radius:5px;background:#333;color:#fff;}
+.action-btn:hover{background:#555;}
+.chart-container{margin-top:20px;background:var(--card);padding:12px;border-radius:10px;}
 </style>
 </head>
-
 <body>
 
 <div class="header">
-<h2>PRO-FIX</h2>
-
+<h2>PRO-FIX <span style="color:var(--blue)">TV</span></h2>
 <div class="icons">
-<div onclick="openUsta()">👤</div>
-<div onclick="toggleMenu(true)">☰</div>
+<div onclick="openUstaPanel()">👤</div>
+<div onclick="toggleSidebar(true)">☰</div>
 </div>
 </div>
 
 <div class="container">
 
-<input id="device" placeholder="Cihaz Model">
-<input id="code" placeholder="Servis Kodu">
+<p class="section-label">Cihaz Model</p>
+<input type="text" id="device" class="input-box" placeholder="Örn: LG 42LB">
 
-<select id="usta">
-<option value="">Usta seç</option>
+<p class="section-label">Servis Kodu</p>
+<input type="text" id="code" class="input-box" placeholder="000000">
+
+<p class="section-label">Usta Seç</p>
+<select id="usta" class="input-box">
+<option value="">Seçiniz</option>
 <option>Kadir</option>
 <option>Mehmet</option>
 </select>
 
-<select id="islem">
-<option value="">İşlem seç</option>
+<p class="section-label">Yapılan İşlem</p>
+<select id="islem" class="input-box">
+<option value="">Seçiniz</option>
 <option>BGA</option>
 <option>EMMC</option>
 </select>
 
-<button onclick="save()">Kaydet</button>
+<button class="btn" onclick="saveData()">Kaydet</button>
 
 </div>
 
-<!-- KAYIT PANEL -->
-<div class="sidebar" id="menu">
-<div class="close" onclick="toggleMenu(false)">Kapat</div>
-
-<input id="search" placeholder="Ara..." onkeyup="render()">
-<div id="list"></div>
+<!-- Kayıtlar -->
+<div class="sidebar" id="sidebar">
+<div class="close-sidebar" onclick="toggleSidebar(false)">✕ Kapat</div>
+<h3>Kayıtlı Cihazlar</h3>
+<input type="text" id="search" class="input-box" placeholder="Ara..." onkeyup="renderRecords()">
+<div id="record-list"></div>
 </div>
 
-<!-- USTA PANEL -->
+<!-- Usta Paneli -->
 <div class="sidebar" id="ustaPanel">
-<div class="close" onclick="toggleUsta(false)">Kapat</div>
-
+<div class="close-sidebar" onclick="toggleUsta(false)">✕ Kapat</div>
 <h3>Usta Performans</h3>
 
-<select id="ustaSec">
-<option value="">Usta</option>
+<select id="filterUsta" class="input-box">
+<option value="">Usta Seç</option>
 <option>Kadir</option>
 <option>Mehmet</option>
 </select>
 
-<select id="zaman">
+<select id="filterType" class="input-box">
 <option value="today">Bugün</option>
 <option value="month">Bu Ay</option>
-<option value="custom">Özel</option>
+<option value="custom">Özel Tarih</option>
 </select>
 
-<input type="date" id="start">
-<input type="date" id="end">
+<input type="date" id="start" class="input-box">
+<input type="date" id="end" class="input-box">
+<button class="btn" onclick="analyzeUsta()">Hesapla</button>
 
-<button onclick="hesapla()">Hesapla</button>
+<h3 id="resultUsta"></h3>
 
-<h2 id="sonuc"></h2>
-
+<div class="chart-container">
+<canvas id="chart"></canvas>
+</div>
 </div>
 
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+let db = JSON.parse(localStorage.getItem('profix_db')) || [];
 
-let db=JSON.parse(localStorage.getItem("db"))||[];
-
-// KAYDET
-function save(){
-let d=device.value;
-let c=code.value;
-let u=usta.value;
-let i=islem.value;
-
-if(!d||!c||!u||!i){alert("Eksik alan");return;}
-
-db.unshift({device:d,code:c,usta:u,islem:i,date:new Date().toISOString()});
-localStorage.setItem("db",JSON.stringify(db));
-
-device.value="";
-code.value="";
-usta.value="";
-islem.value="";
-
-render();
-alert("Kaydedildi");
+function saveData(){
+const d = document.getElementById('device').value.trim();
+const c = document.getElementById('code').value.trim();
+const u = document.getElementById('usta').value;
+const i = document.getElementById('islem').value;
+if(!d || !c || !u || !i){alert("Eksik alan!"); return;}
+const id = Date.now();
+db.unshift({id, device:d, code:c, usta:u, islem:i, date:new Date().toISOString()});
+localStorage.setItem('profix_db', JSON.stringify(db));
+document.getElementById('device').value='';
+document.getElementById('code').value='';
+document.getElementById('usta').value='';
+document.getElementById('islem').value='';
+renderRecords();
+alert("✅ Kayıt Başarılı!");
 }
 
-// MENÜ
-function toggleMenu(x){
-menu.className=x?"sidebar open":"sidebar";
-render();
-}
-
-// USTA PANELİ (ŞİFRELİ)
-function openUsta(){
-let s=prompt("Şifre");
-if(btoa(s)==="MTYxNg=="){
-toggleUsta(true);
-}else{
-alert("Yanlış şifre");
-}
-}
-
-function toggleUsta(x){
-ustaPanel.className=x?"sidebar open":"sidebar";
-}
-
-// LİSTE
-function render(){
-let t=search.value||"";
-list.innerHTML="";
-
-db.filter(x=>x.device.includes(t)||x.code.includes(t)||x.usta.includes(t))
+function renderRecords(){
+const list = document.getElementById('record-list');
+const term = document.getElementById('search').value.toLowerCase();
+list.innerHTML = '';
+db.filter(x => x.device.toLowerCase().includes(term) || x.code.includes(term) || x.usta.toLowerCase().includes(term))
 .forEach(x=>{
-let div=document.createElement("div");
-div.className="record";
-div.innerHTML=`${x.code} - ${x.device}<br>${x.usta} | ${x.islem}`;
-list.appendChild(div);
+const card = document.createElement('div');
+card.className = 'record-card';
+card.innerHTML = `<h4>${x.code} - ${x.device}</h4>
+<p>Usta: ${x.usta}</p>
+<p>İşlem: ${x.islem}</p>
+<p>Tarih: ${new Date(x.date).toLocaleString('tr-TR')}</p>
+<div class="actions">
+<span class="action-btn" onclick="editRecord(${x.id})">Düzenle</span>
+<span class="action-btn" onclick="deleteRecord(${x.id})">Sil</span>
+</div>`;
+list.appendChild(card);
 });
 }
 
-// ANALİZ
-function hesapla(){
+function toggleSidebar(show){document.getElementById('sidebar').className = show ? 'sidebar open' : 'sidebar';}
+function toggleUsta(show){document.getElementById('ustaPanel').className = show ? 'sidebar open' : 'sidebar';}
 
-let u=ustaSec.value;
-let z=zaman.value;
-let s=start.value;
-let e=end.value;
+function editRecord(id){
+const rec = db.find(x=>x.id===id);
+if(!rec) return;
+document.getElementById('device').value = rec.device;
+document.getElementById('code').value = rec.code;
+document.getElementById('usta').value = rec.usta;
+document.getElementById('islem').value = rec.islem;
+db = db.filter(x=>x.id!==id);
+localStorage.setItem('profix_db', JSON.stringify(db));
+renderRecords();
+}
 
-let now=new Date();
-let say=0;
+function deleteRecord(id){
+if(confirm("Silmek istediğine emin misin?")){
+db = db.filter(x=>x.id!==id);
+localStorage.setItem('profix_db', JSON.stringify(db));
+renderRecords();
+}
+}
 
+function openUstaPanel(){
+const s = prompt("Şifreyi gir");
+if(btoa(s)==="MTYxNg=="){toggleUsta(true);}else{alert("Yanlış şifre!");}
+}
+
+let chart;
+
+function analyzeUsta(){
+const usta = document.getElementById('filterUsta').value;
+const type = document.getElementById('filterType').value;
+const start = document.getElementById('start').value;
+const end = document.getElementById('end').value;
+const now = new Date();
+let labels = [], counts = [];
+
+const ustalar = ["Kadir","Mehmet"];
+ustalar.forEach(u=>{
+let c = 0;
 db.forEach(x=>{
-let d=new Date(x.date);
-
+const d = new Date(x.date);
 if(u && x.usta!==u) return;
-
-if(z==="today"){
-if(d.toDateString()===now.toDateString()) say++;
-}
-else if(z==="month"){
-if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()) say++;
-}
-else if(z==="custom"){
-if(s && e){
-if(d>=new Date(s) && d<=new Date(e)) say++;
-}
-}
+if(type==="today"){if(d.toDateString()===now.toDateString()) c++;}
+else if(type==="month"){if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()) c++;}
+else if(type==="custom"){if(start && end){if(d>=new Date(start) && d<=new Date(end)) c++;}}
+});
+labels.push(u);
+counts.push(c);
 });
 
-sonuc.innerText="Toplam İş: "+say;
+document.getElementById('resultUsta').innerText="Toplam İş: "+counts.reduce((a,b)=>a+b,0);
+
+if(chart) chart.destroy();
+const ctx = document.getElementById('chart').getContext('2d');
+chart = new Chart(ctx,{
+type:'bar',
+data:{
+labels:labels,
+datasets:[{
+label:'İş Sayısı',
+data:counts,
+backgroundColor:[ 'var(--blue)','var(--green)']
+}]
+},
+options:{responsive:true,plugins:{legend:{display:false}}}
+});
 }
 
-render();
-
+renderRecords();
 </script>
-
 </body>
 </html>
