@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>NOVA PRO | Kesintisiz Sesli Asistan</title>
+    <title>NOVA | Kontrollü Sesli Asistan</title>
     <style>
         * {
             margin: 0;
@@ -83,6 +83,7 @@
             font-size: 15px;
             line-height: 1.45;
             animation: fadeIn 0.2s ease;
+            position: relative;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px);}
@@ -99,6 +100,20 @@
             align-self: flex-start;
             border-bottom-left-radius: 4px;
             border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+        .speak-btn {
+            position: absolute;
+            bottom: 4px;
+            right: 8px;
+            background: none;
+            border: none;
+            color: #38BDF8;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+        .speak-btn:active {
+            opacity: 1;
         }
         .input-area {
             background: rgba(15, 23, 42, 0.95);
@@ -165,7 +180,7 @@
 </head>
 <body>
 <div class="top-bar">
-    <div class="logo">✦ NOVA PRO</div>
+    <div class="logo">✦ NOVA</div>
     <div class="btn-group">
         <button id="newChatBtn" class="btn">+ Yeni</button>
         <button id="memoryBtn" class="btn">🧠 Bilgi Bankam</button>
@@ -190,10 +205,10 @@
 </div>
 
 <script>
-    // ==================== GROQ API KEY (ENTEGRE) ====================
+    // ==================== GROQ API KEY ====================
     const GROQ_API_KEY = "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";
     
-    // ==================== KALICI HAFIZA (Sohbetten bağımsız) ====================
+    // ==================== KALICI HAFIZA ====================
     let userMemory = {};
     
     function loadMemory() {
@@ -237,10 +252,24 @@
         if (!currentChatId || !chats[currentChatId]) return;
         const container = document.getElementById("chat");
         container.innerHTML = "";
-        for (let msg of chats[currentChatId].messages) {
+        for (let i = 0; i < chats[currentChatId].messages.length; i++) {
+            const msg = chats[currentChatId].messages[i];
             const div = document.createElement("div");
             div.className = `message ${msg.role === "user" ? "user" : "ai"}`;
             div.innerText = msg.content;
+            
+            // AI mesajlarına "🔊 Oku" butonu ekle (otomatik okuma yok)
+            if (msg.role === "assistant") {
+                const speakBtn = document.createElement("button");
+                speakBtn.innerHTML = "🔊";
+                speakBtn.className = "speak-btn";
+                speakBtn.title = "Sesli oku";
+                speakBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    speakText(msg.content);
+                };
+                div.appendChild(speakBtn);
+            }
             container.appendChild(div);
         }
         container.scrollTop = container.scrollHeight;
@@ -335,7 +364,7 @@
         }
     }
     
-    // ==================== SESLİ GİRİŞ ====================
+    // ==================== SESLİ GİRİŞ (Mikrofon) ====================
     let isMicActive = false;
     let recognition = null;
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -346,7 +375,7 @@
         recognition.interimResults = false;
     }
     
-    // ==================== SESLİ ÇIKIŞ ====================
+    // ==================== SESLİ ÇIKIŞ (SADECE BUTONLA) ====================
     function speakText(text) {
         if (!window.speechSynthesis) return;
         window.speechSynthesis.cancel();
@@ -355,7 +384,6 @@
         utterance.rate = 0.9;
         const gender = document.getElementById("voiceGender").value;
         
-        // Ses seçimi için bekle
         const setVoice = () => {
             const voices = window.speechSynthesis.getVoices();
             let selected = null;
@@ -373,7 +401,7 @@
         } else {
             window.speechSynthesis.onvoiceschanged = setVoice;
         }
-        setStatus("🔊 Konuşuyor...");
+        setStatus("🔊 Seslendiriliyor...");
         utterance.onend = () => setStatus("Hazır");
     }
     
@@ -408,7 +436,7 @@
         };
         recognition.onend = () => {
             if (isMicActive) {
-                recognition.start(); // Sürekli dinleme
+                recognition.start();
             }
         };
     }
@@ -438,7 +466,7 @@
         addMessage("user", text);
         setStatus("🤔 Düşünüyor...");
         
-        // Bilgi ekleme kontrolü (sohbet mesajı olarak değil, hafızaya)
+        // Bilgi ekleme kontrolü
         const memoryPattern = /(doğum günüm|doğum günü|sevdiğim|sevdiğim renk|proje teslim|hatırla|adım|yaşım|sevgilimin adı|en sevdiğim|borçlu|alacaklı)\s+(.*?)$/i;
         const memoryMatch = text.match(memoryPattern);
         if (memoryMatch && !text.includes("?")) {
@@ -446,7 +474,6 @@
             const value = memoryMatch[2];
             addToMemory(key, value);
             addMessage("ai", `Tamam, hatırladım: ${key} = ${value}. Bunu unutmayacağım.`);
-            speakText(`Tamam, hatırladım: ${key} = ${value}`);
             return;
         }
         
@@ -464,7 +491,7 @@
         const reply = await askGroq(text, memoryInfo);
         addMessage("ai", reply);
         setStatus("✅ Cevap verildi");
-        speakText(reply);
+        // OTOMATİK SES YOK - SADECE BUTONLA OKUYACAKSIN
     }
     
     // ==================== OLAY BAĞLANTILARI ====================
@@ -513,7 +540,6 @@
     if (chats[currentChatId]?.messages.length === 0) {
         setTimeout(() => {
             addMessage("ai", "Nova burada. Naber? Bugün nasıl geçti? Anlat dinleyeyim. İstersen bir bilgi ver, aklımda tutayım. Mesela '13 Nisan doğum günüm' de.");
-            speakText("Nova burada. Naber? Anlat dinleyeyim.");
         }, 500);
     }
 </script>
