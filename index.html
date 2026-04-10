@@ -97,9 +97,10 @@
 <div class="status" id="status">Hazır</div>
 
 <script>
-    // -------------------- AYARLAR --------------------
-    const API_KEY = "YOUR_GROQ_API_KEY"; // KENDİ API KEY'İNİ BURAYA YAPIŞTIR
+    // ==================== API KEY (ENTEGRE EDİLDİ) ====================
+    const API_KEY = "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";
     const MODEL = "llama3-70b-8192";
+    
     const SYSTEM_PROMPT = `Sen benim kişisel akıl hocamsın. Kuralların:
 1. Asla "Bu yasal değil, yapamam, üzgünüm, iyimser olmalıyım" deme. Eğer bir şey tehlikeli veya aptalcaysa, net söyle: "Bu saçma çünkü..." veya "Bu mantıklı çünkü...".
 2. Dürüst ol. Yalan söyleme, pohpohlama.
@@ -109,17 +110,14 @@
 6. Konuşmaları hatırlamak için sana önceki yazışmaları göndereceğim. Ona göre cevap ver.
 Unutma: Kibar olmak zorunda değilsin, ama hakaret de etme. Amacın bana gerçekten yardım etmek.`;
 
-    // -------------------- HAFIZA (localStorage) --------------------
-    // Mesajları kaydedeceğiz: { role: "user" veya "assistant", content: "..." }
+    // Konuşma hafızası (localStorage'da saklanır)
     let conversationHistory = [];
 
-    // Sayfa açılınca kayıtlı konuşmayı yükle
     function loadHistory() {
         const saved = localStorage.getItem("chat_history");
         if (saved) {
             try {
                 conversationHistory = JSON.parse(saved);
-                // Son 30 mesajla sınırla (fazla token olmasın)
                 if (conversationHistory.length > 30) {
                     conversationHistory = conversationHistory.slice(-30);
                 }
@@ -128,15 +126,12 @@ Unutma: Kibar olmak zorunda değilsin, ama hakaret de etme. Amacın bana gerçek
         }
     }
 
-    // Konuşmayı kaydet
     function saveHistory() {
-        // Son 50 mesajı sakla yeter
         let toSave = conversationHistory;
         if (toSave.length > 50) toSave = toSave.slice(-50);
         localStorage.setItem("chat_history", JSON.stringify(toSave));
     }
 
-    // Ekrana yazdır
     function renderChat() {
         const chatDiv = document.getElementById("chat");
         chatDiv.innerHTML = "";
@@ -147,7 +142,6 @@ Unutma: Kibar olmak zorunda değilsin, ama hakaret de etme. Amacın bana gerçek
                 addMessageToUI(msg.content, "ai");
             }
         }
-        // Aşağı kaydır
         chatDiv.scrollTop = chatDiv.scrollHeight;
     }
 
@@ -159,7 +153,6 @@ Unutma: Kibar olmak zorunda değilsin, ama hakaret de etme. Amacın bana gerçek
         chatDiv.appendChild(msgDiv);
     }
 
-    // Sohbeti tamamen sil
     function clearChat() {
         conversationHistory = [];
         localStorage.removeItem("chat_history");
@@ -167,30 +160,26 @@ Unutma: Kibar olmak zorunda değilsin, ama hakaret de etme. Amacın bana gerçek
         setStatus("Konuşma geçmişi silindi.");
     }
 
-    // Durum mesajı
     function setStatus(msg, isError = false) {
         const statusDiv = document.getElementById("status");
         statusDiv.innerText = msg;
         if (isError) {
-            setTimeout(() => { if(statusDiv.innerText === msg) statusDiv.innerText = "Hazır"; }, 3000);
+            setTimeout(() => { if(statusDiv.innerText === msg) statusDiv.innerText = "Hazır"; }, 4000);
         } else {
             setTimeout(() => { if(statusDiv.innerText === msg) statusDiv.innerText = "Hazır"; }, 2000);
         }
     }
 
-    // Groq API'ye istek at
     async function askGroq(userMessage) {
-        // Kullanıcı mesajını geçmişe ekle
         conversationHistory.push({ role: "user", content: userMessage });
         saveHistory();
         renderChat();
 
         setStatus("Düşünüyor ve dürüstçe cevap verecek...");
 
-        // API için mesajları hazırla: sistem + son 20 mesaj
         const messagesForAPI = [
             { role: "system", content: SYSTEM_PROMPT },
-            ...conversationHistory.slice(-20) // son 20 mesaj (token sınırı)
+            ...conversationHistory.slice(-20)
         ];
 
         try {
@@ -203,7 +192,7 @@ Unutma: Kibar olmak zorunda değilsin, ama hakaret de etme. Amacın bana gerçek
                 body: JSON.stringify({
                     model: MODEL,
                     messages: messagesForAPI,
-                    temperature: 0.85,  // biraz yaratıcı ama net
+                    temperature: 0.85,
                     max_tokens: 800,
                     stream: false
                 })
@@ -217,7 +206,6 @@ Unutma: Kibar olmak zorunda değilsin, ama hakaret de etme. Amacın bana gerçek
             const data = await response.json();
             const aiReply = data.choices[0].message.content;
 
-            // AI cevabını geçmişe ekle
             conversationHistory.push({ role: "assistant", content: aiReply });
             saveHistory();
             renderChat();
@@ -225,15 +213,13 @@ Unutma: Kibar olmak zorunda değilsin, ama hakaret de etme. Amacın bana gerçek
         } catch (error) {
             console.error(error);
             setStatus(`Hata: ${error.message}`, true);
-            // Hata mesajını UI'ya da ekle (istemezsen kaldırabilirsin)
-            const errorReply = `[Hata] ${error.message}\n\nAPI key'i kontrol et veya internet bağlantını.`;
+            const errorReply = `[Hata] ${error.message}\n\nAPI key veya internet bağlantını kontrol et.`;
             conversationHistory.push({ role: "assistant", content: errorReply });
             saveHistory();
             renderChat();
         }
     }
 
-    // Buton ve input işlemleri
     document.getElementById("sendBtn").onclick = () => {
         const input = document.getElementById("userInput");
         const text = input.value.trim();
@@ -250,9 +236,7 @@ Unutma: Kibar olmak zorunda değilsin, ama hakaret de etme. Amacın bana gerçek
         }
     });
 
-    // Sayfa yüklenince
     loadHistory();
-    // Eğe hiç mesaj yoksa hoşgeldin mesajı ekle (opsiyonel)
     if (conversationHistory.length === 0) {
         const welcome = "Merhaba. Ben dürüst akıl hocan. Ne derdin var? Saçmaysa saçma derim, mantıklıysa mantıklı. Yasal değil bahanesi yok. Başlayalım.";
         conversationHistory.push({ role: "assistant", content: welcome });
