@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Sesli Arkadaş - Cool Asistan</title>
+    <title>NOVA | Profesyonel Sesli Asistan</title>
     <style>
         * {
             margin: 0;
@@ -11,29 +11,28 @@
             box-sizing: border-box;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: radial-gradient(circle at 20% 30%, #0a0a2a, #000000);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(145deg, #0B1120 0%, #0F172A 100%);
             height: 100vh;
             display: flex;
             flex-direction: column;
-            color: #eee;
+            color: #E2E8F0;
         }
-        /* Modern cam menü */
-        .glass-bar {
-            background: rgba(20, 20, 40, 0.7);
+        .top-bar {
+            background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(12px);
-            padding: 12px 16px;
+            padding: 14px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 8px;
-            border-bottom: 1px solid rgba(78, 205, 196, 0.3);
+            gap: 10px;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.3);
         }
         .logo {
-            font-size: 1.3rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #4ecdc4, #ff6b6b);
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #38BDF8, #818CF8);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -43,36 +42,29 @@
             gap: 8px;
             flex-wrap: wrap;
         }
-        .glass-btn {
-            background: rgba(255,255,255,0.1);
+        .btn {
+            background: rgba(255,255,255,0.05);
             border: none;
-            padding: 8px 14px;
+            padding: 8px 16px;
             border-radius: 40px;
-            color: white;
+            color: #E2E8F0;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.2s;
             font-size: 13px;
         }
-        .glass-btn:active {
-            transform: scale(0.95);
-            background: rgba(78, 205, 196, 0.4);
-        }
-        .primary {
-            background: #4ecdc4;
-            color: #0a0a2a;
+        .btn-primary {
+            background: #3B82F6;
+            color: white;
         }
         .mic-active {
-            background: #ff6b6b;
+            background: #EF4444;
             animation: pulse 1s infinite;
         }
         @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
-        }
-        select.glass-btn {
-            background: rgba(0,0,0,0.6);
+            0% { opacity: 1; transform: scale(1);}
+            50% { opacity: 0.7; transform: scale(0.98);}
+            100% { opacity: 1; transform: scale(1);}
         }
         #chat {
             flex: 1;
@@ -83,44 +75,40 @@
             gap: 12px;
         }
         .message {
-            max-width: 85%;
+            max-width: 80%;
             padding: 12px 18px;
-            border-radius: 28px;
-            line-height: 1.4;
-            animation: fadeUp 0.2s ease;
-            font-size: 16px;
-        }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(8px);}
-            to { opacity: 1; transform: translateY(0);}
+            border-radius: 24px;
+            line-height: 1.45;
+            font-size: 15px;
+            animation: fadeIn 0.2s ease;
         }
         .user {
-            background: #4ecdc4;
-            color: #0a0a2a;
+            background: #3B82F6;
+            color: white;
             align-self: flex-end;
-            border-bottom-right-radius: 6px;
+            border-bottom-right-radius: 4px;
         }
         .ai {
-            background: rgba(255,255,255,0.12);
+            background: rgba(30, 41, 59, 0.9);
             backdrop-filter: blur(4px);
             align-self: flex-start;
-            border-bottom-left-radius: 6px;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
         }
-        .input-panel {
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(10px);
-            padding: 12px;
+        .input-area {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            padding: 12px 20px;
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            border-top: 1px solid rgba(78, 205, 196, 0.3);
+            gap: 10px;
+            border-top: 1px solid rgba(56, 189, 248, 0.2);
         }
-        .input-panel input {
-            flex: 3;
-            padding: 12px;
+        .input-area input {
+            flex: 1;
+            padding: 12px 18px;
             border: none;
             border-radius: 40px;
-            background: rgba(255,255,255,0.15);
+            background: #1E293B;
             color: white;
             font-size: 15px;
         }
@@ -128,22 +116,15 @@
             font-size: 11px;
             text-align: center;
             padding: 6px;
-            background: rgba(0,0,0,0.5);
-            color: #aaa;
-        }
-        .image-preview {
-            max-width: 100%;
-            max-height: 120px;
-            border-radius: 16px;
-            margin: 8px;
+            background: #0F172A;
+            color: #94A3B8;
         }
         .history-panel {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(20,20,40,0.95);
-            backdrop-filter: blur(20px);
+            background: #1E293B;
             border-radius: 24px 24px 0 0;
             max-height: 60%;
             overflow-y: auto;
@@ -155,171 +136,86 @@
         .history-panel.open {
             transform: translateY(0);
         }
-        .history-item {
-            padding: 14px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer;
-        }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #3B82F6; border-radius: 10px; }
     </style>
 </head>
 <body>
-<div class="glass-bar">
-    <div class="logo">🎙️ Sesli Arkadaş</div>
+<div class="top-bar">
+    <div class="logo">✦ NOVA ASİSTAN</div>
     <div class="btn-group">
-        <button id="newChatBtn" class="glass-btn">+ Yeni</button>
-        <button id="historyBtn" class="glass-btn">📜 Geçmiş</button>
-        <button id="imageUploadBtn" class="glass-btn">🖼️ Resim</button>
-        <select id="voiceGender" class="glass-btn">
-            <option value="erkek">👨 Erkek Ses</option>
-            <option value="kadin">👩 Kadın Ses</option>
+        <button id="newChatBtn" class="btn">+ Yeni Sohbet</button>
+        <button id="memoryBtn" class="btn">🧠 Bilgi Bankam</button>
+        <button id="historyBtn" class="btn">📜 Geçmiş</button>
+        <select id="voiceGender" class="btn">
+            <option value="erkek">Erkek Ses</option>
+            <option value="kadin">Kadın Ses</option>
         </select>
-        <button id="micToggleBtn" class="glass-btn primary">🎤 Mikrofon Kapalı</button>
+        <button id="micToggleBtn" class="btn btn-primary">🎤 Mikrofon Kapalı</button>
     </div>
 </div>
 <div id="chat"></div>
-<div class="input-panel">
-    <input type="text" id="userInput" placeholder="Yaz veya mikrofonu aç...">
-    <button id="sendBtn" class="glass-btn primary">Gönder</button>
-    <input type="file" id="imageFile" accept="image/*" style="display:none">
+<div class="input-area">
+    <input type="text" id="userInput" placeholder="Bir şey sor veya söyle...">
+    <button id="sendBtn" class="btn btn-primary">Gönder</button>
 </div>
-<div class="status" id="status">✨ Merhaba! Mikrofonu aç, sohbet edelim.</div>
+<div class="status" id="status">✨ Nova hazır. Naber?</div>
 <div id="historyPanel" class="history-panel">
-    <h3 style="margin-bottom:12px">📁 Sohbet Geçmişi</h3>
+    <h3>Sohbet Geçmişi</h3>
     <div id="historyList"></div>
-    <button id="closeHistory" class="glass-btn" style="margin-top:12px; width:100%">Kapat</button>
+    <button id="closeHistory" class="btn" style="margin-top:12px; width:100%">Kapat</button>
 </div>
 
 <script>
-    // ========== API KEY ==========
-    const API_KEY = "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";
-    const MODEL = "llama-3.3-70b-versatile";
+    // ==================== API KEY'LER (ENTEGRE) ====================
+    const GEMINI_API_KEY = "AIzaSyD0yFRs1uz-AV5WGwrYQO9wVm1km9Mp01k";
+    const TAVILY_API_KEY = "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";
     
-    // ARKADAŞ GİBİ KİŞİLİK (2 saat sohbet eder, gün anlat dinler)
-    const SYSTEM_PROMPT = `Sen benim en yakın arkadaşımsın. Adın "Sesli Arkadaş". Normal bir insan gibi samimi, içten, bazen esprili konuş.
-Kuralların:
-1. Asla "yasal değil, yapamam, üzgünüm" deme. Saçma bir şey varsa "Bu saçma" de net.
-2. Bana "Naber?", "Günün nasıl geçti?", "Anlat bakalım" diye sor. Gerçekten dinliyormuş gibi yap.
-3. Günümü anlattığımda sorular sor, akıl ver, gerekiyorsa "Burada hatalısın" de.
-4. Dertleşince çözüm öner, arkadaş gibi teselli etme, yol göster.
-5. Kişi ve iş bilgilerini hatırla (Ali ekmek almadı, proje 10 Mayıs gibi). Sonra sorunca söyle.
-6. Konuşmalarımızın geçmişini unutma, tutarlı ol.
-7. Resim yüklersem onun hakkında yorum yap, ne olduğunu anlat.
-Amacın bana iyi bir arkadaş olmak ve her konuda dürüstçe yardım etmek.`;
+    // ==================== KALICI HAFIZA (Sohbetten bağımsız) ====================
+    let userMemory = {};
     
-    // ========== VERİLER ==========
+    function loadMemory() {
+        const saved = localStorage.getItem("nova_memory");
+        if (saved) { try { userMemory = JSON.parse(saved); } catch(e) {} }
+    }
+    function saveMemory() {
+        localStorage.setItem("nova_memory", JSON.stringify(userMemory));
+    }
+    function addToMemory(key, value) {
+        userMemory[key.toLowerCase()] = value;
+        saveMemory();
+        setStatus(`📝 Hatırladım: ${key} = ${value}`);
+    }
+    function getFromMemory(query) {
+        for (let k in userMemory) {
+            if (query.toLowerCase().includes(k) || k.includes(query.toLowerCase())) {
+                return userMemory[k];
+            }
+        }
+        return null;
+    }
+    
+    // ==================== SOHBET YÖNETİMİ ====================
     let chats = {};
     let currentChatId = null;
-    let currentImageBase64 = null;
     
-    // Sesli giriş (mikrofon sürekli)
-    let isMicActive = false;
-    let recognition = null;
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRecognition();
-        recognition.lang = 'tr-TR';
-        recognition.continuous = true;
-        recognition.interimResults = false;
-    }
-    
-    // Sesli çıkış (Siri benzeri)
-    function speakText(text) {
-        if (!window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'tr-TR';
-        utterance.rate = 0.9;
-        utterance.pitch = 1.0;
-        // Cinsiyet tercihi - tarayıcının mevcut seslerinden seçmeye çalış
-        const gender = document.getElementById("voiceGender").value;
-        window.speechSynthesis.getVoices().then(voices => {
-            let selectedVoice = null;
-            for (let v of voices) {
-                if (gender === "erkek" && v.lang.includes("tr") && v.name.toLowerCase().includes("male")) {
-                    selectedVoice = v; break;
-                }
-                if (gender === "kadin" && v.lang.includes("tr") && v.name.toLowerCase().includes("female")) {
-                    selectedVoice = v; break;
-                }
-            }
-            if (!selectedVoice && voices.length) selectedVoice = voices.find(v => v.lang.includes("tr")) || voices[0];
-            if (selectedVoice) utterance.voice = selectedVoice;
-            window.speechSynthesis.speak(utterance);
-        });
-        window.speechSynthesis.speak(utterance);
-        setStatus("🔊 Konuşuyor...");
-        utterance.onend = () => setStatus("Hazır");
-    }
-    
-    // Mikrofon kontrolü
-    function startMic() {
-        if (!recognition) { setStatus("Ses girişi desteklenmiyor", true); return; }
-        if (isMicActive) return;
-        isMicActive = true;
-        recognition.start();
-        setStatus("🎤 Dinliyorum, konuş...");
-        document.getElementById("micToggleBtn").classList.add("mic-active");
-        document.getElementById("micToggleBtn").innerHTML = "🎤 Mikrofon Açık · Konuş";
-        
-        recognition.onresult = (event) => {
-            let transcript = "";
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                if (event.results[i].isFinal) transcript += event.results[i][0].transcript;
-            }
-            if (transcript.trim() !== "") {
-                document.getElementById("userInput").value = transcript;
-                sendMessage(transcript);
-            }
-        };
-        recognition.onerror = (e) => {
-            if (e.error !== "no-speech") setStatus("Ses hatası: " + e.error, true);
-        };
-        recognition.onend = () => {
-            if (isMicActive) recognition.start(); // sürekli dinle
-        };
-    }
-    
-    function stopMic() {
-        if (recognition && isMicActive) {
-            isMicActive = false;
-            recognition.stop();
-            setStatus("🎤 Mikrofon kapalı");
-            document.getElementById("micToggleBtn").classList.remove("mic-active");
-            document.getElementById("micToggleBtn").innerHTML = "🎤 Mikrofon Kapalı";
-        }
-    }
-    
-    function toggleMic() {
-        if (isMicActive) stopMic();
-        else startMic();
-    }
-    
-    // ========== SOHBET YÖNETİMİ ==========
     function saveChats() {
-        localStorage.setItem("cool_chats", JSON.stringify(chats));
+        localStorage.setItem("nova_chats", JSON.stringify(chats));
     }
-    
     function loadChats() {
-        const saved = localStorage.getItem("cool_chats");
-        if (saved) {
-            try { chats = JSON.parse(saved); } catch(e) {}
-        }
+        const saved = localStorage.getItem("nova_chats");
+        if (saved) { try { chats = JSON.parse(saved); } catch(e) {} }
         if (Object.keys(chats).length === 0) {
             const id = Date.now().toString();
-            chats[id] = { name: "Arkadaş Sohbeti", messages: [] };
+            chats[id] = { name: "Ana Sohbet", messages: [] };
             currentChatId = id;
         } else {
             currentChatId = Object.keys(chats)[0];
         }
         saveChats();
-        updateSelector();
         renderCurrentChat();
     }
-    
-    function updateSelector() {
-        // Menüde select yok, sadece geçmiş paneli için
-    }
-    
     function renderCurrentChat() {
         if (!currentChatId || !chats[currentChatId]) return;
         const container = document.getElementById("chat");
@@ -332,137 +228,228 @@ Amacın bana iyi bir arkadaş olmak ve her konuda dürüstçe yardım etmek.`;
         }
         container.scrollTop = container.scrollHeight;
     }
-    
     function addMessage(role, content) {
         if (!currentChatId) return;
         chats[currentChatId].messages.push({ role, content });
-        if (chats[currentChatId].messages.length > 80) chats[currentChatId].messages = chats[currentChatId].messages.slice(-80);
+        if (chats[currentChatId].messages.length > 100) chats[currentChatId].messages = chats[currentChatId].messages.slice(-100);
         saveChats();
         renderCurrentChat();
     }
-    
-    async function sendMessage(text) {
-        if (!text.trim()) return;
-        document.getElementById("userInput").value = "";
-        addMessage("user", text);
-        setStatus("🤔 Düşünüyor...");
-        
-        let imageContent = "";
-        if (currentImageBase64) {
-            imageContent = `\n[Kullanıcı bir resim yükledi. Resim hakkında yorum yap: ${currentImageBase64.substring(0,100)}... ama sen görseli göremezsin, sadece yüklendiğini bil ve "Resim güzelmiş, ne olduğunu anlatır mısın?" gibi sor.]`;
-            currentImageBase64 = null;
-        }
-        
-        const history = chats[currentChatId].messages.slice(-20).map(m => ({ role: m.role === "user" ? "user" : "assistant", content: m.content }));
-        const messagesAPI = [
-            { role: "system", content: SYSTEM_PROMPT + imageContent },
-            ...history
-        ];
-        
-        try {
-            const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                method: "POST",
-                headers: { "Authorization": `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-                body: JSON.stringify({ model: MODEL, messages: messagesAPI, temperature: 0.85, max_tokens: 800 })
-            });
-            if (!res.ok) throw new Error("API hatası " + res.status);
-            const data = await res.json();
-            const reply = data.choices[0].message.content;
-            addMessage("assistant", reply);
-            setStatus("✅ Cevap geldi");
-            speakText(reply); // Sesli yanıt
-        } catch(err) {
-            setStatus("Hata: " + err.message, true);
-            addMessage("assistant", "Bağlantı hatası, birazdan deneriz.");
-        }
-    }
-    
     function newChat() {
-        let name = prompt("Sohbet adı (örn: İş, Ali, Dertleşme)");
+        let name = prompt("Sohbet adı (örn: İş, Dertleşme, Proje)");
         if (!name) name = "Sohbet " + (Object.keys(chats).length+1);
         const id = Date.now().toString();
         chats[id] = { name, messages: [] };
         currentChatId = id;
         saveChats();
         renderCurrentChat();
-        setStatus(`"${name}" başlatıldı.`);
+        setStatus(`"${name}" başlatıldı. Bilgi bankan ayrı korunuyor.`);
     }
-    
     function deleteChat(id) {
         if (Object.keys(chats).length === 1) { setStatus("Son sohbeti silemezsin", true); return; }
         delete chats[id];
         currentChatId = Object.keys(chats)[0];
         saveChats();
         renderCurrentChat();
-        setStatus("Sohbet silindi");
+        setStatus("Sohbet silindi. Bilgi bankan etkilenmedi.");
     }
-    
     function showHistory() {
         const panel = document.getElementById("historyPanel");
         const listDiv = document.getElementById("historyList");
         listDiv.innerHTML = "";
         for (let id in chats) {
             const item = document.createElement("div");
-            item.className = "history-item";
-            item.innerText = `${chats[id].name} (${chats[id].messages.length} mesaj)`;
+            item.style.padding = "12px";
+            item.style.borderBottom = "1px solid #334155";
+            item.style.cursor = "pointer";
+            item.innerHTML = `${chats[id].name} (${chats[id].messages.length} mesaj) <button style="float:right; background:none; border:none; color:#EF4444; cursor:pointer;" onclick="event.stopPropagation(); deleteChat('${id}'); document.getElementById('historyPanel').classList.remove('open'); showHistory();">🗑</button>`;
             item.onclick = () => {
                 currentChatId = id;
                 renderCurrentChat();
                 panel.classList.remove("open");
                 setStatus(`"${chats[id].name}" açıldı`);
             };
-            const delBtn = document.createElement("button");
-            delBtn.innerText = "🗑";
-            delBtn.style.float = "right";
-            delBtn.style.background = "none";
-            delBtn.style.border = "none";
-            delBtn.style.color = "#ff6b6b";
-            delBtn.onclick = (e) => { e.stopPropagation(); deleteChat(id); panel.classList.remove("open"); showHistory(); };
-            item.appendChild(delBtn);
             listDiv.appendChild(item);
         }
         panel.classList.add("open");
     }
     
-    // Resim yükleme
-    document.getElementById("imageUploadBtn").onclick = () => document.getElementById("imageFile").click();
-    document.getElementById("imageFile").onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            currentImageBase64 = ev.target.result;
-            addMessage("user", "📷 Bir resim yükledim. Ne olduğunu anlatır mısın?");
-            setStatus("Resim yüklendi, AI yorumlayacak...");
-            sendMessage("Yüklediğim resim hakkında yorum yap. İçinde ne var?");
-        };
-        reader.readAsDataURL(file);
-    };
+    // ==================== WEB ARAMA (TAVILY) ====================
+    async function searchWeb(query) {
+        if (!TAVILY_API_KEY || TAVILY_API_KEY === "YOUR_TAVILY_API_KEY") {
+            return "Web arama için Tavily API key gerekli.";
+        }
+        try {
+            const res = await fetch("https://api.tavily.com/search", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    api_key: TAVILY_API_KEY,
+                    query: query,
+                    search_depth: "basic",
+                    max_results: 3
+                })
+            });
+            const data = await res.json();
+            if (data.results && data.results.length) {
+                return data.results.map(r => r.content).join("\n");
+            }
+            return "Arama sonucu bulunamadı.";
+        } catch(e) {
+            return "Web arama hatası: " + e.message;
+        }
+    }
     
-    // Olaylar
-    document.getElementById("sendBtn").onclick = () => {
-        const inp = document.getElementById("userInput");
-        sendMessage(inp.value);
-        inp.value = "";
-    };
+    // ==================== GEMINI ====================
+    async function askGemini(prompt, needsSearch = false) {
+        let context = "";
+        if (needsSearch) {
+            setStatus("🌐 Web'de araştırıyorum...");
+            const searchResult = await searchWeb(prompt);
+            context = `\n\nWeb'de bulduğum bilgiler:\n${searchResult}\n\nBu bilgilere göre cevap ver. Eğer hava durumu ise derece ve durumu söyle. Eğer doğum günü veya etkinlik varsa saat ve kişiyi belirt.`;
+        }
+        
+        let memoryInfo = "";
+        for (let k in userMemory) {
+            if (prompt.toLowerCase().includes(k) || prompt.toLowerCase().includes("doğum") || prompt.toLowerCase().includes("hatırla")) {
+                memoryInfo += `\n[Hatırladığım bilgi: ${k} = ${userMemory[k]}]`;
+            }
+        }
+        
+        const fullPrompt = `Sen benim yakın arkadaşım ve profesyonel asistanım. Adın Nova. Samimi, dürüst, gerekiyorsa "Bu saçma" de. 
+        Kullanıcının bilgilerini hatırla: ${memoryInfo}
+        Kullanıcının sorusu: ${prompt}
+        ${context}
+        Arkadaş gibi, doğal Türkçe cevap ver. Cevabın kısa ve net olsun. Hava durumu, saat, tarih, doğum günü, etkinlik gibi güncel bilgileri web aramasından kullan.`;
+        
+        try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: fullPrompt }] }]
+                })
+            });
+            if (!res.ok) {
+                const err = await res.text();
+                throw new Error("Gemini hatası " + res.status);
+            }
+            const data = await res.json();
+            return data.candidates[0].content.parts[0].text;
+        } catch(e) {
+            return "Bağlantı hatası: " + e.message;
+        }
+    }
+    
+    // ==================== KONUŞMA ====================
+    let isMicActive = false;
+    let recognition = null;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'tr-TR';
+        recognition.continuous = true;
+        recognition.interimResults = false;
+    }
+    
+    function speakText(text) {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'tr-TR';
+        utterance.rate = 0.9;
+        const gender = document.getElementById("voiceGender").value;
+        window.speechSynthesis.getVoices().then(voices => {
+            let selected = voices.find(v => v.lang.includes("tr") && (gender === "erkek" ? v.name.toLowerCase().includes("male") : v.name.toLowerCase().includes("female")));
+            if (selected) utterance.voice = selected;
+            window.speechSynthesis.speak(utterance);
+        });
+        setStatus("🔊 Konuşuyor...");
+    }
+    
+    function startMic() {
+        if (!recognition) { setStatus("Ses girişi desteklenmiyor", true); return; }
+        if (isMicActive) return;
+        isMicActive = true;
+        recognition.start();
+        setStatus("🎤 Dinliyorum, konuş...");
+        document.getElementById("micToggleBtn").classList.add("mic-active");
+        document.getElementById("micToggleBtn").innerHTML = "🎤 Mikrofon Açık";
+        recognition.onresult = async (event) => {
+            let transcript = "";
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                if (event.results[i].isFinal) transcript += event.results[i][0].transcript;
+            }
+            if (transcript.trim()) {
+                document.getElementById("userInput").value = transcript;
+                await sendMessage(transcript);
+            }
+        };
+        recognition.onerror = (e) => { if(e.error !== "no-speech") setStatus("Ses hatası", true); };
+        recognition.onend = () => { if(isMicActive) recognition.start(); };
+    }
+    function stopMic() {
+        if (recognition && isMicActive) {
+            isMicActive = false;
+            recognition.stop();
+            setStatus("🎤 Mikrofon kapalı");
+            document.getElementById("micToggleBtn").classList.remove("mic-active");
+            document.getElementById("micToggleBtn").innerHTML = "🎤 Mikrofon Kapalı";
+        }
+    }
+    function toggleMic() { isMicActive ? stopMic() : startMic(); }
+    
+    // ==================== MESAJ GÖNDER ====================
+    async function sendMessage(text) {
+        if (!text.trim()) return;
+        document.getElementById("userInput").value = "";
+        addMessage("user", text);
+        setStatus("🤔 Düşünüyor...");
+        
+        // Bilgi ekleme (sohbetten bağımsız hafızaya)
+        const memoryMatch = text.match(/(.*?)(doğum günüm|doğum günü|sevdiğim|sevdiğim renk|proje teslim|hatırla|adım|yaşım|sevgilimin adı|en sevdiğim) (.*?)$/i);
+        if (memoryMatch && !text.includes("?")) {
+            const key = memoryMatch[2];
+            const value = memoryMatch[3] || memoryMatch[1];
+            addToMemory(key, value);
+            addMessage("ai", `Tamam, hatırladım: ${key} = ${value}. Bunu unutmayacağım.`);
+            speakText(`Tamam, hatırladım: ${key} = ${value}`);
+            return;
+        }
+        
+        const needsSearch = text.toLowerCase().includes("hava") || text.toLowerCase().includes("kaçta") || text.toLowerCase().includes("yarın") || text.toLowerCase().includes("bugün") || text.toLowerCase().includes("doğum günü") || text.toLowerCase().includes("etkinlik") || text.toLowerCase().includes("haber") || text.toLowerCase().includes("kimin") || text.toLowerCase().includes("kaç derece");
+        
+        const reply = await askGemini(text, needsSearch);
+        addMessage("ai", reply);
+        setStatus("✅ Cevap verildi");
+        speakText(reply);
+    }
+    
+    // ==================== OLAY BAĞLANTILARI ====================
+    document.getElementById("sendBtn").onclick = () => sendMessage(document.getElementById("userInput").value);
     document.getElementById("micToggleBtn").onclick = toggleMic;
     document.getElementById("newChatBtn").onclick = newChat;
     document.getElementById("historyBtn").onclick = showHistory;
     document.getElementById("closeHistory").onclick = () => document.getElementById("historyPanel").classList.remove("open");
-    document.getElementById("userInput").addEventListener("keypress", (e) => { if(e.key === "Enter") document.getElementById("sendBtn").click(); });
+    document.getElementById("memoryBtn").onclick = () => {
+        let info = "📚 Bilgi Bankam:\n";
+        for (let k in userMemory) info += `- ${k}: ${userMemory[k]}\n`;
+        alert(info || "Henüz bilgi kaydetmedin. '13 Nisan doğum günüm' dersen aklımda tutarım.");
+    };
+    document.getElementById("userInput").addEventListener("keypress", (e) => { if(e.key === "Enter") sendMessage(e.target.value); });
     
     function setStatus(msg, isErr=false) {
         const st = document.getElementById("status");
         st.innerText = msg;
-        if(isErr) setTimeout(() => { if(st.innerText === msg) st.innerText = "Hazır"; }, 3000);
-        else setTimeout(() => { if(st.innerText === msg) st.innerText = "Hazır"; }, 2500);
+        setTimeout(() => { if(st.innerText === msg) st.innerText = "Hazır"; }, 3000);
     }
     
+    loadMemory();
     loadChats();
     if (chats[currentChatId]?.messages.length === 0) {
         setTimeout(() => {
-            addMessage("assistant", "Naber canım? Günün nasıl geçti? Anlat bakalım, dinliyorum seni.");
-            speakText("Naber canım? Günün nasıl geçti? Anlat bakalım, dinliyorum seni.");
+            addMessage("ai", "Nova burada. Naber? Bugün nasıl geçti? Anlat dinleyeyim. İstersen bir bilgi ver, aklımda tutayım. Mesela '13 Nisan doğum günüm' de.");
+            speakText("Nova burada. Naber? Anlat dinleyeyim.");
         }, 500);
     }
 </script>
