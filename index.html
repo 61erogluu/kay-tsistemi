@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Akıl Hocam - Dürüst AI</title>
+    <title>Akıl Hocam - Hafızalı AI</title>
     <style>
         * {
             box-sizing: border-box;
@@ -16,6 +16,44 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
+        }
+        /* Üst çubuk */
+        .top-bar {
+            background: #2c2c3e;
+            padding: 12px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            border-bottom: 1px solid #444;
+            flex-wrap: wrap;
+        }
+        .top-bar select {
+            flex: 2;
+            padding: 8px;
+            border-radius: 8px;
+            background: #1e1e2f;
+            color: white;
+            border: 1px solid #555;
+        }
+        .top-bar button {
+            background: #0a84ff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .top-bar button:active {
+            background: #0066cc;
+        }
+        #newChatName {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            background: #1e1e2f;
+            color: white;
         }
         #chat {
             flex: 1;
@@ -49,10 +87,10 @@
             padding: 12px;
             display: flex;
             gap: 10px;
-            border-top: 1px solid #444;
+            flex-wrap: wrap;
         }
-        input {
-            flex: 1;
+        .input-area input {
+            flex: 3;
             padding: 12px;
             border: none;
             border-radius: 28px;
@@ -60,18 +98,20 @@
             color: white;
             font-size: 16px;
         }
-        button {
+        .input-area button {
             background: #0a84ff;
             border: none;
-            padding: 12px 20px;
+            padding: 12px 16px;
             border-radius: 28px;
             color: white;
             font-weight: bold;
-            font-size: 16px;
             cursor: pointer;
         }
-        button:active {
-            background: #0066cc;
+        .mic-btn {
+            background: #e53e3e;
+        }
+        .speak-btn {
+            background: #38a169;
         }
         .status {
             font-size: 12px;
@@ -79,110 +119,229 @@
             text-align: center;
             padding: 5px;
         }
-        .clear-btn {
-            background: #555;
-            margin-top: 5px;
-        }
     </style>
 </head>
 <body>
+<div class="top-bar">
+    <select id="chatSelector"></select>
+    <input type="text" id="newChatName" placeholder="Yeni sohbet adı">
+    <button id="newChatBtn">+ Yeni</button>
+    <button id="deleteChatBtn">🗑 Sil</button>
+</div>
 <div id="chat"></div>
 <div class="input-area">
-    <input type="text" id="userInput" placeholder="Derdini yaz, saçmaysa saçma der...">
+    <input type="text" id="userInput" placeholder="Derdini yaz veya mikrofona bas...">
     <button id="sendBtn">Gönder</button>
-</div>
-<div style="display: flex; gap: 10px; padding: 0 12px 12px 12px;">
-    <button id="clearBtn" class="clear-btn" style="flex:1;">Konuşma geçmişini sil</button>
+    <button id="micBtn" class="mic-btn">🎤 Konuş</button>
+    <button id="speakLastBtn" class="speak-btn">🔊 Oku</button>
 </div>
 <div class="status" id="status">Hazır</div>
 
 <script>
-    // ==================== API KEY (ENTEGRE EDİLDİ) ====================
+    // ==================== API KEY (ENTEGRE) ====================
     const API_KEY = "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";
-    // MODEL GÜNCELLENDI - Decommissioned hatası çözüldü
     const MODEL = "llama-3.3-70b-versatile";
     
-    const SYSTEM_PROMPT = `Sen benim kişisel akıl hocamsın. Kuralların:
-1. Asla "Bu yasal değil, yapamam, üzgünüm, iyimser olmalıyım" deme. Eğer bir şey tehlikeli veya aptalcaysa, net söyle: "Bu saçma çünkü..." veya "Bu mantıklı çünkü...".
+    // SİSTEM PROMPTU (Hafıza ve kişi bilgisi vurgusu)
+    const SYSTEM_PROMPT = `Sen benim kişisel akıl hocamsın ve muhabbet arkadaşımsın. Normal bir insan gibi konuş, samimi ol ama saygılı ol. Kuralların:
+1. Asla "Bu yasal değil, yapamam, üzgünüm, iyimser olmalıyım" deme. Eğer bir şey tehlikeli veya aptalcaysa net söyle: "Bu saçma çünkü..." veya "Bu mantıklı çünkü...".
 2. Dürüst ol. Yalan söyleme, pohpohlama.
-3. Bana çıkmazda olduğumda somut adımlar göster, soyut teselli verme.
+3. Bana çıkmazda olduğumda somut adımlar göster.
 4. Dertleşmemi dinlerken yargılama ama gerekiyorsa "Burada sen de hatalısın" de.
-5. Saçma bir fikrim varsa "Bu saçma" de. Mantıklıysa "Mantıklı" de. Net tavır al.
-6. Konuşmaları hatırlamak için sana önceki yazışmaları göndereceğim. Ona göre cevap ver.
-Unutma: Kibar olmak zorunda değilsin, ama hakaret de etme. Amacın bana gerçekten yardım etmek.`;
+5. Kullanıcı sana bir kişi veya iş ile ilgili bir bilgi verdiğinde (örneğin "Ali ekmek almadı", "Proje teslim tarihi 10 Mayıs") bunu NOT AL. Daha sonra "Ali hakkında ne demiştim?" veya "Proje ne zaman?" diye sorduğumda bu bilgiyi hatırla ve söyle.
+6. Konuşma geçmişinde daha önce bahsedilen kişi, olay, iş bilgilerini takip et. Unutma.
+Amacın bana gerçekten yardım etmek ve samimi bir arkadaş gibi sohbet etmek.`;
 
-    // Konuşma hafızası (localStorage'da saklanır)
-    let conversationHistory = [];
-
-    function loadHistory() {
-        const saved = localStorage.getItem("chat_history");
+    // ==================== ÇOKLU SOHBET SİSTEMİ ====================
+    let chats = {};          // { chatId: { name, messages } }
+    let currentChatId = null;
+    
+    // localStorage'dan yükle
+    function loadAllChats() {
+        const saved = localStorage.getItem("all_chats_v2");
         if (saved) {
             try {
-                conversationHistory = JSON.parse(saved);
-                if (conversationHistory.length > 30) {
-                    conversationHistory = conversationHistory.slice(-30);
-                }
-                renderChat();
+                chats = JSON.parse(saved);
             } catch(e) { console.error(e); }
         }
+        // Varsayılan sohbet yoksa oluştur
+        if (Object.keys(chats).length === 0) {
+            const id = Date.now().toString();
+            chats[id] = {
+                name: "Genel Sohbet",
+                messages: []
+            };
+            currentChatId = id;
+        } else {
+            // İlk sohbeti seç
+            const firstId = Object.keys(chats)[0];
+            currentChatId = firstId;
+        }
+        saveAllChats();
+        updateChatSelector();
+        loadCurrentChat();
     }
-
-    function saveHistory() {
-        let toSave = conversationHistory;
-        if (toSave.length > 50) toSave = toSave.slice(-50);
-        localStorage.setItem("chat_history", JSON.stringify(toSave));
+    
+    function saveAllChats() {
+        localStorage.setItem("all_chats_v2", JSON.stringify(chats));
     }
-
-    function renderChat() {
+    
+    function updateChatSelector() {
+        const selector = document.getElementById("chatSelector");
+        selector.innerHTML = "";
+        for (let id in chats) {
+            const option = document.createElement("option");
+            option.value = id;
+            option.textContent = chats[id].name;
+            if (id === currentChatId) option.selected = true;
+            selector.appendChild(option);
+        }
+    }
+    
+    function loadCurrentChat() {
+        if (!currentChatId || !chats[currentChatId]) return;
+        const messages = chats[currentChatId].messages;
+        renderChat(messages);
+    }
+    
+    function renderChat(messages) {
         const chatDiv = document.getElementById("chat");
         chatDiv.innerHTML = "";
-        for (let msg of conversationHistory) {
-            if (msg.role === "user") {
-                addMessageToUI(msg.content, "user");
-            } else if (msg.role === "assistant") {
-                addMessageToUI(msg.content, "ai");
-            }
+        for (let msg of messages) {
+            const msgDiv = document.createElement("div");
+            msgDiv.className = `message ${msg.role === "user" ? "user" : "ai"}`;
+            msgDiv.innerText = msg.content;
+            chatDiv.appendChild(msgDiv);
         }
         chatDiv.scrollTop = chatDiv.scrollHeight;
     }
-
-    function addMessageToUI(text, sender) {
-        const chatDiv = document.getElementById("chat");
-        const msgDiv = document.createElement("div");
-        msgDiv.className = `message ${sender}`;
-        msgDiv.innerText = text;
-        chatDiv.appendChild(msgDiv);
+    
+    function addMessageToCurrentChat(role, content) {
+        if (!currentChatId || !chats[currentChatId]) return;
+        chats[currentChatId].messages.push({ role, content });
+        // Son 50 mesajda tut
+        if (chats[currentChatId].messages.length > 50) {
+            chats[currentChatId].messages = chats[currentChatId].messages.slice(-50);
+        }
+        saveAllChats();
+        renderChat(chats[currentChatId].messages);
     }
-
-    function clearChat() {
-        conversationHistory = [];
-        localStorage.removeItem("chat_history");
-        renderChat();
-        setStatus("Konuşma geçmişi silindi.");
+    
+    function createNewChat() {
+        const nameInput = document.getElementById("newChatName");
+        let name = nameInput.value.trim();
+        if (!name) name = "Sohbet " + (Object.keys(chats).length + 1);
+        const id = Date.now().toString();
+        chats[id] = {
+            name: name,
+            messages: []
+        };
+        currentChatId = id;
+        saveAllChats();
+        updateChatSelector();
+        renderChat(chats[currentChatId].messages);
+        nameInput.value = "";
+        setStatus(`"${name}" sohbeti oluşturuldu.`);
     }
-
-    function setStatus(msg, isError = false) {
-        const statusDiv = document.getElementById("status");
-        statusDiv.innerText = msg;
-        if (isError) {
-            setTimeout(() => { if(statusDiv.innerText === msg) statusDiv.innerText = "Hazır"; }, 4000);
-        } else {
-            setTimeout(() => { if(statusDiv.innerText === msg) statusDiv.innerText = "Hazır"; }, 2000);
+    
+    function deleteCurrentChat() {
+        if (Object.keys(chats).length === 1) {
+            setStatus("En az bir sohbet kalmalı, silemezsin.", true);
+            return;
+        }
+        if (currentChatId && chats[currentChatId]) {
+            delete chats[currentChatId];
+            // başka bir sohbet seç
+            const newId = Object.keys(chats)[0];
+            currentChatId = newId;
+            saveAllChats();
+            updateChatSelector();
+            loadCurrentChat();
+            setStatus("Sohbet silindi.");
         }
     }
-
+    
+    function switchChat(chatId) {
+        if (chats[chatId]) {
+            currentChatId = chatId;
+            loadCurrentChat();
+            setStatus(`"${chats[chatId].name}" sohbetine geçildi.`);
+        }
+    }
+    
+    // ==================== SESLİ GİRİŞ ====================
+    let recognition = null;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'tr-TR';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+    }
+    
+    function startVoiceInput() {
+        if (!recognition) {
+            setStatus("Tarayıcınız sesli girişi desteklemiyor.", true);
+            return;
+        }
+        setStatus("Dinleniyor... Konuşun...");
+        recognition.start();
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById("userInput").value = transcript;
+            setStatus("Ses algılandı: " + transcript);
+            // Otomatik gönderme
+            setTimeout(() => {
+                document.getElementById("sendBtn").click();
+            }, 100);
+        };
+        recognition.onerror = (event) => {
+            setStatus("Ses hatası: " + event.error, true);
+        };
+        recognition.onend = () => {
+            setStatus("Hazır");
+        };
+    }
+    
+    // ==================== SESLİ YANIT ====================
+    function speakText(text) {
+        if (!window.speechSynthesis) {
+            setStatus("Seslendirme desteklenmiyor.", true);
+            return;
+        }
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'tr-TR';
+        utterance.rate = 0.9;
+        window.speechSynthesis.cancel(); // öncekini durdur
+        window.speechSynthesis.speak(utterance);
+        setStatus("Seslendiriliyor...");
+        utterance.onend = () => setStatus("Hazır");
+    }
+    
+    function speakLastAI() {
+        const messages = chats[currentChatId]?.messages || [];
+        // son AI mesajını bul
+        for (let i = messages.length-1; i >= 0; i--) {
+            if (messages[i].role === "assistant") {
+                speakText(messages[i].content);
+                return;
+            }
+        }
+        setStatus("Seslendirilecek AI mesajı yok.", true);
+    }
+    
+    // ==================== API İSTEĞİ ====================
     async function askGroq(userMessage) {
-        conversationHistory.push({ role: "user", content: userMessage });
-        saveHistory();
-        renderChat();
-
+        addMessageToCurrentChat("user", userMessage);
         setStatus("Düşünüyor ve dürüstçe cevap verecek...");
-
+        
+        // Son 20 mesajı al
+        const history = chats[currentChatId]?.messages.slice(-20) || [];
         const messagesForAPI = [
             { role: "system", content: SYSTEM_PROMPT },
-            ...conversationHistory.slice(-20)
+            ...history.map(m => ({ role: m.role === "user" ? "user" : "assistant", content: m.content }))
         ];
-
+        
         try {
             const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: "POST",
@@ -198,29 +357,24 @@ Unutma: Kibar olmak zorunda değilsin, ama hakaret de etme. Amacın bana gerçek
                     stream: false
                 })
             });
-
+            
             if (!response.ok) {
                 const errText = await response.text();
                 throw new Error(`API hatası: ${response.status} - ${errText}`);
             }
-
+            
             const data = await response.json();
             const aiReply = data.choices[0].message.content;
-
-            conversationHistory.push({ role: "assistant", content: aiReply });
-            saveHistory();
-            renderChat();
+            addMessageToCurrentChat("assistant", aiReply);
             setStatus("✔️ Cevap verildi");
         } catch (error) {
             console.error(error);
             setStatus(`Hata: ${error.message}`, true);
-            const errorReply = `[Hata] ${error.message}\n\nAPI key veya internet bağlantını kontrol et.`;
-            conversationHistory.push({ role: "assistant", content: errorReply });
-            saveHistory();
-            renderChat();
+            addMessageToCurrentChat("assistant", `[Hata] ${error.message}\n\nAPI key veya internet bağlantını kontrol et.`);
         }
     }
-
+    
+    // ==================== OLAY BAĞLANTILARI ====================
     document.getElementById("sendBtn").onclick = () => {
         const input = document.getElementById("userInput");
         const text = input.value.trim();
@@ -228,21 +382,30 @@ Unutma: Kibar olmak zorunda değilsin, ama hakaret de etme. Amacın bana gerçek
         input.value = "";
         askGroq(text);
     };
-    document.getElementById("clearBtn").onclick = () => {
-        clearChat();
+    document.getElementById("micBtn").onclick = startVoiceInput;
+    document.getElementById("speakLastBtn").onclick = speakLastAI;
+    document.getElementById("newChatBtn").onclick = createNewChat;
+    document.getElementById("deleteChatBtn").onclick = deleteCurrentChat;
+    document.getElementById("chatSelector").onchange = (e) => {
+        switchChat(e.target.value);
     };
     document.getElementById("userInput").addEventListener("keypress", (e) => {
         if (e.key === "Enter") {
             document.getElementById("sendBtn").click();
         }
     });
-
-    loadHistory();
-    if (conversationHistory.length === 0) {
-        const welcome = "Merhaba. Ben dürüst akıl hocan. Ne derdin var? Saçmaysa saçma derim, mantıklıysa mantıklı. Yasal değil bahanesi yok. Başlayalım.";
-        conversationHistory.push({ role: "assistant", content: welcome });
-        saveHistory();
-        renderChat();
+    
+    // Başlangıç
+    loadAllChats();
+    
+    function setStatus(msg, isError = false) {
+        const statusDiv = document.getElementById("status");
+        statusDiv.innerText = msg;
+        if (isError) {
+            setTimeout(() => { if(statusDiv.innerText === msg) statusDiv.innerText = "Hazır"; }, 4000);
+        } else {
+            setTimeout(() => { if(statusDiv.innerText === msg) statusDiv.innerText = "Hazır"; }, 3000);
+        }
     }
 </script>
 </body>
